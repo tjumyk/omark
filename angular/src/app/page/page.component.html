@@ -1,0 +1,16 @@
+<div class="ui container">
+  <div class="ui segment basic center aligned">
+    <a class="ui header" routerLink="/">
+      <img src="static/assets/logo-256.png" alt="">
+      UNSWKG Online Marking System
+    </a>
+  </div>
+
+  <router-outlet></router-outlet>
+</div>
+<div class="ui segment center aligned vertical footer">
+  <div class="ui container">
+    <p>&copy; Yukai (Kelvin) Miao, UNSWKG 2019.</p>
+    <p *ngIf="version">Version: {{version.version}}</p>
+  </div>
+</div>

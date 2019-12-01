@@ -1,4 +1,5 @@
 import os
+import subprocess
 
 from flask import Flask, request, jsonify
 
@@ -34,9 +35,9 @@ oauth.init_app(app, login_callback=_login_callback)
 
 app.register_blueprint(account_api, url_prefix='/api/account')
 app.register_blueprint(admin_api, url_prefix='/api/admin')
-app.register_blueprint(exam_api, url_prefix='/api/exam')
-app.register_blueprint(answer_api, url_prefix='/api/answer')
-app.register_blueprint(marking_api, url_prefix='/api/marking')
+app.register_blueprint(exam_api, url_prefix='/api/exams')
+app.register_blueprint(answer_api, url_prefix='/api/answers')
+app.register_blueprint(marking_api, url_prefix='/api/markings')
 
 
 @app.route('/')
@@ -68,6 +69,12 @@ def create_db():
 @app.cli.command()
 def drop_db():
     db.drop_all()
+
+
+@app.route('/api/version')
+def api_version():
+    git_version = subprocess.check_output(['git', 'describe', '--tags']).decode().strip()
+    return jsonify(version=git_version)
 
 
 if __name__ == '__main__':

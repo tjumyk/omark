@@ -1,0 +1,36 @@
+<div class="ui container">
+  <div class="ui grid middle aligned stackable centered">
+    <div class="column six wide">
+      <div class="ui center aligned header">
+        <img src="static/assets/logo-256.png" alt="">
+        UNSWKG Online Marking System
+      </div>
+
+      <app-error [error]="error"></app-error>
+
+      <div class="ui segment basic">
+        <div class="ui loader text inline active centered" *ngIf="loadingUser">Loading User Info...</div>
+        <div class="ui loader text inline active centered" *ngIf="loadingExams">Loading Exams...</div>
+
+        <div class="ui menu vertical fluid" *ngIf="exams && exams.length">
+          <a *ngFor="let exam of exams" routerLink="/exams/{{exam.id}}" class="item"><i class="icon angle right"></i>{{exam.name}}</a>
+        </div>
+      </div>
+
+      <ng-container *ngIf="user">
+        <div class="ui segment basic center aligned">
+
+          <div class="ui basic buttons">
+            <a class="ui basic button" href="account/profile" target="_blank">
+              <i class="icon user circle"></i> {{user.nickname || user.name}}
+            </a>
+            <a class="ui basic button" routerLink="/admin" *ngIf="isAdmin">
+              <i class="icon cogs"></i> Management
+            </a>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+
+</div>

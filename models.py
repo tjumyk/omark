@@ -73,7 +73,7 @@ class Exam(db.Model):
         return '<Exam %r>' % self.name
 
     def to_dict(self, with_questions: bool = False, with_assignments: bool = False) -> dict:
-        d = dict(id=self.id, name=self.name, close_at=self.close_at,
+        d = dict(id=self.id, name=self.name, is_locked=self.is_locked,
                  created_at=self.created_at, modified_at=self.modified_at)
         if with_questions:
             d['questions'] = [q.to_dict(with_marker_assignments=with_assignments) for q in self.questions]

@@ -36,7 +36,9 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/omark",
+            "baseHref": "/",
+            "deployUrl": "static/",
+            "outputPath": "../static",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -47,6 +49,7 @@
               "src/assets"
             ],
             "styles": [
+              "node_modules/semantic-ui/dist/semantic.min.css",
               "src/styles.less"
             ],
             "scripts": []

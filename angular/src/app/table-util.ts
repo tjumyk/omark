@@ -166,7 +166,7 @@ export class Pagination<T> {
   private static extractField(obj: any, segments: string[]) {
     let ret = obj;
     for (let segment of segments) {
-      if (typeof ret != 'object')
+      if (typeof ret != 'object' || ret === null)
         return null;
       ret = ret[segment]
     }

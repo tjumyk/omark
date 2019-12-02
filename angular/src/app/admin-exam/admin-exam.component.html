@@ -1,1 +1,95 @@
-<p>admin-exam works!</p>
+<app-error [error]="error"></app-error>
+
+<ng-container *ngIf="exam">
+  <div class="ui segment">
+    <div class="ui list horizontal">
+      <div class="item">
+        <div class="header">ID</div>
+        {{exam.id}}
+      </div>
+      <div class="item">
+        <div class="header">Name</div>
+        {{exam.name}}
+      </div>
+      <div class="item">
+        <div class="header">Status</div>
+        <i class="ui icon lock red" *ngIf="exam.is_locked; else exam_open"></i>
+        <ng-template #exam_open><i class="ui icon lock open green"></i></ng-template>
+      </div>
+      <div class="item">
+        <div class="header">Created At</div>
+        {{exam.created_at | date: 'medium'}}
+      </div>
+      <div class="item">
+        <div class="header">Updated At</div>
+        {{exam.modified_at | date: 'medium'}}
+      </div>
+    </div>
+  </div>
+
+  <table class="ui table unstackable">
+    <thead><tr><th>#</th><th>ID</th><th>Index</th><th>Marks</th><th>Assignments</th></tr></thead>
+    <tbody>
+    <tr *ngFor="let q of exam.questions; index as i">
+      <td>{{i+1}}</td>
+      <td>{{q.id}}</td>
+      <td>{{q.index}}</td>
+      <td>{{q.marks}}</td>
+      <td>
+        <div *ngFor="let ass of q.marker_assignments" class="ui label">
+          <app-user-mini-card  [enableAdmin]="true" [enableAvatar]="true" [enablePopup]="true" [user]="ass.marker"></app-user-mini-card>
+        </div>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+  <div class="ui grid stackable centered">
+    <div class="six wide column">
+      <div class="ui segment">
+        <form class="ui form" #f="ngForm" (ngSubmit)="addQuestion(f)" [ngClass]="{'loading': addingQuestion}">
+          <div class="field required" [ngClass]="{'error': (indexModel.touched || indexModel.dirty || f.submitted) && indexModel.invalid}">
+            <label>Index</label>
+            <input type="number" name="index" required min="1" step="1" [(ngModel)]="newQuestionForm.index" #indexModel="ngModel">
+            <div class="errors">
+              <label *ngIf="indexModel.errors?.required"><i class="icon times"></i> Index is required</label>
+            </div>
+          </div>
+          <div class="field required" [ngClass]="{'error': (marksModel.touched || marksModel.dirty || f.submitted) && marksModel.invalid}">
+            <label>Marks</label>
+            <input type="number" name="marks" required min="0" step="0.1" [(ngModel)]="newQuestionForm.marks" #marksModel="ngModel">
+            <div class="errors">
+              <label *ngIf="marksModel.errors?.required"><i class="icon times"></i> Marks is required</label>
+            </div>
+          </div>
+          <button type="submit" class="ui button primary fluid"><i class="icon plus"></i> Add Question</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="six wide column">
+      <div class="ui segment">
+        <form class="ui form" #f2="ngForm" (ngSubmit)="addAssignment(f2)" [ngClass]="{'loading': addingAssignment}">
+          <div class="field required" [ngClass]="{'error': (qidModel.touched || qidModel.dirty || f2.submitted) && qidModel.invalid}">
+            <label>Question</label>
+            <select name="qid" [(ngModel)]="newAssignmentForm.qid" #qidModel="ngModel">
+              <option [ngValue]="q.id" *ngFor="let q of exam.questions">Q{{q.index}} (id: {{q.id}})</option>
+            </select>
+            <div class="errors">
+              <label *ngIf="qidModel.errors?.required"><i class="icon times"></i> Question is required</label>
+            </div>
+          </div>
+          <div class="field required" [ngClass]="{'error': (midModel.touched || midModel.dirty || f.submitted) && midModel.invalid}">
+            <label>Marker ID</label>
+            <input type="number" name="mid" min="1" step="1" required [(ngModel)]="newAssignmentForm.mid" #midModel="ngModel">
+            <div class="errors">
+              <label *ngIf="midModel.errors?.required"><i class="icon times"></i> Marker ID is required</label>
+            </div>
+          </div>
+          <button type="submit" class="ui button primary fluid"><i class="icon plus"></i> Add Assignment</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+</ng-container>

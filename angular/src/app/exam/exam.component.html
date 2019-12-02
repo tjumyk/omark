@@ -1,1 +1,8 @@
-<p>exam works!</p>
+<app-error [error]="error"></app-error>
+
+<ng-container *ngIf="exam">
+  <a class="ui header" routerLink=".">
+    <i class="icon archive" [class.red]="exam.is_locked"></i> {{exam.name}}
+  </a>
+  <router-outlet></router-outlet>
+</ng-container>

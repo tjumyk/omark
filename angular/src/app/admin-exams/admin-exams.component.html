@@ -2,16 +2,22 @@
 
 <table class="ui table unstackable" *ngIf="exams">
   <thead>
-  <tr><th>#</th><th>ID</th><th>Name</th><th>Created At</th><th>Actions</th></tr>
+  <tr><th>#</th><th>ID</th><th>Name</th><th>Status</th><th>Created At</th><th>Updated At</th><th>Actions</th></tr>
   </thead>
   <tbody>
   <tr *ngFor="let exam of exams; index as i">
     <td>{{i + 1}}</td>
     <td>{{exam.id}}</td>
     <td>{{exam.name}}</td>
+    <td>
+      <i class="ui icon lock red" *ngIf="exam.is_locked; else exam_open"></i>
+      <ng-template #exam_open><i class="ui icon lock open green"></i></ng-template>
+    </td>
     <td>{{exam.created_at | date: 'medium'}}</td>
+    <td>{{exam.modified_at | date: 'medium'}}</td>
     <td>
       <div class="ui mini buttons">
+        <button class="ui icon button" #btnToggleExamLock (click)="toggleExamLock(exam, btnToggleExamLock)"><i class="icon lock"></i></button>
         <a class="ui icon button" routerLink="{{exam.id}}"><i class="icon horizontal ellipsis"></i></a>
       </div>
     </td>

@@ -20,6 +20,24 @@ def do_exams():
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
+@admin_api.route('/exams/<int:eid>/lock', methods=['PUT', 'DELETE'])
+@requires_admin
+def do_exam_lock(eid: int):
+    try:
+        exam = ExamService.get(eid)
+        if exam is None:
+            return jsonify(msg='exam not found'), 404
+
+        if request.method == 'PUT':
+            ExamService.lock(exam)
+        else:  # DELETE
+            ExamService.unlock(exam)
+        db.session.commit()
+        return "", 204
+    except ExamServiceError as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
 @admin_api.route('/exams/<int:eid>/questions', methods=['POST'])
 @requires_admin
 def do_exam_questions(eid: int):
@@ -51,7 +69,7 @@ def do_exam_assignments(eid):
         if request.method == 'POST':
             ass = ExamService.add_marker_question_assignment(question, marker)
             db.session.commit()
-            return jsonify(ass.to_dict()), 201
+            return jsonify(ass.to_dict(with_marker=True)), 201
         else:  # DELETE
             ass = ExamService.get_marker_question_assignment(question, marker)
             if ass is None:

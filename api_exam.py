@@ -45,14 +45,14 @@ def do_exam_books(eid: int):
             return jsonify(msg='exam not found'), 404
 
         if request.method == 'GET':
-            return jsonify([b.to_dict() for b in exam.answer_books])
+            return jsonify([b.to_dict(with_student=True, with_markings=True) for b in exam.answer_books])
         else:  # POST
             params = request.json
             student_id = params.get('sid')
             if student_id is None:
                 student = None
             else:
-                student = AccountService.get_user(student_id)
+                student = AccountService.sync_user_by_id(student_id)
                 if student is None:
                     return jsonify(msg='student not found'), 404
             book = AnswerService.add_book(exam, student, creator=user)

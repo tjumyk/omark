@@ -1,1 +1,45 @@
-<p>answer-book works!</p>
+<app-error [error]="error"></app-error>
+
+<ng-container *ngIf="book">
+  <div class="ui segment">
+    <ng-template #system>System</ng-template>
+    <div class="ui list horizontal">
+      <div class="item">
+        <div class="header">ID</div>
+        {{book.id}}
+      </div>
+      <div class="item">
+        <div class="header">Student</div>
+        <app-user-mini-card [enablePopup]="false" [user]="book.student" *ngIf="book.student_id; else noStudent"></app-user-mini-card>
+        <ng-template #noStudent>(No Student Info)</ng-template>
+      </div>
+      <div class="item">
+        <div class="header">Created At</div>
+        {{book.created_at | date: 'medium'}}
+      </div>
+    </div>
+  </div>
+
+  <div class="ui grid stackable">
+    <div class="column twelve wide">
+      <div class="ui card page" *ngFor="let page of book.pages">
+        Page {{page.id}}
+      </div>
+
+      <div class="ui grid two column centered">
+        <div class="column">
+          <div class="ui segment">
+            <form class="ui form">
+              <div class="field">
+                <label>File</label>
+                <input type="file" name="file">
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="column four wide"></div>
+  </div>
+
+</ng-container>

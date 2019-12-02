@@ -1,1 +1,68 @@
-<p>answer-books works!</p>
+<app-error [error]="error"></app-error>
+
+<ng-container *ngIf="books">
+  <div class="ui top attached clearing segment">
+    <div class="ui right floated menu secondary fitted">
+      <div class="item">
+        <div class="ui basic buttons small">
+          <a class="ui button" href="javascript:alert('not implemented!')" target="_blank"><i class="icon share"></i> Export</a>
+        </div>
+      </div>
+    </div>
+    <div class="ui left floated menu secondary fitted">
+      <div class="item">
+        <div class="ui input icon">
+          <input type="text" name="bookSearchKey" #inputBookSearch (keyup)="bookSearchKey.next(inputBookSearch.value)"
+                 placeholder="Search Book...">
+          <i class="icon search"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+  <table class="ui table unstackable sortable celled attached">
+    <thead>
+    <tr>
+      <th>#</th>
+      <th (click)="sortField('id', thID)" #thID>ID</th>
+      <th (click)="sortField('student.name', thStudent)" #thStudent>Student</th>
+      <th (click)="sortField('_markings_'+q.id, thQuestion)" #thQuestion *ngFor="let q of exam.questions">Q{{q.index}}</th>
+      <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let book of bookPages.pageItems; index as i">
+      <td>{{bookPages.startRow + i}}</td>
+      <td>{{book.id}}</td>
+      <td>
+        <app-user-mini-card *ngIf="book.student_id" [user]="book.student" [enablePopup]="true" [enableAdmin]="isAdmin"></app-user-mini-card>
+      </td>
+      <td *ngFor="let q of exam.questions">
+        <ng-container *ngIf="book['_markings_q' + q.index] != null">
+          {{book['_markings_' + q.id].marks}}
+        </ng-container>
+      </td>
+      <td>
+        <div class="ui mini buttons">
+          <a routerLink="{{book.id}}" class="ui button icon"><i class="icon horizontal ellipsis"></i></a>
+        </div>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+  <app-table-pagination-toolbar class="bottom attached" [pagination]="bookPages"></app-table-pagination-toolbar>
+</ng-container>
+
+
+<div class="ui grid stackable centered">
+  <div class="column six wide">
+    <div class="ui segment">
+      <form class="ui form" #f="ngForm" (ngSubmit)="addBook(f)" [class.loading]="addingBook">
+        <div class="field">
+          <label>Student ID</label>
+          <input type="number" min="1" step="1" name="student_id" [(ngModel)]="newBookForm.sid">
+        </div>
+        <button type="submit" class="ui button fluid primary"><i class="icon plus"></i> Add Book</button>
+      </form>
+    </div>
+  </div>
+</div>

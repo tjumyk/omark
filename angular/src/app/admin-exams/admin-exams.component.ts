@@ -51,4 +51,23 @@ export class AdminExamsComponent implements OnInit {
     )
   }
 
+  toggleExamLock(exam: Exam, btn: HTMLElement) {
+    btn.classList.add('loading', 'disabled');
+    if (exam.is_locked) {
+      this.adminService.unlockExam(exam.id).pipe(
+        finalize(() => btn.classList.remove('loading', 'disabled'))
+      ).subscribe(
+        () => exam.is_locked = false,
+        error => this.error = error.error
+      )
+    } else {
+      this.adminService.lockExam(exam.id).pipe(
+        finalize(() => btn.classList.remove('loading', 'disabled'))
+      ).subscribe(
+        () => exam.is_locked = true,
+        error => this.error = error.error
+      )
+    }
+  }
+
 }

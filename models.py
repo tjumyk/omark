@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 
 from flask_sqlalchemy import SQLAlchemy
@@ -161,7 +162,7 @@ class AnswerBook(db.Model):
         if with_pages:
             d['pages'] = [p.to_dict() for p in self.pages]
         if with_markings:
-            d['markings'] = [m.to_dict() for m in self.markings]
+            d['markings'] = [m.to_dict(with_creator=with_creator, with_modifier=with_modifier) for m in self.markings]
         if with_creator:
             d['creator'] = self.creator.to_dict() if self.creator else None
         if with_modifier:
@@ -174,7 +175,8 @@ class AnswerPage(db.Model):
     book_id = db.Column(db.Integer, db.ForeignKey('answer_book.id'), nullable=False)
 
     index = db.Column(db.Integer, nullable=False)
-    path = db.Column(db.String(128), nullable=False)
+    file_path = db.Column(db.String(128), nullable=False)
+    file_index = db.Column(db.Integer)
     transform = db.Column(db.String(64))
 
     creator_id = db.Column(db.Integer, db.ForeignKey('user_alias.id'))
@@ -191,7 +193,8 @@ class AnswerPage(db.Model):
 
     def to_dict(self, with_book: bool = False, with_annotations: bool = False,
                 with_creator: bool = False, with_modifier: bool = False) -> dict:
-        d = dict(id=self.id, book_id=self.book_id, index=self.index, transform=self.transform,
+        d = dict(id=self.id, book_id=self.book_id, index=self.index, file_index=self.file_index,
+                 transform=self.transform, file_path=self.file_path,
                  created_at=self.created_at, modified_at=self.modified_at)
         if with_book:
             d['book'] = self.book.to_dict()
@@ -228,6 +231,7 @@ class Marking(db.Model):
     def to_dict(self, with_book: bool = False, with_question: bool = False,
                 with_creator: bool = False, with_modifier: bool = False) -> dict:
         d = dict(id=self.id, book_id=self.book_id, question_id=self.question_id,
+                 marks=self.marks, remarks=self.remarks,
                  creator_id=self.creator_id, modifier_id=self.modifier_id,
                  created_at=self.created_at, modified_at=self.modified_at)
         if with_book:

@@ -68,24 +68,28 @@ class AnswerService:
         return AnswerPage.query.get(_id)
 
     @staticmethod
-    def add_page(book: AnswerBook, path: str, index: int = None, creator: UserAlias = None) -> AnswerPage:
+    def add_page(book: AnswerBook, file_path: str, file_index: int = None, index: int = None,
+                 creator: UserAlias = None) -> AnswerPage:
         if book is None:
             raise AnswerServiceError('book is required')
-        if not path:
-            raise AnswerServiceError('path is required')
+        if not file_path:
+            raise AnswerServiceError('file path is required')
 
         if book.exam.is_locked:
             raise AnswerServiceError('exam has been locked')
 
         if index is None:  # auto increment
             index = db.session.query(func.count()) \
-                .filter(AnswerPage.book_id == book.id)\
-                .scalar() + 1
+                        .filter(AnswerPage.book_id == book.id) \
+                        .scalar() + 1
         else:
             if not isinstance(index, int):
                 raise AnswerServiceError('index must be an integer')
 
-        page = AnswerPage(book=book, index=index, path=path, creator=creator)
+        if file_index is not None and not isinstance(file_index, int):
+            raise AnswerServiceError('file_index must be an integer')
+
+        page = AnswerPage(book=book, index=index, file_path=file_path, file_index=file_index, creator=creator)
         db.session.add(page)
         return page
 

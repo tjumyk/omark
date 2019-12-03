@@ -1,6 +1,7 @@
 export class BasicError {
   msg: string;
   detail?: string;
+  redirect_url?: string;
 }
 
 export class User {
@@ -82,7 +83,8 @@ export class AnswerPage {
   book_id: number;
 
   index: number;
-  path: string;
+  file_path: string;
+  file_index?: number;
   transform: string;
 
   creator_id?: number;

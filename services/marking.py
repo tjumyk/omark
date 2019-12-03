@@ -47,6 +47,9 @@ class MarkingService:
                 .scalar():
             raise MarkingServiceError('duplicate marking')
 
+        if marks < 0 or marks > question.marks:
+            raise MarkingServiceError('invalid marks')
+
         marking = Marking(book=book, question=question, marks=marks, remarks=remarks, creator=creator)
         db.session.add(marking)
         return marking
@@ -68,6 +71,9 @@ class MarkingService:
             ass = ExamService.get_marker_question_assignment(marking.question, modifier)
             if ass is None:
                 raise MarkingServiceError('no assignment')
+
+        if marks < 0 or marks > marking.question.marks:
+            raise MarkingServiceError('invalid marks')
 
         marking.marks = marks
         marking.remarks = remarks

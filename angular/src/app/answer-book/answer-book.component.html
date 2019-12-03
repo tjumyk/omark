@@ -22,24 +22,34 @@
 
   <div class="ui grid stackable">
     <div class="column twelve wide">
-      <div class="ui card page" *ngFor="let page of book.pages">
-        Page {{page.id}}
+      <div class="ui grid two column">
+        <div class="column" *ngFor="let page of book.pages; index as i">
+          <app-answer-page-preview [page]="page" [pdfCache]="pdfCache" (click)="showAnnotator(i + 1)"></app-answer-page-preview>
+        </div>
       </div>
 
-      <div class="ui grid two column centered">
+      <div class="ui grid two column centered stackable">
         <div class="column">
           <div class="ui segment">
-            <form class="ui form">
-              <div class="field">
+            <div class="ui top attached progress" *ngIf="addingPages">
+              <div class="bar" [ngStyle]="{'width.%': addPagesProgress}"></div>
+            </div>
+            <form class="ui form" #f="ngForm" (ngSubmit)="addPages(inputFile.files)" [class.loading]="addingPages">
+              <div class="field required">
                 <label>File</label>
-                <input type="file" name="file">
+                <input type="file" name="file" accept="image/*,.pdf" required #inputFile multiple>
               </div>
+              <button type="submit" class="ui button primary fluid"><i class="icon plus"></i> Add Pages</button>
             </form>
           </div>
         </div>
       </div>
     </div>
-    <div class="column four wide"></div>
+    <div class="column four wide">
+      <app-answer-book-markings-view *ngIf="!annotatorShown" [exam]="exam" [book]="book" (error)="error=$event"></app-answer-book-markings-view>
+    </div>
   </div>
 
+  <app-answer-book-annotator *ngIf="annotatorShown" [startPageIndex]="annotatorStartPageIndex" (closed)="hideAnnotator()"
+                             [exam]="exam" [book]="book" [pdfCache]="pdfCache"></app-answer-book-annotator>
 </ng-container>

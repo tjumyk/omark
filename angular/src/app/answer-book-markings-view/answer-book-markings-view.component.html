@@ -1,0 +1,50 @@
+<div class="ui divider horizontal" [class.inverted]="darkMode">Markings</div>
+<table class="ui table unstackable celled compact">
+  <thead><tr><th>Q</th><th>Marks</th><th>Marker</th></tr></thead>
+  <tbody>
+  <tr *ngFor="let item of qMap|keyvalue">
+    <td>Q{{item.value.question.index}}</td>
+    <ng-container *ngIf="item.value.editing; else notEditing">
+      <td colspan="2">
+        <div class="ui action input fluid" [class.disabled]="item.value.submitting">
+          <ng-container *ngIf="item.value.marking; else addMark">
+            <input type="number" min="0" [max]="item.value.question.marks" placeholder="Marks..." #inputMarks
+                   [value]="item.value.initialMarks" (keyup.enter)="updateMarking(item.value.question, item.value.marking, inputMarks.value)">
+            <button  class="ui icon button" (click)="updateMarking(item.value.question, item.value.marking, inputMarks.value)"
+                     [ngClass]="{'loading disabled': item.value.submitting}">
+              <i class="icon save"></i>
+            </button>
+            <button class="ui icon button" (click)="item.value.editing=false"
+                    [ngClass]="{'loading disabled': item.value.submitting}">
+              <i class="icon times"></i>
+            </button>
+          </ng-container>
+          <ng-template #addMark>
+            <input type="number" min="0" [max]="item.value.question.marks" placeholder="Marks..." #inputMarks
+                   (keyup.enter)="addMarking(item.value.question, inputMarks.value)">
+            <button class="ui icon button" (click)="addMarking(item.value.question, inputMarks.value)"
+                    [ngClass]="{'loading disabled': item.value.submitting}">
+              <i class="icon save"></i>
+            </button>
+          </ng-template>
+        </div>
+      </td>
+    </ng-container>
+    <ng-template #notEditing>
+      <ng-container *ngIf="item.value.marking; else notMarked">
+        <td>
+          {{item.value.marking.marks}}
+          <i class="icon edit link" (click)="startUpdateMarking(item.value.question)" *ngIf="item.value.assigned"></i>
+        </td>
+        <td>
+          <app-user-mini-card [enablePopup]="true" [user]="item.value.marking.modifier || item.value.marking.creator"></app-user-mini-card>
+        </td>
+      </ng-container>
+      <ng-template #notMarked>
+        <td colspan="2">(not marked)</td>
+      </ng-template>
+    </ng-template>
+
+  </tr>
+  </tbody>
+</table>

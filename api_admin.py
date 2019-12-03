@@ -49,7 +49,7 @@ def do_exam_questions(eid: int):
         params = request.json
         q = ExamService.add_question(exam, params.get('index'), params.get('marks'), params.get('description'))
         db.session.commit()
-        return jsonify(q.to_dict()), 201
+        return jsonify(q.to_dict(with_marker_assignments=True)), 201
     except ExamServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 

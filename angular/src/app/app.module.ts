@@ -21,6 +21,11 @@ import { ExamComponent } from './exam/exam.component';
 import { AnswerBookComponent } from './answer-book/answer-book.component';
 import { AnswerBooksComponent } from './answer-books/answer-books.component';
 import { AdminExamComponent } from './admin-exam/admin-exam.component';
+import { AnswerPagePreviewComponent } from './answer-page-preview/answer-page-preview.component';
+import { PdfPageViewComponent } from './pdf-page-view/pdf-page-view.component';
+import { AnswerBookAnnotatorComponent } from './answer-book-annotator/answer-book-annotator.component';
+import { AnswerPageViewComponent } from './answer-page-view/answer-page-view.component';
+import { AnswerBookMarkingsViewComponent } from './answer-book-markings-view/answer-book-markings-view.component';
 
 @NgModule({
   declarations: [
@@ -41,6 +46,11 @@ import { AdminExamComponent } from './admin-exam/admin-exam.component';
     AnswerBookComponent,
     AnswerBooksComponent,
     AdminExamComponent,
+    AnswerPagePreviewComponent,
+    PdfPageViewComponent,
+    AnswerBookAnnotatorComponent,
+    AnswerPageViewComponent,
+    AnswerBookMarkingsViewComponent,
   ],
   imports: [
     BrowserModule,

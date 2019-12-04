@@ -65,9 +65,7 @@ export class AnswerBookComponent implements OnInit {
 
                 this.book = book;
 
-                for (let page of book.pages) {
-                  this.processPage(page);
-                }
+                this.processPages(book.pages);
               },
               error => this.error = error.error
             )
@@ -79,38 +77,53 @@ export class AnswerBookComponent implements OnInit {
     )
   }
 
-  private processPage(page: AnswerPage) {
-    if (page.file_path.toLowerCase().endsWith('.pdf')) {
-      if (this.pdfCache[page.file_path] === undefined) {
-        this.pdfCache[page.file_path] = null;  // mark null to indicate requested
+  private processPages(pages: AnswerPage[]) {
+    for(let page of pages){
+      if (page.file_path.toLowerCase().endsWith('.pdf')) {
+        if (this.pdfCache[page.file_path] === undefined) {
+          this.pdfCache[page.file_path] = null;  // mark null to indicate requested
+          this.answerService.getPageFile(page).subscribe(
+            data => {
+              pdfjsLib.getDocument(data).promise.then(
+                doc => {
+                  const entry = new PDFCacheEntry();
+                  this.pdfCache[page.file_path] = entry;
+                  entry.document = doc;
+
+                  const processPage = (i)=>{
+                    doc.getPage(i).then(
+                      _page => {
+                        entry.pages[i - 1] = _page;
+                        for(let __page of pages){
+                          if(__page.file_path == page.file_path && i == __page.file_index){
+                            __page['_loaded']  = true;
+                            break;
+                          }
+                        }
+                      },
+                      error => this.error = {msg: 'Failed to get PDF page', detail: error}
+                    );
+                  };
+
+                  const numPages = doc.numPages;
+                  let i = 1;
+                  while(i <= numPages){
+                    processPage(i);
+                    ++i;
+                  }
+                },
+                error => {
+                  this.error = {msg: 'Failed to load PDF Document', detail: error}
+                }
+              )
+            },
+            error => this.error = error.error
+          )
+        }
+      } else {
         this.answerService.getPageFile(page).subscribe(
           data => {
-            pdfjsLib.getDocument(data).promise.then(
-              doc => {
-                const entry = new PDFCacheEntry();
-                this.pdfCache[page.file_path] = entry;
-                entry.document = doc;
-
-                const processPage = (i)=>{
-                  doc.getPage(i).then(
-                    page => {
-                      entry.pages[i-1] = page;
-                    },
-                    error => this.error = {msg: 'Failed to get PDF page', detail: error}
-                  );
-                };
-
-                const numPages = doc.numPages;
-                let i = 1;
-                while(i <= numPages){
-                  processPage(i);
-                  ++i;
-                }
-              },
-              error => {
-                this.error = {msg: 'Failed to load PDF Document', detail: error}
-              }
-            )
+            page['_loaded'] = true;
           },
           error => this.error = error.error
         )
@@ -133,9 +146,7 @@ export class AnswerBookComponent implements OnInit {
             break;
           case HttpEventType.Response:
             const pages = event.body as AnswerPage[];
-            for (let page of pages) {
-              this.processPage(page)
-            }
+            this.processPages(pages);
             this.book.pages.push(...pages)
         }
       },

@@ -1,13 +1,14 @@
-<ng-container *ngIf="isPdf; else imageView">
-  <ng-container *ngIf="pdfCache[page.file_path] && pdfCache[page.file_path].pages[page.file_index-1] ; else loadingPdf">
+<ng-container *ngIf="page._loaded; else loading">
+  <ng-container *ngIf="isPdf; else imageView">
     <app-pdf-page-view [page]="pdfCache[page.file_path].pages[page.file_index-1]" [renderText]="pdfRenderText"></app-pdf-page-view>
   </ng-container>
-  <ng-template #loadingPdf>
-    <div class="ui segment basic very padded">
-      <div class="ui loader active inline centered"></div>
-    </div>
+  <ng-template #imageView>
+    <img src="api/answers/books/{{page.book_id}}/files/{{page.file_path}}">
   </ng-template>
 </ng-container>
-<ng-template #imageView>
-  <img src="api/answers/books/{{page.book_id}}/files/{{page.file_path}}">
+
+<ng-template #loading>
+  <div class="ui segment basic very padded">
+    <div class="ui loader active inline centered"></div>
+  </div>
 </ng-template>

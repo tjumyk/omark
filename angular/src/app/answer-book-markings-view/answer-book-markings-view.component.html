@@ -37,7 +37,7 @@
           <i class="icon edit link" (click)="startUpdateMarking(item.value.question)" *ngIf="item.value.assigned"></i>
         </td>
         <td>
-          <app-user-mini-card [enablePopup]="true" [user]="item.value.marking.modifier || item.value.marking.creator"></app-user-mini-card>
+          <app-user-mini-card [enablePopup]="false" [user]="item.value.marking.modifier || item.value.marking.creator"></app-user-mini-card>
         </td>
       </ng-container>
       <ng-template #notMarked>

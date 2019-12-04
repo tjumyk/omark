@@ -33,6 +33,7 @@ export class AnswerBookMarkingsViewComponent implements OnInit {
   user: User;
 
   qMap: {[qid: number]: QuestionInfo} = {};
+  total: number;
 
   constructor(private accountService: AccountService,
               private answerService: AnswerService,
@@ -65,6 +66,8 @@ export class AnswerBookMarkingsViewComponent implements OnInit {
           const info = this.qMap[question.id];
           info.editing = info.assigned && !info.marking;
         }
+
+        this.updateTotal();
       },
       error => this.error.emit(error.error)
     )
@@ -87,6 +90,7 @@ export class AnswerBookMarkingsViewComponent implements OnInit {
         this.book.markings.push(marking);
         info.marking = marking;
         info.editing = false;
+        this.updateTotal();
       },
       error => this.error.emit(error.error)
     )
@@ -117,6 +121,7 @@ export class AnswerBookMarkingsViewComponent implements OnInit {
           this.book.markings.splice(mIndex, 1, _marking);
         info.marking = _marking;
         info.editing = false;
+        this.updateTotal();
       },
       error => this.error.emit(error.error)
     )
@@ -126,5 +131,17 @@ export class AnswerBookMarkingsViewComponent implements OnInit {
     const info = this.qMap[question.id];
     info.initialMarks = info.marking.marks;
     info.editing = true;
+  }
+
+  updateTotal(){
+    if (this.book.markings.length > 0) {
+      let total = 0;
+      for (let marking of this.book.markings) {
+        total += marking.marks;
+      }
+      this.total = total;
+    } else {
+      this.total = undefined;
+    }
   }
 }

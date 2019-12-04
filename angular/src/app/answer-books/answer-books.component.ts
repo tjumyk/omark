@@ -67,9 +67,13 @@ export class AnswerBooksComponent implements OnInit {
 
   private setupBook(book: AnswerBook){
     if(book.markings){
+      let total = 0;
       for(let marking of book.markings){
-        book['_markings_' + marking.question_id] = marking
+        book['_marks_' + marking.question_id] = marking.marks;
+        total += marking.marks;
       }
+      if(book.markings.length > 0)
+        book['_total_marks'] = total;
     }
   }
 

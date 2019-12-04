@@ -66,7 +66,9 @@ export class PdfPageViewComponent implements OnInit, AfterViewInit, OnDestroy {
     const zoom = window.devicePixelRatio || 1.0;
     let viewport = this.page.getViewport({scale: 1.0});
     let width = element.clientWidth;
+    const textViewport = this.page.getViewport({scale: width / viewport.width});
     viewport = this.page.getViewport({scale: zoom * width / viewport.width});
+
     canvas.height = viewport.height;
     canvas.width = viewport.width;
     wrapper.style.width = width + 'px';
@@ -97,7 +99,7 @@ export class PdfPageViewComponent implements OnInit, AfterViewInit, OnDestroy {
                 const _textLayer = api({
                   textContent: textContent,
                   container: textLayer,
-                  viewport: viewport
+                  viewport: textViewport
                 });
                 _textLayer._render();
               }

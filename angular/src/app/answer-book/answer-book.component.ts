@@ -1,11 +1,12 @@
 import {Component, OnInit} from '@angular/core';
-import {AnswerBook, AnswerPage, BasicError, Exam} from "../models";
+import {AnswerBook, AnswerPage, BasicError, Exam, User} from "../models";
 import {AnswerService, PDFCache, PDFCacheEntry} from "../answer.service";
 import {ActivatedRoute} from "@angular/router";
 import {finalize} from "rxjs/operators";
 import {HttpEventType} from "@angular/common/http";
 import * as pdfjsLib from "pdfjs-dist/webpack";
 import {ExamService} from "../exam.service";
+import {AccountService} from "../account.service";
 
 @Component({
   selector: 'app-answer-book',
@@ -14,6 +15,9 @@ import {ExamService} from "../exam.service";
 })
 export class AnswerBookComponent implements OnInit {
   error: BasicError;
+
+  user: User;
+  isAdmin: boolean;
 
   examId: number;
   exam: Exam;
@@ -30,7 +34,8 @@ export class AnswerBookComponent implements OnInit {
   annotatorShown: boolean;
   annotatorStartPageIndex: number;
 
-  constructor(private examService: ExamService,
+  constructor(private accountService: AccountService,
+              private examService: ExamService,
               private answerService: AnswerService,
               private route: ActivatedRoute) {
   }
@@ -39,25 +44,33 @@ export class AnswerBookComponent implements OnInit {
     this.examId = parseInt(this.route.parent.snapshot.paramMap.get('exam_id'));
     this.bookId = parseInt(this.route.snapshot.paramMap.get('book_id'));
 
-    this.examService.getCachedExam(this.examId).subscribe(
-      exam=>{
-        this.exam = exam;
+    this.accountService.getCurrentUser().subscribe(
+      user => {
+        this.user = user;
+        this.isAdmin = AccountService.isAdmin(user);
 
-        this.loadingBook = true;
-        this.answerService.getBook(this.bookId).pipe(
-          finalize(() => this.loadingBook = false)
-        ).subscribe(
-          book => {
-            if(book.exam_id != this.examId){
-              this.error = {msg: 'book does not belong to this exam'};
-              return;
-            }
+        this.examService.getCachedExam(this.examId).subscribe(
+          exam => {
+            this.exam = exam;
 
-            this.book = book;
+            this.loadingBook = true;
+            this.answerService.getBook(this.bookId).pipe(
+              finalize(() => this.loadingBook = false)
+            ).subscribe(
+              book => {
+                if (book.exam_id != this.examId) {
+                  this.error = {msg: 'book does not belong to this exam'};
+                  return;
+                }
 
-            for (let page of book.pages) {
-              this.processPage(page);
-            }
+                this.book = book;
+
+                for (let page of book.pages) {
+                  this.processPage(page);
+                }
+              },
+              error => this.error = error.error
+            )
           },
           error => this.error = error.error
         )

@@ -21,6 +21,19 @@ class AnswerService:
         return AnswerBook.query.get(_id)
 
     @staticmethod
+    def go_to_book(from_book: AnswerBook, is_next: bool = True) -> Optional[AnswerBook]:
+        if from_book is None:
+            raise AnswerServiceError('from book is required')
+
+        if is_next:
+            filters = [AnswerBook.id > from_book.id]
+            order_by = AnswerBook.id.asc()
+        else:
+            filters = [AnswerBook.id < from_book.id]
+            order_by = AnswerBook.id.desc()
+        return db.session.query(AnswerBook).filter(*filters).order_by(order_by).first()
+
+    @staticmethod
     def add_book(exam: Exam, student: UserAlias = None, creator: UserAlias = None) -> AnswerBook:
         if exam is None:
             raise AnswerServiceError('exam is required')

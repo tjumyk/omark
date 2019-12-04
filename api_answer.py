@@ -49,6 +49,23 @@ def do_book(bid: int):
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
+@answer_api.route('/books/<int:bid>/next')
+@answer_api.route('/books/<int:bid>/prev')
+@requires_login
+def go_to_book(bid: int):
+    try:
+        book = AnswerService.get_book(bid)
+        if book is None:
+            return jsonify(msg='book not found'), 404
+
+        book2 = AnswerService.go_to_book(book, request.path.endswith('/next'))
+        if book2 is None:
+            return "", 204
+        return jsonify(book2.to_dict())
+    except AnswerServiceError as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
 @answer_api.route('/books/<int:bid>/pages', methods=['POST'])
 @requires_login
 def do_book_pages(bid: int):

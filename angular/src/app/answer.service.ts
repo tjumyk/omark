@@ -33,6 +33,13 @@ export class AnswerService {
     return this.http.get<AnswerBook>(`${this.api}/books/${id}`)
   }
 
+  goToBook(fromId: number, isNext: boolean):Observable<AnswerBook>{
+    if(isNext)
+      return this.http.get<AnswerBook>(`${this.api}/books/${fromId}/next`);
+    else
+      return this.http.get<AnswerBook>(`${this.api}/books/${fromId}/prev`);
+  }
+
   addPages(book_id: number, files: FileList): Observable<HttpEvent<any>> {
     const form = new FormData();
     let i = 0;

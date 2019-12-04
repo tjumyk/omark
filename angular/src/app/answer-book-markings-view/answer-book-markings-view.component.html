@@ -49,3 +49,9 @@
   <tr><td><b>Total</b></td><td colspan="2"><b>{{total}}</b></td></tr>
   </tbody>
 </table>
+
+<div class="ui divider horizontal" [class.inverted]="darkMode">Navigation</div>
+<div class="ui buttons vertical fluid icon labeled basic" [class.inverted]="darkMode">
+  <button class="ui button" (click)="goToBook(btnPrevBook, false)" #btnPrevBook><i class="icon angle left"></i> Previous Book</button>
+  <button class="ui button" (click)="goToBook(btnNextBook, true)" #btnNextBook><i class="icon angle right"></i> Next Book</button>
+</div>

@@ -29,7 +29,7 @@ export class AnswerBookComponent implements OnInit {
   addingPages: boolean;
   addPagesProgress: number;
 
-  pdfCache: PDFCache = {};
+  pdfCache: PDFCache;
 
   annotatorShown: boolean;
   annotatorStartPageIndex: number;
@@ -42,7 +42,6 @@ export class AnswerBookComponent implements OnInit {
 
   ngOnInit() {
     this.examId = parseInt(this.route.parent.snapshot.paramMap.get('exam_id'));
-    this.bookId = parseInt(this.route.snapshot.paramMap.get('book_id'));
 
     this.accountService.getCurrentUser().subscribe(
       user => {
@@ -53,22 +52,31 @@ export class AnswerBookComponent implements OnInit {
           exam => {
             this.exam = exam;
 
-            this.loadingBook = true;
-            this.answerService.getBook(this.bookId).pipe(
-              finalize(() => this.loadingBook = false)
-            ).subscribe(
-              book => {
-                if (book.exam_id != this.examId) {
-                  this.error = {msg: 'book does not belong to this exam'};
-                  return;
-                }
+            this.route.paramMap.subscribe(
+              val=>{
+                this.book = undefined;
+                this.pdfCache = {};
+                this.annotatorStartPageIndex = undefined;
+                this.bookId = parseInt(val.get('book_id'));
 
-                this.book = book;
+                this.loadingBook = true;
+                this.answerService.getBook(this.bookId).pipe(
+                  finalize(() => this.loadingBook = false)
+                ).subscribe(
+                  book => {
+                    if (book.exam_id != this.examId) {
+                      this.error = {msg: 'book does not belong to this exam'};
+                      return;
+                    }
 
-                this.processPages(book.pages);
-              },
-              error => this.error = error.error
-            )
+                    this.book = book;
+
+                    this.processPages(book.pages);
+                  },
+                  error => this.error = error.error
+                )
+              }
+            );
           },
           error => this.error = error.error
         )

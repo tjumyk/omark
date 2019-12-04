@@ -18,11 +18,13 @@
 <div class="content-wrapper">
   <div class="inner" #pageWrappers>
     <div class="page-wrapper" *ngFor="let page of book.pages">
-      <div class="content" *ngIf="page._loaded">
-        <app-answer-page-view [pdfCache]="pdfCache" [page]="page"></app-answer-page-view>
-        <app-annotation-layer class="annotations" [page]="page" [tool]="tool" (error)="error=$event"></app-annotation-layer>
-      </div>
-      <div class="footer">Page {{page.index}}</div>
+      <ng-container *ngIf="page._loaded">
+        <div class="content">
+          <app-answer-page-view [pdfCache]="pdfCache" [page]="page"></app-answer-page-view>
+          <app-annotation-layer class="annotations" [page]="page" [tool]="tool" (error)="error=$event"></app-annotation-layer>
+        </div>
+        <div class="footer">Page {{page.index}}</div>
+      </ng-container>
     </div>
   </div>
   <div class="marking-wrapper">

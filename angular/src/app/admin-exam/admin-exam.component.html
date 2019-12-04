@@ -72,14 +72,14 @@
         <form class="ui form" #f2="ngForm" (ngSubmit)="addAssignment(f2)" [ngClass]="{'loading': addingAssignment}">
           <div class="field required" [ngClass]="{'error': (qidModel.touched || qidModel.dirty || f2.submitted) && qidModel.invalid}">
             <label>Question</label>
-            <select name="qid" [(ngModel)]="newAssignmentForm.qid" #qidModel="ngModel">
+            <select name="qid" [(ngModel)]="newAssignmentForm.qid" #qidModel="ngModel" required>
               <option [ngValue]="q.id" *ngFor="let q of exam.questions">Q{{q.index}} (id: {{q.id}})</option>
             </select>
             <div class="errors">
               <label *ngIf="qidModel.errors?.required"><i class="icon times"></i> Question is required</label>
             </div>
           </div>
-          <div class="field required" [ngClass]="{'error': (midModel.touched || midModel.dirty || f.submitted) && midModel.invalid}">
+          <div class="field required" [ngClass]="{'error': (midModel.touched || midModel.dirty || f2.submitted) && midModel.invalid}">
             <label>Marker ID</label>
             <input type="number" name="mid" min="1" step="1" required [(ngModel)]="newAssignmentForm.mid" #midModel="ngModel">
             <div class="errors">

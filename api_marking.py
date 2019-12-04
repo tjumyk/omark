@@ -28,7 +28,7 @@ def do_marking(mid: int):
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
-@marking_api.route('/annotations/<int:aid>', methods=['PUT'])
+@marking_api.route('/annotations/<int:aid>', methods=['PUT', 'DELETE'])
 @requires_login
 def do_annotation(aid: int):
     try:
@@ -40,9 +40,14 @@ def do_annotation(aid: int):
         if ann is None:
             return jsonify(msg='annotation not found'), 404
 
-        params = request.json
-        MarkingService.update_annotation(ann, params.get('data'), modifier=user)
-        db.session.commit()
-        return jsonify(ann.to_dict(with_creator=True))
+        if request.method == 'PUT':
+            params = request.json
+            MarkingService.update_annotation(ann, params.get('data'), modifier=user)
+            db.session.commit()
+            return jsonify(ann.to_dict(with_creator=True))
+        else:  # DELETE
+            MarkingService.delete_annotation(ann, requester=user)
+            db.session.commit()
+            return "", 204
     except (AccountServiceError, MarkingServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400

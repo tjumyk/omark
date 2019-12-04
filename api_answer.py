@@ -25,7 +25,7 @@ def do_book(bid: int):
             return jsonify(msg='book not found'), 404
 
         if request.method == 'GET':
-            return jsonify(book.to_dict(with_student=True, with_pages=True, with_markings=True,
+            return jsonify(book.to_dict(with_student=True, with_pages=True, with_markings=True, with_annotations=True,
                                         with_creator=True, with_modifier=True))
         else:  # PUT
             user = AccountService.get_current_user()
@@ -43,7 +43,7 @@ def do_book(bid: int):
 
             AnswerService.update_book(book, student, modifier=user)
             db.session.commit()
-            return jsonify(book.to_dict(with_student=True, with_pages=True, with_markings=True,
+            return jsonify(book.to_dict(with_student=True, with_pages=True, with_markings=True, with_annotations=True,
                                         with_creator=True, with_modifier=True))
     except (AccountServiceError, AnswerServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400

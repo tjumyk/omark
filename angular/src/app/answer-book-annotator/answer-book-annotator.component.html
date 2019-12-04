@@ -3,7 +3,14 @@
     Book {{book.id}}
   </div>
   <div *ngIf="book.student_id" class="item">
-    {{book.student.name}}
+    <app-user-mini-card [user]="book.student" [enablePopup]="false"></app-user-mini-card>
+  </div>
+  <div class="item">
+    <div class="ui mini buttons">
+      <button class="ui button icon" (click)="tool='hand'" [class.active]="tool=='hand'"><i class="icon hand pointer"></i></button>
+      <button class="ui button icon" (click)="tool='pen'" [class.active]="tool=='pen'"><i class="icon pencil"></i></button>
+      <button class="ui button icon" (click)="tool='eraser'" [class.active]="tool=='eraser'"><i class="icon eraser"></i></button>
+    </div>
   </div>
   <div class="ui close button circular black icon" (click)="closed.emit()"><i class="icon times"></i></div>
 </div>
@@ -11,8 +18,11 @@
 <div class="content-wrapper">
   <div class="inner" #pageWrappers>
     <div class="page-wrapper" *ngFor="let page of book.pages">
-      <app-answer-page-view  [pdfCache]="pdfCache" [page]="page" [pdfRenderText]="true"></app-answer-page-view>
-      <div class="header">Page {{page.index}}</div>
+      <div class="content">
+        <app-answer-page-view [pdfCache]="pdfCache" [page]="page"></app-answer-page-view>
+        <app-annotation-layer class="annotations" [page]="page" [tool]="tool" (error)="error=$event"></app-annotation-layer>
+      </div>
+      <div class="footer">Page {{page.index}}</div>
     </div>
   </div>
   <div class="marking-wrapper">

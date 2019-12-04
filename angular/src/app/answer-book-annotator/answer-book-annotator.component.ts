@@ -37,6 +37,8 @@ export class AnswerBookAnnotatorComponent implements OnInit, AfterViewInit, OnDe
 
   autoScrollHandler: number;
 
+  tool: string = 'hand';
+
   constructor() { }
 
   ngOnInit() {

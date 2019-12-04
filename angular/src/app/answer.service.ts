@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpEvent, HttpRequest} from "@angular/common/http";
 import {Observable} from "rxjs";
-import {AnswerBook, AnswerPage, Marking} from "./models";
+import {Annotation, AnswerBook, AnswerPage, Marking} from "./models";
 import {PDFDocumentProxy, PDFPageProxy} from "pdfjs-dist/webpack";
 
 export class PDFCacheEntry{
@@ -14,6 +14,10 @@ export class NewMarkingForm{
   qid: number;
   marks: number;
   remarks?:string;
+}
+
+export class NewAnnotationForm{
+  data: string;
 }
 
 @Injectable({
@@ -49,5 +53,9 @@ export class AnswerService {
 
   addMarking(book_id: number, form: NewMarkingForm):Observable<Marking> {
     return this.http.post<Marking>(`${this.api}/books/${book_id}/markings`, form)
+  }
+
+  addAnnotation(page_id: number, form: NewAnnotationForm):Observable<Annotation> {
+    return this.http.post<Annotation>(`${this.api}/pages/${page_id}/annotations`, form)
   }
 }

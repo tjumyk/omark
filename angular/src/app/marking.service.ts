@@ -19,4 +19,8 @@ export class MarkingService {
   updateMarking(mid: number, form: UpdateMarkingForm):Observable<Marking>{
     return this.http.put<Marking>(`${this.api}/${mid}`, form)
   }
+
+  deleteAnnotation(aid: number):Observable<any>{
+    return this.http.delete(`${this.api}/annotations/${aid}`)
+  }
 }

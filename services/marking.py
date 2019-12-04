@@ -117,3 +117,16 @@ class MarkingService:
 
         ann.data = data
         ann.modifier = modifier
+
+    @staticmethod
+    def delete_annotation(ann: Annotation, requester: UserAlias = None):
+        if ann is None:
+            raise MarkingServiceError('annotation is required')
+
+        if ann.page.book.exam.is_locked:
+            raise MarkingServiceError('exam has been locked')
+
+        if requester and (ann.creator_id is None or ann.creator_id != requester.id):
+            raise MarkingServiceError('no permission')
+
+        db.session.delete(ann)

@@ -1,4 +1,3 @@
-import os
 from datetime import datetime
 
 from flask_sqlalchemy import SQLAlchemy
@@ -150,7 +149,7 @@ class AnswerBook(db.Model):
         return '<AnswerBook %r>' % self.id
 
     def to_dict(self, with_exam: bool = False, with_student: bool = False,
-                with_pages: bool = False, with_markings: bool = False,
+                with_pages: bool = False, with_markings: bool = False, with_annotations: bool = False,
                 with_creator: bool = False, with_modifier: bool = False) -> dict:
         d = dict(id=self.id, exam_id=self.exam_id, student_id=self.student_id,
                  creator_id=self.creator_id, modifier_id=self.modifier_id,
@@ -160,7 +159,7 @@ class AnswerBook(db.Model):
         if with_student:
             d['student'] = self.student.to_dict() if self.student else None
         if with_pages:
-            d['pages'] = [p.to_dict() for p in self.pages]
+            d['pages'] = [p.to_dict(with_annotations=with_annotations) for p in self.pages]
         if with_markings:
             d['markings'] = [m.to_dict(with_creator=with_creator, with_modifier=with_modifier) for m in self.markings]
         if with_creator:

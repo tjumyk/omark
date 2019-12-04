@@ -1,0 +1,18 @@
+:host{
+  display: block;
+}
+canvas{
+  width: 100%;
+  height: 100%;
+}
+.mobile-overlay{
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+
+  @media(min-width: 768px){
+    display: none;
+  }
+}

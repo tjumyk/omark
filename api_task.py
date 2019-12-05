@@ -60,3 +60,41 @@ def do_task_books(tid: int):
             return jsonify(book.to_dict(with_student=True)), 201
     except (TaskServiceError, AccountServiceError, AnswerServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@task_api.route('/<int:tid>/export-markings')
+@requires_login
+def export_markings(tid: int):
+    try:
+        task = TaskService.get(tid)
+        if task is None:
+            return jsonify(msg='task not found'), 404
+
+        tsv = []
+        columns = ['BookID', 'UserID', 'UserName']
+        questions = task.questions
+        for q in questions:
+            columns.append('Q%d' % q.index)
+        columns.append('Total')
+        tsv.append('\t'.join(columns))
+
+        for book in task.answer_books:
+            student_name = book.student.name if book.student_id else None
+            book_columns = [book.id, book.student_id, student_name]
+            marking_map = {m.question_id: m for m in book.markings}
+            total = 0
+            for q in questions:
+                marking = marking_map.get(q.id)
+                if marking:
+                    marks = marking.marks
+                    if int(marks) == marks:
+                        marks = int(marks)  # convert to int for str()
+                    book_columns.append(marks)
+                    total += marks
+                else:
+                    book_columns.append(None)
+            book_columns.append(total if marking_map else None)
+            tsv.append('\t'.join([str(c) for c in book_columns]))
+        return '\n'.join(tsv), {'Content-Type': 'text/plain'}
+    except TaskServiceError as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400

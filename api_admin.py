@@ -97,13 +97,18 @@ def import_give(tid: int):
             return jsonify(msg='task not found'), 404
 
         archive = request.files.get('archive')
-        file_names = request.form.get('file_names')
+        file_names_str = request.form.get('file_names')
 
         if not archive:
             return jsonify(msg='archive file is required'), 400
-        if not file_names:
+        if not file_names_str:
             return jsonify(msg='file names are required'), 400
-        file_names = [name for name in file_names.split(',') if name]
+
+        file_names = []
+        for name in file_names_str.split(','):
+            name = name.strip()
+            if name:
+                file_names.append(name)
         if not file_names:
             return jsonify(msg='file names are required'), 400
 
@@ -122,9 +127,12 @@ def import_give(tid: int):
                 book = AnswerService.add_book(task, student)
                 num_books += 1
 
-                for file_name, tmp_path in files.items():
-                    path = file_name  # directly use the file name as path since no conflict could occur here
+                for file_name in file_names:  # keep the original order
+                    tmp_path = files.get(file_name)
+                    if not tmp_path:  # file not found in submission
+                        continue
 
+                    path = file_name  # directly use the file name as path since no conflict could occur here
                     ext = os.path.splitext(file_name)[-1]
                     if ext == '.pdf':  # split pdf pages
                         num_pages = get_pdf_pages(tmp_path)

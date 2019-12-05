@@ -9,8 +9,8 @@ from auth_connect.oauth import requires_login
 from models import db
 from services.account import AccountService, AccountServiceError
 from services.answer import AnswerService, AnswerServiceError
-from services.task import TaskService, TaskServiceError
 from services.marking import MarkingService, MarkingServiceError
+from services.task import TaskService, TaskServiceError
 from utils.pdf import get_pdf_pages
 
 answer_api = Blueprint('answer_api', __name__)
@@ -119,7 +119,7 @@ def do_book_pages(bid: int):
                 file.save(full_path)
                 pages.append(page)
         db.session.commit()
-        return jsonify([page.to_dict(with_creator=True) for page in pages]), 201
+        return jsonify([page.to_dict(with_annotations=True, with_creator=True) for page in pages]), 201
     except (AccountServiceError, AnswerServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 

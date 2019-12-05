@@ -1,5 +1,9 @@
 <app-error [error]="error"></app-error>
 
+<div class="ui segment very padded basic" *ngIf="loadingBooks">
+  <div class="ui active loader inline text centered">Loading books...</div>
+</div>
+
 <ng-container *ngIf="books">
   <div class="ui top attached clearing segment">
     <div class="ui right floated menu secondary fitted">

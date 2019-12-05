@@ -79,7 +79,7 @@ export class AnswerBookMarkingsViewComponent implements OnInit {
   addMarking(question: Question, marks: any) {
     const info = this.qMap[question.id];
     if (typeof marks == 'string')
-      marks = parseInt(marks);
+      marks = parseFloat(marks);
 
     const form = new NewMarkingForm();
     form.qid = question.id;
@@ -102,7 +102,7 @@ export class AnswerBookMarkingsViewComponent implements OnInit {
   updateMarking(question: Question, marking: Marking, marks: any) {
     const info = this.qMap[question.id];
     if (typeof marks == 'string')
-      marks = parseInt(marks);
+      marks = parseFloat(marks);
 
     const form = new UpdateMarkingForm();
     form.marks = marks;

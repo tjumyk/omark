@@ -79,9 +79,11 @@ class GiveImporter:
 
         root = extract_dir
         dir_list = os.listdir(root)
-        if len(dir_list) == 1:  # there is a wrapper folder
-            root = os.path.join(root, dir_list[0])
-            dir_list = os.listdir(root)
+        if len(dir_list) == 1:
+            child = os.path.join(root, dir_list[0])
+            if os.path.isdir(child):  # there is a wrapper folder
+                root = child
+                dir_list = os.listdir(root)
 
         for name in sorted(dir_list):
             if name.startswith('.'):

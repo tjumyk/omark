@@ -44,8 +44,8 @@
     </tbody>
   </table>
 
-  <div class="ui grid stackable centered">
-    <div class="six wide column">
+  <div class="ui grid stackable centered three column">
+    <div class="column">
       <div class="ui segment">
         <form class="ui form" #f="ngForm" (ngSubmit)="addQuestion(f)" [ngClass]="{'loading': addingQuestion}">
           <div class="field required" [ngClass]="{'error': (indexModel.touched || indexModel.dirty || f.submitted) && indexModel.invalid}">
@@ -67,7 +67,7 @@
       </div>
     </div>
 
-    <div class="six wide column">
+    <div class="column">
       <div class="ui segment">
         <form class="ui form" #f2="ngForm" (ngSubmit)="addAssignment(f2)" [ngClass]="{'loading': addingAssignment}">
           <div class="field required" [ngClass]="{'error': (qidModel.touched || qidModel.dirty || f2.submitted) && qidModel.invalid}">
@@ -87,6 +87,31 @@
             </div>
           </div>
           <button type="submit" class="ui button primary fluid"><i class="icon plus"></i> Add Assignment</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="column">
+      <div class="ui segment">
+        <div class="ui top attached progress" *ngIf="importingGive">
+          <div class="bar" [ngStyle]="{'width.%': importGiveProgress}"></div>
+        </div>
+        <form class="ui form" #f3="ngForm" (ngSubmit)="importGive(f3, inputArchiveFile.files)" [ngClass]="{'loading': importingGive}">
+          <div class="field required" [ngClass]="{'error': (archiveModel.touched || archiveModel.dirty || f3.submitted) && archiveModel.invalid}">
+            <label>Archive File</label>
+            <input type="file" required name="archive" accept=".zip,.tar,.tar.gz" [(ngModel)]="importGiveArchive" #archiveModel="ngModel" #inputArchiveFile>
+            <div class="errors">
+              <label *ngIf="archiveModel.errors?.required"><i class="icon times"></i> Archive file is required</label>
+            </div>
+          </div>
+          <div class="field required" [ngClass]="{'error': (fileNamesModel.touched || fileNamesModel.dirty || f3.submitted) && fileNamesModel.invalid}">
+            <label>File Names</label>
+            <input type="text" name="file_names" required [(ngModel)]="importGiveFileNames" #fileNamesModel="ngModel" placeholder="comma-separated file names">
+            <div class="errors">
+              <label *ngIf="fileNamesModel.errors?.required"><i class="icon times"></i> File names are required</label>
+            </div>
+          </div>
+          <button type="submit" class="ui button primary fluid"><i class="icon upload"></i> Import Give Submissions</button>
         </form>
       </div>
     </div>

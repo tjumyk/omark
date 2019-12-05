@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {Observable} from "rxjs";
 import {Task, MarkerQuestionAssignment, Question} from "./models";
-import {HttpClient} from "@angular/common/http";
+import {HttpClient, HttpEvent, HttpRequest} from "@angular/common/http";
 
 export class NewTaskForm {
   name: string;
@@ -16,6 +16,10 @@ export class NewQuestionForm{
 export class NewMarkerQuestionAssignmentForm{
   qid: number;
   marker_name: string;
+}
+
+export class ImportGiveResponse{
+  num_books: number;
 }
 
 @Injectable({
@@ -45,5 +49,14 @@ export class AdminService {
 
   addAssignment(taskId: number, form: NewMarkerQuestionAssignmentForm):Observable<MarkerQuestionAssignment> {
     return this.http.post<MarkerQuestionAssignment>(`${this.api}/tasks/${taskId}/assignments`, form)
+  }
+
+  importGiveSubmissions(taskId: number, archive: File, fileNames: string): Observable<HttpEvent<any>>{
+    const form = new FormData();
+    form.append('archive', archive);
+    form.append('file_names', fileNames);
+    const req = new HttpRequest('POST', `${this.api}/tasks/${taskId}/import-give`,
+      form, {reportProgress: true});
+    return this.http.request(req);
   }
 }

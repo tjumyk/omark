@@ -4,7 +4,8 @@ import {TaskService} from "../task.service";
 import {ActivatedRoute} from "@angular/router";
 import {finalize} from "rxjs/operators";
 import {NgForm} from "@angular/forms";
-import {AdminService, NewMarkerQuestionAssignmentForm, NewQuestionForm} from "../admin.service";
+import {AdminService, ImportGiveResponse, NewMarkerQuestionAssignmentForm, NewQuestionForm} from "../admin.service";
+import {HttpEventType} from "@angular/common/http";
 
 @Component({
   selector: 'app-admin-task',
@@ -23,6 +24,11 @@ export class AdminTaskComponent implements OnInit {
 
   newAssignmentForm = new NewMarkerQuestionAssignmentForm();
   addingAssignment: boolean;
+
+  importGiveArchive: string;
+  importGiveFileNames: string;
+  importingGive: boolean;
+  importGiveProgress: number;
 
   constructor(private taskService: TaskService,
               private adminService: AdminService,
@@ -72,6 +78,30 @@ export class AdminTaskComponent implements OnInit {
             q.marker_assignments.push(ass);
             break;
           }
+        }
+      },
+      error => this.error = error.error
+    )
+  }
+
+  importGive(f: NgForm, fileList: FileList) {
+    if (f.invalid || fileList.length < 1)
+      return;
+
+    const archive = fileList.item(0);
+
+    this.importingGive = true;
+    this.adminService.importGiveSubmissions(this.taskId, archive, this.importGiveFileNames).pipe(
+      finalize(() => this.importingGive = false)
+    ).subscribe(
+      event => {
+        switch (event.type) {
+          case HttpEventType.UploadProgress:
+            this.importGiveProgress = Math.round(100 * event.loaded / event.total);
+            break;
+          case HttpEventType.Response:
+            const resp = event.body as ImportGiveResponse;
+            alert(`Imported books: ${resp.num_books}`)
         }
       },
       error => this.error = error.error

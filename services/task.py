@@ -1,9 +1,10 @@
 from typing import Optional, List
 
 from sqlalchemy import func
+from sqlalchemy.orm import joinedload
 
 from error import BasicError
-from models import Task, db, Question, UserAlias, MarkerQuestionAssignment
+from models import Task, db, Question, UserAlias, MarkerQuestionAssignment, AnswerBook
 
 
 class TaskServiceError(BasicError):
@@ -47,6 +48,16 @@ class TaskService:
         if not task.is_locked:
             raise TaskServiceError('not locked')
         task.is_locked = False
+
+    @staticmethod
+    def get_books_with_markings_and_students(task: Task) -> List[AnswerBook]:
+        if task is None:
+            raise TaskServiceError('task is required')
+
+        return AnswerBook.query.with_parent(task) \
+            .options(joinedload(AnswerBook.markings), joinedload(AnswerBook.student)) \
+            .order_by(AnswerBook.id) \
+            .all()
 
     @staticmethod
     def get_question(_id: int) -> Optional[Question]:

@@ -45,7 +45,8 @@ def do_task_books(tid: int):
             return jsonify(msg='task not found'), 404
 
         if request.method == 'GET':
-            return jsonify([b.to_dict(with_student=True, with_markings=True) for b in task.answer_books])
+            books = TaskService.get_books_with_markings_and_students(task)
+            return jsonify([b.to_dict(with_student=True, with_markings=True) for b in books])
         else:  # POST
             params = request.json
             student_id = params.get('sid')
@@ -70,6 +71,8 @@ def export_markings(tid: int):
         if task is None:
             return jsonify(msg='task not found'), 404
 
+        books = TaskService.get_books_with_markings_and_students(task)
+
         tsv = []
         columns = ['BookID', 'UserID', 'UserName']
         questions = task.questions
@@ -78,7 +81,7 @@ def export_markings(tid: int):
         columns.append('Total')
         tsv.append('\t'.join(columns))
 
-        for book in task.answer_books:
+        for book in books:
             student_name = book.student.name if book.student_id else None
             book_columns = [book.id, book.student_id, student_name]
             marking_map = {m.question_id: m for m in book.markings}

@@ -79,11 +79,11 @@
               <label *ngIf="qidModel.errors?.required"><i class="icon times"></i> Question is required</label>
             </div>
           </div>
-          <div class="field required" [ngClass]="{'error': (midModel.touched || midModel.dirty || f2.submitted) && midModel.invalid}">
-            <label>Marker ID</label>
-            <input type="number" name="mid" min="1" step="1" required [(ngModel)]="newAssignmentForm.mid" #midModel="ngModel">
+          <div class="field required" [ngClass]="{'error': (markerNameModel.touched || markerNameModel.dirty || f2.submitted) && markerNameModel.invalid}">
+            <label>Marker Name</label>
+            <input type="text" name="marker_name" required [(ngModel)]="newAssignmentForm.marker_name" #markerNameModel="ngModel">
             <div class="errors">
-              <label *ngIf="midModel.errors?.required"><i class="icon times"></i> Marker ID is required</label>
+              <label *ngIf="markerNameModel.errors?.required"><i class="icon times"></i> Marker name is required</label>
             </div>
           </div>
           <button type="submit" class="ui button primary fluid"><i class="icon plus"></i> Add Assignment</button>

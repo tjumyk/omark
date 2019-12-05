@@ -15,7 +15,7 @@ export class NewQuestionForm{
 
 export class NewMarkerQuestionAssignmentForm{
   qid: number;
-  mid: string;
+  marker_name: string;
 }
 
 @Injectable({

@@ -64,7 +64,7 @@ def do_task_assignments(tid):
 
         params = request.json
         question = TaskService.get_question(params.get('qid'))
-        marker = AccountService.sync_user_by_id(params.get('mid'))
+        marker = AccountService.sync_user_by_name(params.get('marker_name'))
 
         if request.method == 'POST':
             ass = TaskService.add_marker_question_assignment(question, marker)

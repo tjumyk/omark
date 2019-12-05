@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {Observable, of} from "rxjs";
-import {AnswerBook, Exam} from "./models";
+import {AnswerBook, Task} from "./models";
 import {HttpClient} from "@angular/common/http";
 import {tap} from "rxjs/operators";
 
@@ -11,30 +11,30 @@ export class NewAnswerBookForm {
 @Injectable({
   providedIn: 'root'
 })
-export class ExamService {
-  private api: string = 'api/exams';
-  private cachedExams: { [id: number]: Exam } = {};
+export class TaskService {
+  private api: string = 'api/tasks';
+  private cachedTasks: { [id: number]: Task } = {};
 
   constructor(private http: HttpClient) {
   }
 
-  getExams(): Observable<Exam[]> {
-    return this.http.get<Exam[]>(this.api + '/')
+  getTasks(): Observable<Task[]> {
+    return this.http.get<Task[]>(this.api + '/')
   }
 
-  getExam(id: number): Observable<Exam> {
-    return this.http.get<Exam>(`${this.api}/${id}`).pipe(
-      tap(exam => {
-        this.cachedExams[id] = exam
+  getTask(id: number): Observable<Task> {
+    return this.http.get<Task>(`${this.api}/${id}`).pipe(
+      tap(task => {
+        this.cachedTasks[id] = task
       })
     )
   }
 
-  getCachedExam(id: number): Observable<Exam> {
-    const exam = this.cachedExams[id];
-    if (exam)
-      return of(exam);
-    return this.getExam(id);
+  getCachedTask(id: number): Observable<Task> {
+    const task = this.cachedTasks[id];
+    if (task)
+      return of(task);
+    return this.getTask(id);
   }
 
   getAnswerBooks(id: number): Observable<AnswerBook[]> {

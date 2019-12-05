@@ -4,48 +4,48 @@ from auth_connect.oauth import requires_login
 from models import db
 from services.account import AccountService, AccountServiceError
 from services.answer import AnswerService, AnswerServiceError
-from services.exam import ExamService, ExamServiceError
+from services.task import TaskService, TaskServiceError
 
-exam_api = Blueprint('exam_api', __name__)
+task_api = Blueprint('task_api', __name__)
 
 
-@exam_api.route('/')
+@task_api.route('/')
 @requires_login
-def get_exams():
+def get_tasks():
     try:
-        exams = ExamService.get_all()
-        return jsonify([e.to_dict() for e in exams])
-    except ExamServiceError as e:
+        tasks = TaskService.get_all()
+        return jsonify([t.to_dict() for t in tasks])
+    except TaskServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
-@exam_api.route('/<int:eid>')
+@task_api.route('/<int:tid>')
 @requires_login
-def get_exam(eid: int):
+def get_task(tid: int):
     try:
-        exam = ExamService.get(eid)
-        if exam is None:
-            return jsonify(msg='exam not found'), 404
+        task = TaskService.get(tid)
+        if task is None:
+            return jsonify(msg='task not found'), 404
 
-        return jsonify(exam.to_dict(with_questions=True, with_assignments=True))
-    except ExamServiceError as e:
+        return jsonify(task.to_dict(with_questions=True, with_assignments=True))
+    except TaskServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
-@exam_api.route('/<int:eid>/answer-books', methods=['GET', 'POST'])
+@task_api.route('/<int:tid>/answer-books', methods=['GET', 'POST'])
 @requires_login
-def do_exam_books(eid: int):
+def do_task_books(tid: int):
     try:
         user = AccountService.get_current_user()
         if user is None:
             return jsonify(msg='user info required'), 500
 
-        exam = ExamService.get(eid)
-        if exam is None:
-            return jsonify(msg='exam not found'), 404
+        task = TaskService.get(tid)
+        if task is None:
+            return jsonify(msg='task not found'), 404
 
         if request.method == 'GET':
-            return jsonify([b.to_dict(with_student=True, with_markings=True) for b in exam.answer_books])
+            return jsonify([b.to_dict(with_student=True, with_markings=True) for b in task.answer_books])
         else:  # POST
             params = request.json
             student_id = params.get('sid')
@@ -55,8 +55,8 @@ def do_exam_books(eid: int):
                 student = AccountService.sync_user_by_id(student_id)
                 if student is None:
                     return jsonify(msg='student not found'), 404
-            book = AnswerService.add_book(exam, student, creator=user)
+            book = AnswerService.add_book(task, student, creator=user)
             db.session.commit()
             return jsonify(book.to_dict(with_student=True)), 201
-    except (ExamServiceError, AccountServiceError, AnswerServiceError) as e:
+    except (TaskServiceError, AccountServiceError, AnswerServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400

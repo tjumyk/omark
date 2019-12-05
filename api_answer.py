@@ -9,7 +9,7 @@ from auth_connect.oauth import requires_login
 from models import db
 from services.account import AccountService, AccountServiceError
 from services.answer import AnswerService, AnswerServiceError
-from services.exam import ExamService, ExamServiceError
+from services.task import TaskService, TaskServiceError
 from services.marking import MarkingService, MarkingServiceError
 from utils.pdf import get_pdf_pages
 
@@ -174,11 +174,11 @@ def do_book_markings(bid: int):
             return jsonify(msg='book not found'), 404
 
         params = request.json
-        question = ExamService.get_question(params.get('qid'))
+        question = TaskService.get_question(params.get('qid'))
         marking = MarkingService.add(book, question, params.get('marks'), params.get('remarks'), creator=user)
         db.session.commit()
         return jsonify(marking.to_dict(with_creator=True)), 201
-    except (AccountServiceError, AnswerServiceError, ExamServiceError, MarkingServiceError) as e:
+    except (AccountServiceError, AnswerServiceError, TaskServiceError, MarkingServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 

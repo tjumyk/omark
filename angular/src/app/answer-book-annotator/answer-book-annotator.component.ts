@@ -9,7 +9,7 @@ import {
   Output,
   ViewChild
 } from '@angular/core';
-import {AnswerBook, BasicError, Exam} from "../models";
+import {AnswerBook, BasicError, Task} from "../models";
 import {PDFCache} from "../answer.service";
 
 @Component({
@@ -21,7 +21,7 @@ export class AnswerBookAnnotatorComponent implements OnInit, AfterViewInit, OnDe
   error: BasicError;
 
   @Input()
-  exam: Exam;
+  task: Task;
   @Input()
   book: AnswerBook;
   @Input()

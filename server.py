@@ -6,7 +6,7 @@ from flask import Flask, request, jsonify
 from api_account import account_api
 from api_admin import admin_api
 from api_answer import answer_api
-from api_exam import exam_api
+from api_task import task_api
 from api_marking import marking_api
 from auth_connect import oauth
 from models import db
@@ -35,13 +35,13 @@ oauth.init_app(app, login_callback=_login_callback)
 
 app.register_blueprint(account_api, url_prefix='/api/account')
 app.register_blueprint(admin_api, url_prefix='/api/admin')
-app.register_blueprint(exam_api, url_prefix='/api/exams')
+app.register_blueprint(task_api, url_prefix='/api/tasks')
 app.register_blueprint(answer_api, url_prefix='/api/answers')
 app.register_blueprint(marking_api, url_prefix='/api/markings')
 
 
 @app.route('/')
-@app.route('/exams/<path:path>')
+@app.route('/tasks/<path:path>')
 @app.route('/admin/<path:path>')
 @oauth.requires_login
 def get_index_page(path=''):

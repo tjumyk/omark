@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
-import {AnswerBook, BasicError, Exam, User} from "../models";
+import {AnswerBook, BasicError, Task, User} from "../models";
 import {ActivatedRoute} from "@angular/router";
-import {ExamService, NewAnswerBookForm} from "../exam.service";
+import {TaskService, NewAnswerBookForm} from "../task.service";
 import {debounceTime, finalize} from "rxjs/operators";
 import {makeSortField, Pagination} from "../table-util";
 import {NgForm} from "@angular/forms";
@@ -19,8 +19,8 @@ export class AnswerBooksComponent implements OnInit {
   user: User;
   isAdmin: boolean;
 
-  examId: number;
-  exam: Exam;
+  taskId: number;
+  task: Task;
 
   books: AnswerBook[];
   loadingBooks: boolean;
@@ -32,24 +32,24 @@ export class AnswerBooksComponent implements OnInit {
   addingBook: boolean;
 
   constructor(private accountService: AccountService,
-              private examService: ExamService,
+              private taskService: TaskService,
               private route: ActivatedRoute) {
   }
 
   ngOnInit() {
-    this.examId = parseInt(this.route.parent.snapshot.paramMap.get('exam_id'));
+    this.taskId = parseInt(this.route.parent.snapshot.paramMap.get('task_id'));
 
     this.accountService.getCurrentUser().subscribe(
       user=>{
         this.user = user;
         this.isAdmin = AccountService.isAdmin(user);
 
-        this.examService.getCachedExam(this.examId).subscribe(
-          exam => {
-            this.exam = exam;
+        this.taskService.getCachedTask(this.taskId).subscribe(
+          task => {
+            this.task = task;
 
             this.loadingBooks = true;
-            this.examService.getAnswerBooks(this.examId).pipe(
+            this.taskService.getAnswerBooks(this.taskId).pipe(
               finalize(() => this.loadingBooks = false)
             ).subscribe(
               books => {
@@ -115,7 +115,7 @@ export class AnswerBooksComponent implements OnInit {
       return;
 
     this.addingBook = true;
-    this.examService.addAnswerBook(this.examId, this.newBookForm).pipe(
+    this.taskService.addAnswerBook(this.taskId, this.newBookForm).pipe(
       finalize(() => this.addingBook = false)
     ).subscribe(
       book => {

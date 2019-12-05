@@ -16,11 +16,11 @@ import {FormsModule} from "@angular/forms";
 import {PageComponent} from "./page/page.component";
 import { HomeComponent } from './home/home.component';
 import {AdminComponent} from "./admin/admin.component";
-import { AdminExamsComponent } from './admin-exams/admin-exams.component';
-import { ExamComponent } from './exam/exam.component';
+import { AdminTasksComponent } from './admin-tasks/admin-tasks.component';
+import { TaskComponent } from './task/task.component';
 import { AnswerBookComponent } from './answer-book/answer-book.component';
 import { AnswerBooksComponent } from './answer-books/answer-books.component';
-import { AdminExamComponent } from './admin-exam/admin-exam.component';
+import { AdminTaskComponent } from './admin-task/admin-task.component';
 import { AnswerPagePreviewComponent } from './answer-page-preview/answer-page-preview.component';
 import { PdfPageViewComponent } from './pdf-page-view/pdf-page-view.component';
 import { AnswerBookAnnotatorComponent } from './answer-book-annotator/answer-book-annotator.component';
@@ -42,11 +42,11 @@ import { AnnotationLayerComponent } from './annotation-layer/annotation-layer.co
     PageComponent,
     HomeComponent,
     AdminComponent,
-    AdminExamsComponent,
-    ExamComponent,
+    AdminTasksComponent,
+    TaskComponent,
     AnswerBookComponent,
     AnswerBooksComponent,
-    AdminExamComponent,
+    AdminTaskComponent,
     AnswerPagePreviewComponent,
     PdfPageViewComponent,
     AnswerBookAnnotatorComponent,

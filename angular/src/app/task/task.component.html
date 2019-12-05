@@ -1,8 +1,8 @@
 <app-error [error]="error"></app-error>
 
-<ng-container *ngIf="exam">
+<ng-container *ngIf="task">
   <a class="ui header" routerLink=".">
-    <i class="icon archive" [class.red]="exam.is_locked"></i> {{exam.name}}
+    <i class="icon archive" [class.red]="task.is_locked"></i> {{task.name}}
   </a>
   <router-outlet></router-outlet>
 </ng-container>

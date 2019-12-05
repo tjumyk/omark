@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {AnswerBook, BasicError, Exam, Marking, Question, User} from "../models";
+import {AnswerBook, BasicError, Task, Marking, Question, User} from "../models";
 import {AccountService} from "../account.service";
 import {MarkingService, UpdateMarkingForm} from "../marking.service";
 import {AnswerService, NewMarkingForm} from "../answer.service";
@@ -22,7 +22,7 @@ export class QuestionInfo{
 })
 export class AnswerBookMarkingsViewComponent implements OnInit {
   @Input()
-  exam: Exam;
+  task: Task;
   @Input()
   book: AnswerBook;
   @Input()
@@ -48,7 +48,7 @@ export class AnswerBookMarkingsViewComponent implements OnInit {
       user => {
         this.user = user;
 
-        for (let question of this.exam.questions) {
+        for (let question of this.task.questions) {
           const info = new QuestionInfo();
           this.qMap[question.id] = info;
           info.question = question;
@@ -65,7 +65,7 @@ export class AnswerBookMarkingsViewComponent implements OnInit {
           info.marking = marking;
         }
 
-        for(let question of this.exam.questions){
+        for(let question of this.task.questions){
           const info = this.qMap[question.id];
           info.editing = info.assigned && !info.marking;
         }

@@ -60,7 +60,7 @@ class GroupAlias(db.Model):
         return _dict
 
 
-class Exam(db.Model):
+class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     name = db.Column(db.String(64), unique=True, nullable=False)
@@ -70,7 +70,7 @@ class Exam(db.Model):
     modified_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     def __repr__(self):
-        return '<Exam %r>' % self.name
+        return '<Task %r>' % self.name
 
     def to_dict(self, with_questions: bool = False, with_assignments: bool = False) -> dict:
         d = dict(id=self.id, name=self.name, is_locked=self.is_locked,
@@ -82,7 +82,7 @@ class Exam(db.Model):
 
 class Question(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    exam_id = db.Column(db.Integer, db.ForeignKey('exam.id'), nullable=False)
+    task_id = db.Column(db.Integer, db.ForeignKey('task.id'), nullable=False)
 
     index = db.Column(db.Integer, nullable=False)
     marks = db.Column(db.Float, nullable=False)
@@ -91,16 +91,16 @@ class Question(db.Model):
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     modified_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    exam = db.relationship('Exam', backref=db.backref('questions'))
+    task = db.relationship('Task', backref=db.backref('questions'))
 
     def __repr__(self):
         return '<Question %r>' % self.id
 
-    def to_dict(self, with_exam: bool = False, with_marker_assignments: bool = False) -> dict:
-        d = dict(id=self.id, exam_id=self.exam_id, index=self.index, marks=self.marks, description=self.description,
+    def to_dict(self, with_task: bool = False, with_marker_assignments: bool = False) -> dict:
+        d = dict(id=self.id, task_id=self.task_id, index=self.index, marks=self.marks, description=self.description,
                  created_at=self.created_at, modified_at=self.modified_at)
-        if with_exam:
-            d['exam'] = self.exam.to_dict()
+        if with_task:
+            d['task'] = self.task.to_dict()
         if with_marker_assignments:
             d['marker_assignments'] = [ass.to_dict(with_marker=True) for ass in self.marker_assignments]
         return d
@@ -131,7 +131,7 @@ class MarkerQuestionAssignment(db.Model):
 
 class AnswerBook(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    exam_id = db.Column(db.Integer, db.ForeignKey('exam.id'), nullable=False)
+    task_id = db.Column(db.Integer, db.ForeignKey('task.id'), nullable=False)
 
     student_id = db.Column(db.Integer, db.ForeignKey('user_alias.id'))
 
@@ -140,7 +140,7 @@ class AnswerBook(db.Model):
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     modified_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    exam = db.relationship('Exam', backref=db.backref('answer_books'))
+    task = db.relationship('Task', backref=db.backref('answer_books'))
     student = db.relationship('UserAlias', backref=db.backref('answer_books'), foreign_keys='[AnswerBook.student_id]')
     creator = db.relationship('UserAlias', foreign_keys='[AnswerBook.creator_id]')
     modifier = db.relationship('UserAlias', foreign_keys='[AnswerBook.modifier_id]')
@@ -148,14 +148,14 @@ class AnswerBook(db.Model):
     def __repr__(self):
         return '<AnswerBook %r>' % self.id
 
-    def to_dict(self, with_exam: bool = False, with_student: bool = False,
+    def to_dict(self, with_task: bool = False, with_student: bool = False,
                 with_pages: bool = False, with_markings: bool = False, with_annotations: bool = False,
                 with_creator: bool = False, with_modifier: bool = False) -> dict:
-        d = dict(id=self.id, exam_id=self.exam_id, student_id=self.student_id,
+        d = dict(id=self.id, task_id=self.task_id, student_id=self.student_id,
                  creator_id=self.creator_id, modifier_id=self.modifier_id,
                  created_at=self.created_at, modified_at=self.modified_at)
-        if with_exam:
-            d['exam'] = self.exam.to_dict()
+        if with_task:
+            d['task'] = self.task.to_dict()
         if with_student:
             d['student'] = self.student.to_dict() if self.student else None
         if with_pages:

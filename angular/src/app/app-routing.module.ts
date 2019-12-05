@@ -6,11 +6,11 @@ import {AdminGuard} from "./admin.guard";
 import {PageComponent} from "./page/page.component";
 import {HomeComponent} from "./home/home.component";
 import {AdminComponent} from "./admin/admin.component";
-import {AdminExamsComponent} from "./admin-exams/admin-exams.component";
-import {ExamComponent} from "./exam/exam.component";
+import {AdminTasksComponent} from "./admin-tasks/admin-tasks.component";
+import {TaskComponent} from "./task/task.component";
 import {AnswerBooksComponent} from "./answer-books/answer-books.component";
 import {AnswerBookComponent} from "./answer-book/answer-book.component";
-import {AdminExamComponent} from "./admin-exam/admin-exam.component";
+import {AdminTaskComponent} from "./admin-task/admin-task.component";
 
 
 const routes: Routes = [
@@ -20,8 +20,8 @@ const routes: Routes = [
     component: PageComponent,
     children: [
       {
-        path: 'exams/:exam_id',
-        component: ExamComponent,
+        path: 'tasks/:task_id',
+        component: TaskComponent,
         children: [
           {path: '', pathMatch: 'full', redirectTo: 'books'},
           {path: 'books', component: AnswerBooksComponent},
@@ -33,9 +33,9 @@ const routes: Routes = [
         canActivate: [AdminGuard],
         component: AdminComponent,
         children: [
-          {path: '', pathMatch: 'full', redirectTo: '/admin/exams'},
-          {path: 'exams', component: AdminExamsComponent},
-          {path: 'exams/:exam_id', component: AdminExamComponent}
+          {path: '', pathMatch: 'full', redirectTo: '/admin/tasks'},
+          {path: 'tasks', component: AdminTasksComponent},
+          {path: 'tasks/:task_id', component: AdminTaskComponent}
         ]
       },
     ]

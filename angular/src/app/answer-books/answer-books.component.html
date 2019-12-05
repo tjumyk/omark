@@ -25,7 +25,7 @@
       <th>#</th>
       <th (click)="sortField('id', thID)" #thID>ID</th>
       <th (click)="sortField('student.name', thStudent)" #thStudent>Student</th>
-      <th (click)="sortField('_marks_'+q.id, thQuestion)" #thQuestion *ngFor="let q of exam.questions">Q{{q.index}}</th>
+      <th (click)="sortField('_marks_'+q.id, thQuestion)" #thQuestion *ngFor="let q of task.questions">Q{{q.index}}</th>
       <th (click)="sortField('_total_marks', thTotal)" #thTotal>Total</th>
       <th>Actions</th>
     </tr>
@@ -37,7 +37,7 @@
       <td>
         <app-user-mini-card *ngIf="book.student_id" [user]="book.student" [enablePopup]="true" [enableAdmin]="isAdmin"></app-user-mini-card>
       </td>
-      <td *ngFor="let q of exam.questions">
+      <td *ngFor="let q of task.questions">
         <ng-container *ngIf="book['_marks_' + q.index] != null">
           {{book['_marks_' + q.id]}}
         </ng-container>

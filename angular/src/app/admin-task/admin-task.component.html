@@ -1,28 +1,28 @@
 <app-error [error]="error"></app-error>
 
-<ng-container *ngIf="exam">
+<ng-container *ngIf="task">
   <div class="ui segment">
     <div class="ui list horizontal">
       <div class="item">
         <div class="header">ID</div>
-        {{exam.id}}
+        {{task.id}}
       </div>
       <div class="item">
         <div class="header">Name</div>
-        {{exam.name}}
+        {{task.name}}
       </div>
       <div class="item">
         <div class="header">Status</div>
-        <i class="ui icon lock red" *ngIf="exam.is_locked; else exam_open"></i>
-        <ng-template #exam_open><i class="ui icon lock open green"></i></ng-template>
+        <i class="ui icon lock red" *ngIf="task.is_locked; else task_open"></i>
+        <ng-template #task_open><i class="ui icon lock open green"></i></ng-template>
       </div>
       <div class="item">
         <div class="header">Created At</div>
-        {{exam.created_at | date: 'medium'}}
+        {{task.created_at | date: 'medium'}}
       </div>
       <div class="item">
         <div class="header">Updated At</div>
-        {{exam.modified_at | date: 'medium'}}
+        {{task.modified_at | date: 'medium'}}
       </div>
     </div>
   </div>
@@ -30,7 +30,7 @@
   <table class="ui table unstackable">
     <thead><tr><th>#</th><th>ID</th><th>Index</th><th>Marks</th><th>Assignments</th></tr></thead>
     <tbody>
-    <tr *ngFor="let q of exam.questions; index as i">
+    <tr *ngFor="let q of task.questions; index as i">
       <td>{{i+1}}</td>
       <td>{{q.id}}</td>
       <td>{{q.index}}</td>
@@ -73,7 +73,7 @@
           <div class="field required" [ngClass]="{'error': (qidModel.touched || qidModel.dirty || f2.submitted) && qidModel.invalid}">
             <label>Question</label>
             <select name="qid" [(ngModel)]="newAssignmentForm.qid" #qidModel="ngModel" required>
-              <option [ngValue]="q.id" *ngFor="let q of exam.questions">Q{{q.index}} (id: {{q.id}})</option>
+              <option [ngValue]="q.id" *ngFor="let q of task.questions">Q{{q.index}} (id: {{q.id}})</option>
             </select>
             <div class="errors">
               <label *ngIf="qidModel.errors?.required"><i class="icon times"></i> Question is required</label>

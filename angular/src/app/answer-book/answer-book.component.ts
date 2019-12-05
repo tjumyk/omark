@@ -1,11 +1,11 @@
 import {Component, OnInit} from '@angular/core';
-import {AnswerBook, AnswerPage, BasicError, Exam, User} from "../models";
+import {AnswerBook, AnswerPage, BasicError, Task, User} from "../models";
 import {AnswerService, PDFCache, PDFCacheEntry} from "../answer.service";
 import {ActivatedRoute} from "@angular/router";
 import {finalize} from "rxjs/operators";
 import {HttpEventType} from "@angular/common/http";
 import * as pdfjsLib from "pdfjs-dist/webpack";
-import {ExamService} from "../exam.service";
+import {TaskService} from "../task.service";
 import {AccountService} from "../account.service";
 
 @Component({
@@ -19,8 +19,8 @@ export class AnswerBookComponent implements OnInit {
   user: User;
   isAdmin: boolean;
 
-  examId: number;
-  exam: Exam;
+  taskId: number;
+  task: Task;
 
   bookId: number;
   book: AnswerBook;
@@ -35,22 +35,22 @@ export class AnswerBookComponent implements OnInit {
   annotatorStartPageIndex: number;
 
   constructor(private accountService: AccountService,
-              private examService: ExamService,
+              private taskService: TaskService,
               private answerService: AnswerService,
               private route: ActivatedRoute) {
   }
 
   ngOnInit() {
-    this.examId = parseInt(this.route.parent.snapshot.paramMap.get('exam_id'));
+    this.taskId = parseInt(this.route.parent.snapshot.paramMap.get('task_id'));
 
     this.accountService.getCurrentUser().subscribe(
       user => {
         this.user = user;
         this.isAdmin = AccountService.isAdmin(user);
 
-        this.examService.getCachedExam(this.examId).subscribe(
-          exam => {
-            this.exam = exam;
+        this.taskService.getCachedTask(this.taskId).subscribe(
+          task => {
+            this.task = task;
 
             this.route.paramMap.subscribe(
               val=>{
@@ -64,8 +64,8 @@ export class AnswerBookComponent implements OnInit {
                   finalize(() => this.loadingBook = false)
                 ).subscribe(
                   book => {
-                    if (book.exam_id != this.examId) {
-                      this.error = {msg: 'book does not belong to this exam'};
+                    if (book.task_id != this.taskId) {
+                      this.error = {msg: 'book does not belong to this task'};
                       return;
                     }
 

@@ -20,7 +20,7 @@ export class Group {
   description: string;
 }
 
-export class Exam {
+export class Task {
   id: number;
   name: string;
   is_locked: boolean;
@@ -33,7 +33,7 @@ export class Exam {
 
 export class Question {
   id: number;
-  exam_id: number;
+  task_id: number;
 
   index: number;
   marks: number;
@@ -44,7 +44,7 @@ export class Question {
 
   marker_assignments?: MarkerQuestionAssignment[];
 
-  exam?: Exam;
+  task?: Task;
 }
 
 export class MarkerQuestionAssignment {
@@ -60,7 +60,7 @@ export class MarkerQuestionAssignment {
 
 export class AnswerBook {
   id: number;
-  exam_id: number;
+  task_id: number;
 
   student_id?: number;
 
@@ -69,7 +69,7 @@ export class AnswerBook {
   created_at: string;
   modified_at: string;
 
-  exam?: Exam;
+  task?: Task;
   student?: User;
   creator?: User;
   modifier?: User;

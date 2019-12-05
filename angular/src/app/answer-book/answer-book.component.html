@@ -46,10 +46,10 @@
       </div>
     </div>
     <div class="column four wide">
-      <app-answer-book-markings-view *ngIf="!annotatorShown" [exam]="exam" [book]="book" (error)="error=$event"></app-answer-book-markings-view>
+      <app-answer-book-markings-view *ngIf="!annotatorShown" [task]="task" [book]="book" (error)="error=$event"></app-answer-book-markings-view>
     </div>
   </div>
 
   <app-answer-book-annotator *ngIf="annotatorShown" [startPageIndex]="annotatorStartPageIndex" (closed)="hideAnnotator()"
-                             [exam]="exam" [book]="book" [pdfCache]="pdfCache"></app-answer-book-annotator>
+                             [task]="task" [book]="book" [pdfCache]="pdfCache"></app-answer-book-annotator>
 </ng-container>

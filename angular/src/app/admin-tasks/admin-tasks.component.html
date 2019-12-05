@@ -1,0 +1,44 @@
+<app-error [error]="error"></app-error>
+
+<table class="ui table unstackable" *ngIf="tasks">
+  <thead>
+  <tr><th>#</th><th>ID</th><th>Name</th><th>Status</th><th>Created At</th><th>Updated At</th><th>Actions</th></tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let task of tasks; index as i">
+    <td>{{i + 1}}</td>
+    <td>{{task.id}}</td>
+    <td>{{task.name}}</td>
+    <td>
+      <i class="ui icon lock red" *ngIf="task.is_locked; else task_open"></i>
+      <ng-template #task_open><i class="ui icon lock open green"></i></ng-template>
+    </td>
+    <td>{{task.created_at | date: 'medium'}}</td>
+    <td>{{task.modified_at | date: 'medium'}}</td>
+    <td>
+      <div class="ui mini buttons">
+        <button class="ui icon button" #btnToggleTaskLock (click)="toggleTaskLock(task, btnToggleTaskLock)"><i class="icon lock"></i></button>
+        <a class="ui icon button" routerLink="{{task.id}}"><i class="icon horizontal ellipsis"></i></a>
+      </div>
+    </td>
+  </tr>
+  </tbody>
+</table>
+
+<div class="ui grid stackable centered">
+  <div class="six wide column">
+    <div class="ui segment">
+      <form class="ui form" #f="ngForm" (ngSubmit)="addTask(f)" [ngClass]="{'loading': addingTask}">
+        <div class="field required" [ngClass]="{'error': (nameModel.touched || nameModel.dirty || f.submitted) && nameModel.invalid}">
+          <label>Name</label>
+          <input type="text" name="name" required maxlength="64" [(ngModel)]="newTaskForm.name" #nameModel="ngModel">
+          <div class="errors">
+            <label *ngIf="nameModel.errors?.required"><i class="icon times"></i> Name is required</label>
+            <label *ngIf="nameModel.errors?.maxlength"><i class="icon times"></i> Name is too long</label>
+          </div>
+        </div>
+        <button type="submit" class="ui button primary fluid"><i class="icon plus"></i> Add Task</button>
+      </form>
+    </div>
+  </div>
+</div>

@@ -1,8 +1,8 @@
 import {Component, OnInit} from '@angular/core';
-import {BasicError, Exam, User} from "../models";
+import {BasicError, Task, User} from "../models";
 import {AccountService} from "../account.service";
 import {finalize} from "rxjs/operators";
-import {ExamService} from "../exam.service";
+import {TaskService} from "../task.service";
 
 @Component({
   selector: 'app-home',
@@ -16,11 +16,11 @@ export class HomeComponent implements OnInit {
   loadingUser: boolean;
   isAdmin: boolean;
 
-  exams: Exam[];
-  loadingExams: boolean;
+  tasks: Task[];
+  loadingTasks: boolean;
 
   constructor(private accountService: AccountService,
-              private examService: ExamService) {
+              private taskService: TaskService) {
   }
 
   ngOnInit() {
@@ -34,12 +34,12 @@ export class HomeComponent implements OnInit {
         this.user = user;
         this.isAdmin = AccountService.isAdmin(user);
 
-        this.loadingExams = true;
-        this.examService.getExams().pipe(
-          finalize(() => this.loadingExams = false)
+        this.loadingTasks = true;
+        this.taskService.getTasks().pipe(
+          finalize(() => this.loadingTasks = false)
         ).subscribe(
-          exams => {
-            this.exams = exams
+          tasks => {
+            this.tasks = tasks
           },
           error => this.error = error.error
         )

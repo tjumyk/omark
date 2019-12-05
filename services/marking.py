@@ -32,12 +32,12 @@ class MarkingService:
         if not isinstance(marks, (int, float)):
             raise MarkingServiceError('marks must be an integer or float')
 
-        if book.exam.is_locked:
-            raise MarkingServiceError('exam has been locked')
+        if book.task.is_locked:
+            raise MarkingServiceError('task has been locked')
 
         if creator:
-            from .exam import ExamService
-            ass = ExamService.get_marker_question_assignment(question, creator)
+            from .task import TaskService
+            ass = TaskService.get_marker_question_assignment(question, creator)
             if ass is None:
                 raise MarkingServiceError('no assignment')
 
@@ -63,12 +63,12 @@ class MarkingService:
         if not isinstance(marks, (int, float)):
             raise MarkingServiceError('marks must be an integer or float')
 
-        if marking.book.exam.is_locked:
-            raise MarkingServiceError('exam has been locked')
+        if marking.book.task.is_locked:
+            raise MarkingServiceError('task has been locked')
 
         if modifier:
-            from .exam import ExamService
-            ass = ExamService.get_marker_question_assignment(marking.question, modifier)
+            from .task import TaskService
+            ass = TaskService.get_marker_question_assignment(marking.question, modifier)
             if ass is None:
                 raise MarkingServiceError('no assignment')
 
@@ -95,8 +95,8 @@ class MarkingService:
         if not data:
             raise MarkingServiceError('data is required')
 
-        if page.book.exam.is_locked:
-            raise MarkingServiceError('exam has been locked')
+        if page.book.task.is_locked:
+            raise MarkingServiceError('task has been locked')
 
         ann = Annotation(page=page, data=data, creator=creator)
         db.session.add(ann)
@@ -109,8 +109,8 @@ class MarkingService:
         if not data:
             raise MarkingServiceError('data is required')
 
-        if ann.page.book.exam.is_locked:
-            raise MarkingServiceError('exam has been locked')
+        if ann.page.book.task.is_locked:
+            raise MarkingServiceError('task has been locked')
 
         if modifier and (ann.creator_id is None or ann.creator_id != modifier.id):
             raise MarkingServiceError('no permission')
@@ -123,8 +123,8 @@ class MarkingService:
         if ann is None:
             raise MarkingServiceError('annotation is required')
 
-        if ann.page.book.exam.is_locked:
-            raise MarkingServiceError('exam has been locked')
+        if ann.page.book.task.is_locked:
+            raise MarkingServiceError('task has been locked')
 
         if requester and (ann.creator_id is None or ann.creator_id != requester.id):
             raise MarkingServiceError('no permission')

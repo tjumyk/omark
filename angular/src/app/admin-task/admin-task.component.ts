@@ -1,22 +1,22 @@
 import {Component, OnInit} from '@angular/core';
-import {BasicError, Exam} from "../models";
-import {ExamService} from "../exam.service";
+import {BasicError, Task} from "../models";
+import {TaskService} from "../task.service";
 import {ActivatedRoute} from "@angular/router";
 import {finalize} from "rxjs/operators";
 import {NgForm} from "@angular/forms";
 import {AdminService, NewMarkerQuestionAssignmentForm, NewQuestionForm} from "../admin.service";
 
 @Component({
-  selector: 'app-admin-exam',
-  templateUrl: './admin-exam.component.html',
-  styleUrls: ['./admin-exam.component.less']
+  selector: 'app-admin-task',
+  templateUrl: './admin-task.component.html',
+  styleUrls: ['./admin-task.component.less']
 })
-export class AdminExamComponent implements OnInit {
+export class AdminTaskComponent implements OnInit {
   error: BasicError;
 
-  examId: number;
-  exam: Exam;
-  loadingExam: boolean;
+  taskId: number;
+  task: Task;
+  loadingTask: boolean;
 
   newQuestionForm = new NewQuestionForm();
   addingQuestion: boolean;
@@ -24,20 +24,20 @@ export class AdminExamComponent implements OnInit {
   newAssignmentForm = new NewMarkerQuestionAssignmentForm();
   addingAssignment: boolean;
 
-  constructor(private examService: ExamService,
+  constructor(private taskService: TaskService,
               private adminService: AdminService,
               private route: ActivatedRoute) {
   }
 
   ngOnInit() {
-    this.examId = parseInt(this.route.snapshot.paramMap.get('exam_id'));
+    this.taskId = parseInt(this.route.snapshot.paramMap.get('task_id'));
 
-    this.loadingExam = true;
-    this.examService.getExam(this.examId).pipe(
-      finalize(() => this.loadingExam = false)
+    this.loadingTask = true;
+    this.taskService.getTask(this.taskId).pipe(
+      finalize(() => this.loadingTask = false)
     ).subscribe(
-      exam => {
-        this.exam = exam;
+      task => {
+        this.task = task;
       },
       error => this.error = error.error
     )
@@ -48,11 +48,11 @@ export class AdminExamComponent implements OnInit {
       return;
 
     this.addingQuestion = true;
-    this.adminService.addQuestion(this.examId, this.newQuestionForm).pipe(
+    this.adminService.addQuestion(this.taskId, this.newQuestionForm).pipe(
       finalize(() => this.addingQuestion = false)
     ).subscribe(
       q => {
-        this.exam.questions.push(q);
+        this.task.questions.push(q);
       },
       error => this.error = error.error
     )
@@ -63,11 +63,11 @@ export class AdminExamComponent implements OnInit {
       return;
 
     this.addingAssignment = true;
-    this.adminService.addAssignment(this.examId, this.newAssignmentForm).pipe(
+    this.adminService.addAssignment(this.taskId, this.newAssignmentForm).pipe(
       finalize(() => this.addingAssignment = false)
     ).subscribe(
       ass => {
-        for (let q of this.exam.questions) {
+        for (let q of this.task.questions) {
           if (q.id == this.newAssignmentForm.qid) {
             q.marker_assignments.push(ass);
             break;

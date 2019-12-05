@@ -10,10 +10,10 @@
 
       <div class="ui segment basic">
         <div class="ui loader text inline active centered" *ngIf="loadingUser">Loading User Info...</div>
-        <div class="ui loader text inline active centered" *ngIf="loadingExams">Loading Exams...</div>
+        <div class="ui loader text inline active centered" *ngIf="loadingTasks">Loading Tasks...</div>
 
-        <div class="ui menu vertical fluid" *ngIf="exams && exams.length">
-          <a *ngFor="let exam of exams" routerLink="/exams/{{exam.id}}" class="item"><i class="icon angle right"></i>{{exam.name}}</a>
+        <div class="ui menu vertical fluid" *ngIf="tasks && tasks.length">
+          <a *ngFor="let task of tasks" routerLink="/tasks/{{task.id}}" class="item"><i class="icon angle right"></i>{{task.name}}</a>
         </div>
       </div>
 

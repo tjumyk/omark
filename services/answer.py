@@ -3,7 +3,7 @@ from typing import Optional
 from sqlalchemy import func
 
 from error import BasicError
-from models import AnswerBook, Exam, UserAlias, db, AnswerPage
+from models import AnswerBook, Task, UserAlias, db, AnswerPage
 
 
 class AnswerServiceError(BasicError):
@@ -34,20 +34,20 @@ class AnswerService:
         return db.session.query(AnswerBook).filter(*filters).order_by(order_by).first()
 
     @staticmethod
-    def add_book(exam: Exam, student: UserAlias = None, creator: UserAlias = None) -> AnswerBook:
-        if exam is None:
-            raise AnswerServiceError('exam is required')
+    def add_book(task: Task, student: UserAlias = None, creator: UserAlias = None) -> AnswerBook:
+        if task is None:
+            raise AnswerServiceError('task is required')
 
-        if exam.is_locked:
-            raise AnswerServiceError('exam has been locked')
+        if task.is_locked:
+            raise AnswerServiceError('task has been locked')
 
         if student and db.session.query(func.count()) \
-                .filter(AnswerBook.exam_id == exam.id,
-                        AnswerBook.student_id == student.id)\
+                .filter(AnswerBook.task_id == task.id,
+                        AnswerBook.student_id == student.id) \
                 .scalar():
             raise AnswerServiceError('duplicate book')
 
-        book = AnswerBook(exam=exam, creator=creator, student=student)
+        book = AnswerBook(task=task, creator=creator, student=student)
         db.session.add(book)
         return book
 
@@ -58,13 +58,13 @@ class AnswerService:
         if modifier is None:
             raise AnswerServiceError('modifier is required')
 
-        if book.exam.is_locked:
-            raise AnswerServiceError('exam has been locked')
+        if book.task.is_locked:
+            raise AnswerServiceError('task has been locked')
 
         if student and db.session.query(func.count()) \
-                .filter( AnswerBook.exam_id == book.exam_id,
-                         AnswerBook.id != book.id,
-                         AnswerBook.student_id == student.id)\
+                .filter(AnswerBook.task_id == book.task_id,
+                        AnswerBook.id != book.id,
+                        AnswerBook.student_id == student.id)\
                 .scalar():
             raise AnswerServiceError('duplicate book')
 
@@ -88,8 +88,8 @@ class AnswerService:
         if not file_path:
             raise AnswerServiceError('file path is required')
 
-        if book.exam.is_locked:
-            raise AnswerServiceError('exam has been locked')
+        if book.task.is_locked:
+            raise AnswerServiceError('task has been locked')
 
         if index is None:  # auto increment
             index = db.session.query(func.count()) \
@@ -115,8 +115,8 @@ class AnswerService:
         if not isinstance(index, int):
             raise AnswerServiceError('index must be an integer')
 
-        if page.book.exam.is_locked:
-            raise AnswerServiceError('exam has been locked')
+        if page.book.task.is_locked:
+            raise AnswerServiceError('task has been locked')
 
         page.index = index
         page.transform = transform

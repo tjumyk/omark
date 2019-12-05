@@ -83,7 +83,7 @@ class GiveImporter:
             root = os.path.join(root, dir_list[0])
             dir_list = os.listdir(root)
 
-        for name in dir_list:
+        for name in sorted(dir_list):
             if name.startswith('.'):
                 continue
             path = os.path.join(root, name)

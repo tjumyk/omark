@@ -1,4 +1,4 @@
-<ng-container *ngIf="page._loaded; else loading">
+<ng-container *ngIf="page['_loaded']; else loading">
   <ng-container *ngIf="isPdf; else imageView">
     <app-pdf-page-view [page]="pdfCache[page.file_path].pages[page.file_index-1]" [renderText]="pdfRenderText"></app-pdf-page-view>
   </ng-container>

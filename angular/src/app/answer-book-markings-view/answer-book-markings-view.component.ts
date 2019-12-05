@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {AnswerBook, BasicError, Task, Marking, Question, User} from "../models";
+import {AnswerBook, BasicError, Marking, Question, Task, User} from "../models";
 import {AccountService} from "../account.service";
 import {MarkingService, UpdateMarkingForm} from "../marking.service";
 import {AnswerService, NewMarkingForm} from "../answer.service";
@@ -153,16 +153,17 @@ export class AnswerBookMarkingsViewComponent implements OnInit {
     this.answerService.goToBook(this.book.id, isNext).pipe(
       finalize(()=>{btn.classList.remove('loading', 'disabled')})
     ).subscribe(
-      _book=>{
-        if(_book){
+      _book => {
+        if (_book) {
           this.router.navigate([`books/${_book.id}`], {relativeTo: this.route.parent});
-        }else{
-          if(isNext)
+        } else {
+          if (isNext)
             alert('No more next books');
           else
             alert('No more previous books');
         }
-      }
+      },
+      error => this.error.emit(error.error)
     )
   }
 }

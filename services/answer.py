@@ -25,11 +25,12 @@ class AnswerService:
         if from_book is None:
             raise AnswerServiceError('from book is required')
 
+        filters = [AnswerBook.task_id == from_book.task_id]
         if is_next:
-            filters = [AnswerBook.id > from_book.id]
+            filters.append(AnswerBook.id > from_book.id)
             order_by = AnswerBook.id.asc()
         else:
-            filters = [AnswerBook.id < from_book.id]
+            filters.append(AnswerBook.id < from_book.id)
             order_by = AnswerBook.id.desc()
         return db.session.query(AnswerBook).filter(*filters).order_by(order_by).first()
 

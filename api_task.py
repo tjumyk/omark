@@ -49,11 +49,11 @@ def do_task_books(tid: int):
             return jsonify([b.to_dict(with_student=True, with_markings=True) for b in books])
         else:  # POST
             params = request.json
-            student_id = params.get('sid')
-            if student_id is None:
+            student_name = params.get('student_name')
+            if not student_name:
                 student = None
             else:
-                student = AccountService.sync_user_by_id(student_id)
+                student = AccountService.sync_user_by_name(student_name)
                 if student is None:
                     return jsonify(msg='student not found'), 404
             book = AnswerService.add_book(task, student, creator=user)

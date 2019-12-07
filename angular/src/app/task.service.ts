@@ -5,7 +5,7 @@ import {HttpClient} from "@angular/common/http";
 import {tap} from "rxjs/operators";
 
 export class NewAnswerBookForm {
-  sid?: number;
+  student_name?: string;
 }
 
 @Injectable({

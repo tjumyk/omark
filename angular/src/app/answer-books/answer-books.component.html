@@ -64,8 +64,8 @@
     <div class="ui segment">
       <form class="ui form" #f="ngForm" (ngSubmit)="addBook(f)" [class.loading]="addingBook">
         <div class="field">
-          <label>Student ID</label>
-          <input type="number" min="1" step="1" name="student_id" [(ngModel)]="newBookForm.sid">
+          <label>Student</label>
+          <input type="text" name="student_name" [(ngModel)]="newBookForm.student_name">
         </div>
         <button type="submit" class="ui button fluid primary"><i class="icon plus"></i> Add Book</button>
       </form>

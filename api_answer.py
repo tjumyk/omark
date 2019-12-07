@@ -33,11 +33,11 @@ def do_book(bid: int):
                 return jsonify(msg='user info required'), 500
 
             params = request.json
-            student_id = params.get('sid')
-            if student_id is None:
+            student_name = params.get('student_name')
+            if not student_name:
                 student = None
             else:
-                student = AccountService.get_user(student_id)
+                student = AccountService.sync_user_by_name(student_name)
                 if student is None:
                     return jsonify(msg='student not found'), 404
 

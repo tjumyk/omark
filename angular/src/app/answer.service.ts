@@ -10,6 +10,10 @@ export class PDFCacheEntry{
 }
 export type PDFCache = {[path: string]: PDFCacheEntry};
 
+export class UpdateAnswerBookForm {
+  student_name?: string;
+}
+
 export class NewMarkingForm{
   qid: number;
   marks: number;
@@ -31,6 +35,10 @@ export class AnswerService {
 
   getBook(id: number): Observable<AnswerBook> {
     return this.http.get<AnswerBook>(`${this.api}/books/${id}`)
+  }
+
+  updateBook(id: number, form: UpdateAnswerBookForm):Observable<AnswerBook>{
+    return this.http.put<AnswerBook>(`${this.api}/books/${id}`, form)
   }
 
   goToBook(fromId: number, isNext: boolean):Observable<AnswerBook>{

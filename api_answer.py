@@ -109,10 +109,7 @@ def do_book_pages(bid: int):
                     tmp_path = os.path.join(tmp_dir, 'file.pdf')
                     file.save(tmp_path)
                     num_pages = get_pdf_pages(tmp_path)
-
-                    for i in range(num_pages):
-                        page = AnswerService.add_page(book, path, file_index=i + 1, creator=user)
-                        pages.append(page)
+                    pages.extend(AnswerService.add_multi_pages(book, path, num_pages, creator=user))
                     shutil.copyfile(tmp_path, full_path)
             else:
                 page = AnswerService.add_page(book, path, index=params.get('index'), creator=user)

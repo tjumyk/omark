@@ -136,8 +136,7 @@ def import_give(tid: int):
                     ext = os.path.splitext(file_name)[-1]
                     if ext == '.pdf':  # split pdf pages
                         num_pages = get_pdf_pages(tmp_path)
-                        for i in range(num_pages):
-                            AnswerService.add_page(book, path, file_index=i + 1)
+                        AnswerService.add_multi_pages(book, path, num_pages)
                     else:
                         AnswerService.add_page(book, path)
                     copy_info.append((tmp_path, book, path))

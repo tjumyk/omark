@@ -1,4 +1,4 @@
-from typing import Optional, Set
+from typing import Optional, Set, List
 
 from sqlalchemy import func
 
@@ -82,8 +82,7 @@ class AnswerService:
         return AnswerPage.query.get(_id)
 
     @staticmethod
-    def add_page(book: AnswerBook, file_path: str, file_index: int = None, index: int = None,
-                 creator: UserAlias = None) -> AnswerPage:
+    def add_page(book: AnswerBook, file_path: str, index: int = None, creator: UserAlias = None) -> AnswerPage:
         if book is None:
             raise AnswerServiceError('book is required')
         if not file_path:
@@ -92,20 +91,51 @@ class AnswerService:
         if book.task.is_locked:
             raise AnswerServiceError('task has been locked')
 
-        if index is None:  # auto increment
-            index = db.session.query(func.count()) \
-                        .filter(AnswerPage.book_id == book.id) \
-                        .scalar() + 1
+        if index is None:  # auto increment (may break if race condition occurs)
+            max_page_index = db.session.query(func.max(AnswerPage.index)).filter(AnswerPage.book_id == book.id).scalar()
+            if max_page_index is None:
+                index = 1
+            else:
+                index = max_page_index + 1
         else:
             if not isinstance(index, int):
                 raise AnswerServiceError('index must be an integer')
 
-        if file_index is not None and not isinstance(file_index, int):
-            raise AnswerServiceError('file_index must be an integer')
-
-        page = AnswerPage(book=book, index=index, file_path=file_path, file_index=file_index, creator=creator)
+        page = AnswerPage(book=book, index=index, file_path=file_path, creator=creator)
         db.session.add(page)
         return page
+
+    @staticmethod
+    def add_multi_pages(book: AnswerBook, file_path: str, num_pages: int, start_index: int = None,
+                        creator: UserAlias = None) -> List[AnswerPage]:
+        if book is None:
+            raise AnswerServiceError('book is required')
+        if not file_path:
+            raise AnswerServiceError('file path is required')
+        if num_pages is None:
+            raise AnswerServiceError('num_pages is required')
+        if not isinstance(num_pages, int):
+            raise AnswerServiceError('num_pages must be an integer')
+
+        if book.task.is_locked:
+            raise AnswerServiceError('task has been locked')
+
+        if start_index is None:  # auto increment (may break if race condition occurs)
+            max_page_index = db.session.query(func.max(AnswerPage.index)).filter(AnswerPage.book_id == book.id).scalar()
+            if max_page_index is None:
+                start_index = 1
+            else:
+                start_index = max_page_index + 1
+        else:
+            if not isinstance(start_index, int):
+                raise AnswerServiceError('start index must be an integer')
+
+        pages = []
+        for i in range(num_pages):
+            page = AnswerPage(book=book, index=i + start_index, file_path=file_path, file_index=i + 1, creator=creator)
+            db.session.add(page)
+            pages.append(page)
+        return pages
 
     @staticmethod
     def update_page(page: AnswerPage, index: int, transform: Optional[str], modifier: UserAlias = None):

@@ -28,15 +28,18 @@
     </div>
   </div>
 
-  <div class="ui grid stackable">
-    <div class="column twelve wide">
-      <div class="ui grid two column">
+  <div class="main-wrapper">
+    <div class="main">
+      <div class="ui grid doubling four column">
         <div class="column" *ngFor="let page of book.pages; index as i">
-          <app-answer-page-preview [page]="page" [pdfCache]="pdfCache" (click)="showAnnotator(i + 1)"></app-answer-page-preview>
+          <app-answer-page-preview [page]="page" [pdfCache]="pdfCache" [enableAdmin]="isAdmin"
+                                   (zoomIn)="showAnnotator(i + 1)"
+                                   (deleted)="afterPageDeleted(page)"
+                                   (error)="error=$event"></app-answer-page-preview>
         </div>
       </div>
 
-      <div class="ui grid two column centered stackable">
+      <div class="ui grid centered stackable four column doubling">
         <div class="column">
           <div class="ui segment">
             <div class="ui top attached progress" *ngIf="addingPages">
@@ -53,7 +56,7 @@
         </div>
       </div>
     </div>
-    <div class="column four wide">
+    <div class="side">
       <app-answer-book-markings-view *ngIf="!annotatorShown" [task]="task" [book]="book" (error)="error=$event"></app-answer-book-markings-view>
     </div>
   </div>

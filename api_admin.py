@@ -155,3 +155,52 @@ def import_give(tid: int):
         return jsonify(num_books=num_books)
     except (TaskServiceError, GiveImporterError, AccountServiceError, AnswerServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@admin_api.route('/books/<int:bid>', methods=['DELETE'])
+@requires_admin
+def delete_book(bid: int):
+    try:
+        book = AnswerService.get_book(bid)
+        if book is None:
+            return jsonify(msg='book not found'), 404
+
+        file_paths = AnswerService.delete_book(book)
+
+        data_folder = app.config['DATA_FOLDER']
+        book_folder = os.path.join(data_folder, 'answer_books', str(book.id))
+        if os.path.exists(book_folder):
+            for path in file_paths:
+                full_path = os.path.join(book_folder, path)
+                if os.path.exists(full_path):
+                    os.remove(full_path)
+            if not os.listdir(book_folder):
+                os.rmdir(book_folder)
+
+        db.session.commit()
+        return "", 204
+    except AnswerServiceError as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@admin_api.route('/pages/<int:pid>', methods=['DELETE'])
+@requires_admin
+def delete_page(pid: int):
+    try:
+        page = AnswerService.get_page(pid)
+        if page is None:
+            return jsonify(msg='page not found'), 404
+
+        file_path = AnswerService.delete_page(page)
+
+        data_folder = app.config['DATA_FOLDER']
+        book_folder = os.path.join(data_folder, 'answer_books', str(page.book_id))
+        if file_path:
+            full_path = os.path.join(book_folder, file_path)
+            if os.path.exists(full_path):
+                os.remove(full_path)
+
+        db.session.commit()
+        return "", 204
+    except AnswerServiceError as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400

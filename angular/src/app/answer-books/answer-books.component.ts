@@ -1,12 +1,13 @@
 import {Component, OnInit} from '@angular/core';
 import {AnswerBook, BasicError, Task, User} from "../models";
 import {ActivatedRoute} from "@angular/router";
-import {TaskService, NewAnswerBookForm} from "../task.service";
+import {NewAnswerBookForm, TaskService} from "../task.service";
 import {debounceTime, finalize} from "rxjs/operators";
 import {makeSortField, Pagination} from "../table-util";
 import {NgForm} from "@angular/forms";
 import {AccountService} from "../account.service";
 import {Subject} from "rxjs";
+import {AdminService} from "../admin.service";
 
 @Component({
   selector: 'app-answer-books',
@@ -32,6 +33,7 @@ export class AnswerBooksComponent implements OnInit {
   addingBook: boolean;
 
   constructor(private accountService: AccountService,
+              private adminService: AdminService,
               private taskService: TaskService,
               private route: ActivatedRoute) {
   }
@@ -127,4 +129,24 @@ export class AnswerBooksComponent implements OnInit {
     )
   }
 
+  deleteBook(book: AnswerBook, btn: HTMLButtonElement, index: number) {
+    let studentInfo = '';
+    if (book.student) {
+      studentInfo = ` from student ${book.student.name}`
+    }
+    if (!confirm(`Really want to delete book ${book.id}${studentInfo}?`))
+      return;
+
+    btn.classList.add('loading', 'disabled');
+    this.adminService.deleteBook(book.id).pipe(
+      finalize(() => btn.classList.remove('loading', 'disabled'))
+    ).subscribe(
+      () => {
+        // assume book list is static after loaded
+        this.books.splice(index, 1);
+        this.bookPages.reload();
+      },
+      error => this.error = error.error
+    )
+  }
 }

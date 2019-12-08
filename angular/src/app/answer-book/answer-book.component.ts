@@ -199,4 +199,17 @@ export class AnswerBookComponent implements OnInit {
     )
   }
 
+  afterPageDeleted(page: AnswerPage) {
+    let i = 0, target = -1;
+    for (let _page of this.book.pages) {
+      if (_page.id == page.id) {
+        target = i;
+        break;
+      }
+      ++i;
+    }
+    if (target >= 0) {
+      this.book.pages.splice(target, 1)
+    }
+  }
 }

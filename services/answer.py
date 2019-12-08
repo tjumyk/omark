@@ -1,9 +1,9 @@
-from typing import Optional
+from typing import Optional, Set
 
 from sqlalchemy import func
 
 from error import BasicError
-from models import AnswerBook, Task, UserAlias, db, AnswerPage
+from models import AnswerBook, Task, UserAlias, db, AnswerPage, Annotation, Marking
 
 
 class AnswerServiceError(BasicError):
@@ -122,3 +122,55 @@ class AnswerService:
         page.index = index
         page.transform = transform
         page.modifier = modifier
+
+    @classmethod
+    def delete_book(cls, book: AnswerBook) -> Set[str]:
+        if book is None:
+            raise AnswerServiceError('book is required')
+
+        if book.task.is_locked:
+            raise AnswerServiceError('task has been locked')
+
+        # batch deletion of markings
+        stmt_delete_markings = Marking.__table__.delete().where(Marking.book_id == book.id)
+        db.session.execute(stmt_delete_markings)
+
+        # keep a copy of file paths of the deleted pages
+        # note: use set due to possible duplicate file_paths among pages
+        file_paths_to_delete = set()
+        for page in book.pages:
+            path_to_delete = cls.delete_page(page)
+            if path_to_delete:
+                file_paths_to_delete.add(path_to_delete)
+
+        # delete the book at last
+        db.session.delete(book)
+
+        return file_paths_to_delete
+
+    @staticmethod
+    def delete_page(page: AnswerPage) -> Optional[str]:
+        if page is None:
+            raise AnswerServiceError('page is required')
+
+        if page.book.task.is_locked:
+            raise AnswerServiceError('task has been locked')
+
+        # batch deletion of annotations
+        stmt_delete_annotations = Annotation.__table__.delete().where(Annotation.page_id == page.id)
+        db.session.execute(stmt_delete_annotations)
+
+        # keep a copy of file path to return for deletion only if this file is no longer required
+        if db.session.query(func.count()) \
+                .filter(AnswerPage.book_id == page.book_id,
+                        AnswerPage.file_path == page.file_path,
+                        AnswerPage.id != page.id) \
+                .scalar():
+            file_path_to_delete = None
+        else:
+            file_path_to_delete = page.file_path
+
+        # delete the page at last
+        db.session.delete(page)
+
+        return file_path_to_delete

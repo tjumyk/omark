@@ -59,4 +59,12 @@ export class AdminService {
       form, {reportProgress: true});
     return this.http.request(req);
   }
+
+  deleteBook(bookId: number) :Observable<any>{
+    return this.http.delete(`${this.api}/books/${bookId}`)
+  }
+
+  deletePage(pageId: number) :Observable<any>{
+    return this.http.delete(`${this.api}/pages/${pageId}`)
+  }
 }

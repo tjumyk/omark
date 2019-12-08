@@ -1,6 +1,9 @@
-<app-answer-page-view [page]="page" [pdfCache]="pdfCache" [pdfRenderText]="false" class="page-view"></app-answer-page-view>
+<app-answer-page-view [page]="page" [pdfCache]="pdfCache" [pdfRenderText]="false" class="page-view" (click)="zoomIn.emit()"></app-answer-page-view>
 <div class="content">
-  <div class="meta">
+  <div class="left floated meta">
     Page {{page.index}}
+  </div>
+  <div class="right floated meta" *ngIf="enableAdmin">
+    <button class="ui mini button icon red" (click)="deletePage(page, btnDeletePage)" #btnDeletePage><i class="icon trash"></i></button>
   </div>
 </div>

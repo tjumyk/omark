@@ -14,6 +14,10 @@ export class UpdateAnswerBookForm {
   student_name?: string;
 }
 
+export class UpdateAnswerPageForm{
+  index: number;
+}
+
 export class NewMarkingForm{
   qid: number;
   marks: number;
@@ -72,5 +76,9 @@ export class AnswerService {
 
   addAnnotation(page_id: number, form: NewAnnotationForm):Observable<Annotation> {
     return this.http.post<Annotation>(`${this.api}/pages/${page_id}/annotations`, form)
+  }
+
+  updatePage(page_id: number, form: UpdateAnswerPageForm):Observable<AnswerPage> {
+    return this.http.put<AnswerPage>(`${this.api}/pages/${page_id}`, form)
   }
 }

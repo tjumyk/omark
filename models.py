@@ -159,7 +159,8 @@ class AnswerBook(db.Model):
         if with_student:
             d['student'] = self.student.to_dict() if self.student else None
         if with_pages:
-            d['pages'] = [p.to_dict(with_annotations=with_annotations) for p in self.pages]
+            d['pages'] = [p.to_dict(with_annotations=with_annotations)
+                          for p in sorted(self.pages, key=lambda p: p.index)]
         if with_markings:
             d['markings'] = [m.to_dict(with_creator=with_creator, with_modifier=with_modifier) for m in self.markings]
         if with_creator:

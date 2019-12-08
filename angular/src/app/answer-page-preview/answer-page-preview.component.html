@@ -1,9 +1,21 @@
 <app-answer-page-view [page]="page" [pdfCache]="pdfCache" [pdfRenderText]="false" class="page-view" (click)="zoomIn.emit()"></app-answer-page-view>
 <div class="content">
-  <div class="left floated meta">
-    Page {{page.index}}
-  </div>
-  <div class="right floated meta" *ngIf="enableAdmin">
-    <button class="ui mini button icon red" (click)="deletePage(page, btnDeletePage)" #btnDeletePage><i class="icon trash"></i></button>
-  </div>
+  <ng-container *ngIf="!editing; else pageEditor">
+    <div class="left floated meta">
+      Page {{page.index}}
+    </div>
+    <div class="right floated meta">
+      <i class="ui link icon edit" (click)="startEditingPage()"></i>
+      <i *ngIf="enableAdmin" class="ui link icon red trash" (click)="deletePage(page, btnDeletePage)" #btnDeletePage></i>
+    </div>
+  </ng-container>
+
+  <ng-template #pageEditor>
+    <div class="ui input small action fluid labeled" [class.disabled]="updating">
+      <div class="ui label">Page</div>
+      <input type="number" min="1" #inputUpdateIndex (keydown.enter)="updatePage(inputUpdateIndex.value)" [value]="editIndex">
+      <button [ngClass]="{'loading disabled': updating}" class="ui button icon" (click)="updatePage(inputUpdateIndex.value)"><i class="icon save"></i></button>
+      <button [ngClass]="{'disabled': updating}" class="ui button icon" (click)="editing=false"><i class="icon times"></i></button>
+    </div>
+  </ng-template>
 </div>

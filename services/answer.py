@@ -149,6 +149,13 @@ class AnswerService:
         if page.book.task.is_locked:
             raise AnswerServiceError('task has been locked')
 
+        if db.session.query(func.count()) \
+                .filter(AnswerPage.book_id == page.book_id,
+                        AnswerPage.id != page.id,
+                        AnswerPage.index == index) \
+                .scalar():
+            raise AnswerServiceError('duplicate index')
+
         page.index = index
         page.transform = transform
         page.modifier = modifier

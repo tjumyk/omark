@@ -154,6 +154,7 @@ def do_page(pid: int):
             params = request.json
             AnswerService.update_page(page, index=params.get('index'), transform=params.get('transform'), modifier=user)
             db.session.commit()
+            return jsonify(page.to_dict(with_annotations=True, with_creator=True, with_modifier=True))
     except (AccountServiceError, AnswerServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 

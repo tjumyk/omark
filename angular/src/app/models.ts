@@ -131,3 +131,7 @@ export class Annotation {
   page?: AnswerPage;
   creator?: User;
 }
+
+export class VersionInfo {
+  version: string;
+}

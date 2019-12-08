@@ -1,9 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {HttpClient} from "@angular/common/http";
 
-interface VersionInfo {
-  version: string;
-}
 
 @Component({
   selector: 'app-page',
@@ -11,15 +7,11 @@ interface VersionInfo {
   styleUrls: ['./page.component.less']
 })
 export class PageComponent implements OnInit {
-  version: VersionInfo;
 
-  constructor(private http: HttpClient) {
+  constructor() {
   }
 
   ngOnInit() {
-    this.http.get<VersionInfo>('api/version').subscribe(
-      version => this.version = version
-    )
   }
 
 }

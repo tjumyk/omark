@@ -27,6 +27,9 @@ import { AnswerBookAnnotatorComponent } from './answer-book-annotator/answer-boo
 import { AnswerPageViewComponent } from './answer-page-view/answer-page-view.component';
 import { AnswerBookMarkingsViewComponent } from './answer-book-markings-view/answer-book-markings-view.component';
 import { AnnotationLayerComponent } from './annotation-layer/annotation-layer.component';
+import { PageWideComponent } from './page-wide/page-wide.component';
+import { PageFooterComponent } from './page-footer/page-footer.component';
+import { PageHeaderComponent } from './page-header/page-header.component';
 
 @NgModule({
   declarations: [
@@ -53,6 +56,9 @@ import { AnnotationLayerComponent } from './annotation-layer/annotation-layer.co
     AnswerPageViewComponent,
     AnswerBookMarkingsViewComponent,
     AnnotationLayerComponent,
+    PageWideComponent,
+    PageFooterComponent,
+    PageHeaderComponent,
   ],
   imports: [
     BrowserModule,

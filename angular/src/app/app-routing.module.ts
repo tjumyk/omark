@@ -11,6 +11,7 @@ import {TaskComponent} from "./task/task.component";
 import {AnswerBooksComponent} from "./answer-books/answer-books.component";
 import {AnswerBookComponent} from "./answer-book/answer-book.component";
 import {AdminTaskComponent} from "./admin-task/admin-task.component";
+import {PageWideComponent} from "./page-wide/page-wide.component";
 
 
 const routes: Routes = [
@@ -19,15 +20,6 @@ const routes: Routes = [
     path: '',
     component: PageComponent,
     children: [
-      {
-        path: 'tasks/:task_id',
-        component: TaskComponent,
-        children: [
-          {path: '', pathMatch: 'full', redirectTo: 'books'},
-          {path: 'books', component: AnswerBooksComponent},
-          {path: 'books/:book_id', component: AnswerBookComponent}
-        ]
-      },
       {
         path: 'admin',
         canActivate: [AdminGuard],
@@ -38,6 +30,21 @@ const routes: Routes = [
           {path: 'tasks/:task_id', component: AdminTaskComponent}
         ]
       },
+    ]
+  },
+  {
+    path: '',
+    component: PageWideComponent,
+    children:[
+      {
+        path: 'tasks/:task_id',
+        component: TaskComponent,
+        children: [
+          {path: '', pathMatch: 'full', redirectTo: 'books'},
+          {path: 'books', component: AnswerBooksComponent},
+          {path: 'books/:book_id', component: AnswerBookComponent}
+        ]
+      }
     ]
   },
   {path: 'forbidden', component: ForbiddenComponent},

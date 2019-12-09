@@ -94,7 +94,7 @@ export class AnswerBookCaptureComponent implements OnInit, AfterViewInit, OnDest
     const video = this.video.nativeElement;
     this.trackSupportedConstraints = navigator.mediaDevices.getSupportedConstraints();
 
-    const constraints = {audio: false, video:{ width: 3000, height: 4000, facingMode: 'environment'}};
+    const constraints = {audio: false, video:{ width: 4000, height: 3000, facingMode: 'environment'}};
     navigator.mediaDevices.getUserMedia(constraints).then(stream=>{
       this.tracks = stream.getVideoTracks();
       if(this.tracks.length){

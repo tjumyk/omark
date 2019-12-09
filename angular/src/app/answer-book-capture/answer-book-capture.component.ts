@@ -150,7 +150,7 @@ export class AnswerBookCaptureComponent implements OnInit, AfterViewInit, OnDest
     const ctx = canvas.getContext('2d');
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(video, 0, 0);
+    ctx.drawImage(video, -this.captureSettings.marginLeft, -this.captureSettings.marginTop);
 
     const dataUrl = canvas.toDataURL();
     ctx.clearRect(0, 0, canvas.width, canvas.height);

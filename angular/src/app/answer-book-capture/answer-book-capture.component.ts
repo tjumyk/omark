@@ -61,12 +61,12 @@ export class AnswerBookCaptureComponent implements OnInit, AfterViewInit, OnDest
   @ViewChild('canvas', {static: false})
   canvas: ElementRef<HTMLCanvasElement>;
 
+  tracks: MediaStreamTrack[] ;
   trackSupportedConstraints: MediaTrackSupportedConstraints;
   trackCapabilities: MediaTrackCapabilities;
   trackConstraints: MediaTrackConstraints;
   trackSettings: MediaTrackSettings;
 
-  captureSettings = new CaptureSettings();
   overlayRect: OverlayRect;
 
   windowResizeHandler;
@@ -83,6 +83,11 @@ export class AnswerBookCaptureComponent implements OnInit, AfterViewInit, OnDest
       window.removeEventListener('resize', this.windowResizeHandler);
       this.windowResizeHandler = null;
     }
+    if(this.tracks){
+      for(let track of this.tracks){
+        track.stop()
+      }
+    }
   }
 
   ngAfterViewInit(): void {
@@ -91,9 +96,9 @@ export class AnswerBookCaptureComponent implements OnInit, AfterViewInit, OnDest
 
     const constraints = {audio: false, video:{ width: 1920, height: 1080}};
     navigator.mediaDevices.getUserMedia(constraints).then(stream=>{
-      const tracks = stream.getVideoTracks();
-      if(tracks.length){
-        const track = tracks[0];
+      this.tracks = stream.getVideoTracks();
+      if(this.tracks.length){
+        const track = this.tracks[0]; // assume only one track exists
         if(track.getCapabilities)
           this.trackCapabilities = track.getCapabilities();
         if(track.getConstraints)

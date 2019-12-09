@@ -1,3 +1,4 @@
+import json
 import os
 import shutil
 import tempfile
@@ -11,6 +12,7 @@ from services.account import AccountService, AccountServiceError
 from services.answer import AnswerService, AnswerServiceError
 from services.marking import MarkingService, MarkingServiceError
 from services.task import TaskService, TaskServiceError
+from utils.image import process_image
 from utils.pdf import get_pdf_pages
 
 answer_api = Blueprint('answer_api', __name__)
@@ -83,6 +85,14 @@ def do_book_pages(bid: int):
         file_list = files.getlist('file')
         if not file_list:
             return jsonify(msg='file is required'), 400
+        options = params.get('options')
+        if options is not None:
+            try:
+                options = json.loads(options)
+                if not isinstance(options, dict):
+                    return jsonify(msg='invalid options format', detail='options must be a dict'), 400
+            except (ValueError, TypeError) as e:
+                return jsonify(msg='invalid options format', detail=str(e)), 400
 
         # prepare file path
         data_folder = app.config['DATA_FOLDER']
@@ -96,7 +106,8 @@ def do_book_pages(bid: int):
             ext = os.path.splitext(file.filename)[-1].lower()
             num_tries = 0
             while True:
-                path = os.path.join(str(uuid.uuid4()) + ext)  # generate a random path
+                random_id = str(uuid.uuid4())
+                path = random_id + ext  # generate a random path
                 full_path = os.path.join(data_folder, book_folder, path)
                 if not os.path.exists(full_path):  # check if the path already exists
                     break
@@ -112,9 +123,27 @@ def do_book_pages(bid: int):
                     pages.extend(AnswerService.add_multi_pages(book, path, num_pages, creator=user))
                     shutil.copyfile(tmp_path, full_path)
             else:
-                page = AnswerService.add_page(book, path, index=params.get('index'), creator=user)
-                file.save(full_path)
-                pages.append(page)
+                if options:
+                    with tempfile.TemporaryDirectory() as tmp_dir:
+                        tmp_path = os.path.join(tmp_dir, 'file' + ext)
+                        file.save(tmp_path)
+                        try:
+                            processed_img_paths = process_image(tmp_path, options, tmp_dir)
+                        except Exception as e:
+                            return jsonify(msg='Failed to process image', detail=str(e)), 400
+
+                        for i, output_img_path in enumerate(processed_img_paths):
+                            if i == 0:
+                                alt_path = path  # keep the path of the first as the original path
+                            else:
+                                alt_path = '%s_%d%s' % (random_id, i, ext)
+                            page = AnswerService.add_page(book, alt_path, creator=user)
+                            shutil.copy(output_img_path, os.path.join(data_folder, book_folder, alt_path))
+                            pages.append(page)
+                else:
+                    page = AnswerService.add_page(book, path, index=params.get('index'), creator=user)
+                    file.save(full_path)
+                    pages.append(page)
         db.session.commit()
         return jsonify([page.to_dict(with_annotations=True, with_creator=True) for page in pages]), 201
     except (AccountServiceError, AnswerServiceError) as e:

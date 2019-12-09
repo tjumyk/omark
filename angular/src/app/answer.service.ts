@@ -28,6 +28,13 @@ export class NewAnnotationForm{
   data: string;
 }
 
+export class PageOptions{
+  cutMiddle: boolean;
+  discardFirst: boolean;
+  fitMaxWidth?: number;
+  fitMaxHeight?: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -52,10 +59,13 @@ export class AnswerService {
       return this.http.get<AnswerBook>(`${this.api}/books/${fromId}/prev`);
   }
 
-  addPages(book_id: number, files: File[]): Observable<HttpEvent<any>> {
+  addPages(book_id: number, files: File[], options?: PageOptions): Observable<HttpEvent<any>> {
     const form = new FormData();
     for (let file of files) {
       form.append('file', file);
+    }
+    if(options){
+      form.append('options', JSON.stringify(options));
     }
 
     const req = new HttpRequest('POST', `${this.api}/books/${book_id}/pages`,

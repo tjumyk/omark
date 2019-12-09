@@ -47,7 +47,7 @@
       position: relative;
       background: black;
 
-      video, .margin-areas {
+      video, canvas, .margin-areas, .cut-middle-lines {
         width: 100%;
         height: 100%;
         position: absolute;
@@ -55,7 +55,7 @@
         left: 0;
       }
 
-      canvas, .overlay{
+      .canvas-wrapper, .overlay{
         position: absolute;
       }
 
@@ -89,6 +89,21 @@
         &>.bottom{
           bottom: 0;
           border-width: 1px 0 0 0;
+        }
+      }
+
+      .cut-middle-lines{
+        .line{
+          border-style: dashed;
+          border-color: yellow;
+          position: absolute;
+        }
+        .vertical{
+          left: 50%;
+          top: 0;
+          width: 0;
+          height: 100%;
+          border-width: 0 0 0 1px;
         }
       }
     }

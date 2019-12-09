@@ -13,9 +13,13 @@
     <div class="camera">
       <video #video></video>
       <div class="overlay" *ngIf="overlayRect" [ngStyle]="{'width.px': overlayRect.width, 'height.px': overlayRect.height, 'left.px': overlayRect.left, 'top.px': overlayRect.top}">
-        <canvas #canvas [ngStyle]="{'left.px': captureSettings.marginLeft * overlayRect.scale, 'width.px': overlayRect.width - (captureSettings.marginLeft + captureSettings.marginRight) * overlayRect.scale, 'top.px': captureSettings.marginTop * overlayRect.scale, 'height.px': overlayRect.height - (captureSettings.marginTop + captureSettings.marginBottom) * overlayRect.scale}"
-                [width]="overlayRect.width / overlayRect.scale - captureSettings.marginLeft - captureSettings.marginRight"
-                [height]="overlayRect.height / overlayRect.scale  - captureSettings.marginTop - captureSettings.marginBottom"></canvas>
+        <div class="canvas-wrapper" [ngStyle]="{'left.px': captureSettings.marginLeft * overlayRect.scale, 'width.px': overlayRect.width - (captureSettings.marginLeft + captureSettings.marginRight) * overlayRect.scale, 'top.px': captureSettings.marginTop * overlayRect.scale, 'height.px': overlayRect.height - (captureSettings.marginTop + captureSettings.marginBottom) * overlayRect.scale}">
+          <canvas #canvas [width]="overlayRect.width / overlayRect.scale - captureSettings.marginLeft - captureSettings.marginRight"
+                  [height]="overlayRect.height / overlayRect.scale  - captureSettings.marginTop - captureSettings.marginBottom"></canvas>
+          <div class="cut-middle-lines" *ngIf="captureSettings.serverOptions.cutMiddle">
+            <div class="vertical line"></div>
+          </div>
+        </div>
         <div class="margin-areas">
           <div class="left area" [ngStyle]="{'width.px': captureSettings.marginLeft * overlayRect.scale}"></div>
           <div class="right area" [ngStyle]="{'width.px': captureSettings.marginRight * overlayRect.scale}"></div>
@@ -60,6 +64,30 @@
               <div class="field">
                 <label>Margin Bottom</label>
                 <input type="number" min="0" name="margin_bottom" [(ngModel)]="captureSettings.marginBottom">
+              </div>
+            </div>
+            <div class="fields">
+              <div class="field">
+                <label>Fit Max Width</label>
+                <input type="number" min="0" name="fit_max_width" [(ngModel)]="captureSettings.serverOptions.fitMaxWidth">
+              </div>
+              <div class="field">
+                <label>Fit Max Height</label>
+                <input type="number" min="0" name="fit_max_height" [(ngModel)]="captureSettings.serverOptions.fitMaxHeight">
+              </div>
+              <div class="field">
+                <label>Cut Middle</label>
+                <div class="ui toggle checkbox">
+                  <input type="checkbox" name="cut_middle" [(ngModel)]="captureSettings.serverOptions.cutMiddle" class="hidden" #inputCheckboxCutMiddle>
+                  <label (click)="inputCheckboxCutMiddle.click()"></label>
+                </div>
+              </div>
+              <div class="field">
+                <label>Discard First Page</label>
+                <div class="ui toggle checkbox">
+                  <input type="checkbox" name="discard_first" [(ngModel)]="captureSettings.serverOptions.discardFirst" class="hidden" #inputCheckboxDiscardFirst>
+                  <label (click)="inputCheckboxDiscardFirst.click()"></label>
+                </div>
               </div>
             </div>
           </form>

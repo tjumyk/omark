@@ -10,15 +10,17 @@ import {
   ViewChild
 } from '@angular/core';
 import {AnswerBook, AnswerPage, BasicError, Task} from "../models";
-import {AnswerService} from "../answer.service";
+import {AnswerService, PageOptions} from "../answer.service";
 import {finalize} from "rxjs/operators";
 import {HttpEventType} from "@angular/common/http";
 
-export class CaptureSettings{
+export class CaptureSettings {
   marginLeft: number = 0;
   marginRight: number = 0;
   marginTop: number = 0;
   marginBottom: number = 0;
+
+  serverOptions = new PageOptions();
 }
 
 export class OverlayRect{
@@ -94,7 +96,7 @@ export class AnswerBookCaptureComponent implements OnInit, AfterViewInit, OnDest
     const video = this.video.nativeElement;
     this.trackSupportedConstraints = navigator.mediaDevices.getSupportedConstraints();
 
-    const constraints = {audio: false, video:{ width: 4000, height: 3000, facingMode: 'environment'}};
+    const constraints = {audio: false, video: {width: 3000, height: 4000, facingMode: 'environment'}};
     navigator.mediaDevices.getUserMedia(constraints).then(stream=>{
       this.tracks = stream.getVideoTracks();
       if(this.tracks.length){
@@ -168,14 +170,14 @@ export class AnswerBookCaptureComponent implements OnInit, AfterViewInit, OnDest
     shot.dataUrl = dataUrl;
     this.shots.push(shot);
 
-    shot.uploading= true;
-    this.answerService.addPages(this.book.id, [blobFile]).pipe(
-      finalize(()=>{
+    shot.uploading = true;
+    this.answerService.addPages(this.book.id, [blobFile], this.captureSettings.serverOptions).pipe(
+      finalize(() => {
         shot.uploading = false;
         URL.revokeObjectURL(shot.dataUrl);
       })
     ).subscribe(
-      event=>{
+      event => {
         switch (event.type) {
           case HttpEventType.UploadProgress:
             shot.uploadProgress = Math.round(100 * event.loaded / event.total);

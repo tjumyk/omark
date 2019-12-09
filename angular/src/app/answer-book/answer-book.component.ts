@@ -7,6 +7,7 @@ import {HttpEventType} from "@angular/common/http";
 import * as pdfjsLib from "pdfjs-dist/webpack";
 import {TaskService} from "../task.service";
 import {AccountService} from "../account.service";
+import {CaptureSettings} from "../answer-book-capture/answer-book-capture.component";
 
 @Component({
   selector: 'app-answer-book',
@@ -37,6 +38,7 @@ export class AnswerBookComponent implements OnInit {
   updatingBook: boolean;
 
   captureShown: boolean;
+  captureSettings = new CaptureSettings();
 
   constructor(private accountService: AccountService,
               private taskService: TaskService,

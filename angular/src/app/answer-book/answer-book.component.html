@@ -66,6 +66,7 @@
 
   <app-answer-book-annotator *ngIf="annotatorShown" [startPageIndex]="annotatorStartPageIndex" (closed)="hideAnnotator()"
                              [task]="task" [book]="book" [pdfCache]="pdfCache"></app-answer-book-annotator>
-  <app-answer-book-capture *ngIf="captureShown" [task]="task" [book]="book" (newPages)="afterCaptureNewPages($event)"
+  <app-answer-book-capture *ngIf="captureShown" [task]="task" [captureSettings]="captureSettings" [book]="book"
+                           (newPages)="afterCaptureNewPages($event)"
                            (closed)="hideCapture()"></app-answer-book-capture>
 </ng-container>

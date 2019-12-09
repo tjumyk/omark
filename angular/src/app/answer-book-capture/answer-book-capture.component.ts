@@ -47,6 +47,8 @@ export class AnswerBookCaptureComponent implements OnInit, AfterViewInit, OnDest
   task: Task;
   @Input()
   book: AnswerBook;
+  @Input()
+  captureSettings : CaptureSettings;
 
   @Output()
   closed = new EventEmitter<any>();

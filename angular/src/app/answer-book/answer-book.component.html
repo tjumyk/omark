@@ -50,8 +50,11 @@
                 <label>File</label>
                 <input type="file" name="file" accept="image/*,.pdf" required #inputFile multiple>
               </div>
-              <button type="submit" class="ui button primary fluid"><i class="icon plus"></i> Add Pages</button>
+              <button type="submit" class="ui button primary fluid"><i class="icon upload"></i> Upload Page Files</button>
             </form>
+
+            <div class="ui horizontal divider">Or</div>
+            <button class="ui button primary fluid" (click)="showCapture()"><i class="icon camera"></i> Capture from Camera</button>
           </div>
         </div>
       </div>
@@ -63,4 +66,6 @@
 
   <app-answer-book-annotator *ngIf="annotatorShown" [startPageIndex]="annotatorStartPageIndex" (closed)="hideAnnotator()"
                              [task]="task" [book]="book" [pdfCache]="pdfCache"></app-answer-book-annotator>
+  <app-answer-book-capture *ngIf="captureShown" [task]="task" [book]="book" (newPages)="afterCaptureNewPages($event)"
+                           (closed)="hideCapture()"></app-answer-book-capture>
 </ng-container>

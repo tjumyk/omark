@@ -30,6 +30,7 @@ import { AnnotationLayerComponent } from './annotation-layer/annotation-layer.co
 import { PageWideComponent } from './page-wide/page-wide.component';
 import { PageFooterComponent } from './page-footer/page-footer.component';
 import { PageHeaderComponent } from './page-header/page-header.component';
+import { AnswerBookCaptureComponent } from './answer-book-capture/answer-book-capture.component';
 
 @NgModule({
   declarations: [
@@ -59,6 +60,7 @@ import { PageHeaderComponent } from './page-header/page-header.component';
     PageWideComponent,
     PageFooterComponent,
     PageHeaderComponent,
+    AnswerBookCaptureComponent,
   ],
   imports: [
     BrowserModule,

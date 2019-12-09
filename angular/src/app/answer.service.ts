@@ -52,14 +52,12 @@ export class AnswerService {
       return this.http.get<AnswerBook>(`${this.api}/books/${fromId}/prev`);
   }
 
-  addPages(book_id: number, files: FileList): Observable<HttpEvent<any>> {
+  addPages(book_id: number, files: File[]): Observable<HttpEvent<any>> {
     const form = new FormData();
-    let i = 0;
-    while (i < files.length) {
-      const file = files.item(i);
+    for (let file of files) {
       form.append('file', file);
-      ++i;
     }
+
     const req = new HttpRequest('POST', `${this.api}/books/${book_id}/pages`,
       form, {reportProgress: true});
     return this.http.request(req);

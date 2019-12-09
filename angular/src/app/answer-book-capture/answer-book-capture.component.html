@@ -1,0 +1,87 @@
+<div class="ui top fixed menu inverted">
+  <div class="item">
+    Book {{book.id}}
+  </div>
+  <div *ngIf="book.student_id" class="item">
+    <app-user-mini-card [user]="book.student" [enablePopup]="false"></app-user-mini-card>
+  </div>
+  <div class="ui close button circular black icon" (click)="closed.emit()"><i class="icon times"></i></div>
+</div>
+
+<div class="content-wrapper">
+  <div class="main">
+    <div class="camera">
+      <video #video></video>
+      <div class="overlay" *ngIf="overlayRect" [ngStyle]="{'width.px': overlayRect.width, 'height.px': overlayRect.height, 'left.px': overlayRect.left, 'top.px': overlayRect.top}">
+        <canvas #canvas [ngStyle]="{'left.px': captureSettings.marginLeft * overlayRect.scale, 'width.px': overlayRect.width - (captureSettings.marginLeft + captureSettings.marginRight) * overlayRect.scale, 'top.px': captureSettings.marginTop * overlayRect.scale, 'height.px': overlayRect.height - (captureSettings.marginTop + captureSettings.marginBottom) * overlayRect.scale}"
+                [width]="overlayRect.width / overlayRect.scale - captureSettings.marginLeft - captureSettings.marginRight"
+                [height]="overlayRect.height / overlayRect.scale  - captureSettings.marginTop - captureSettings.marginBottom"></canvas>
+        <div class="margin-areas">
+          <div class="left area" [ngStyle]="{'width.px': captureSettings.marginLeft * overlayRect.scale}"></div>
+          <div class="right area" [ngStyle]="{'width.px': captureSettings.marginRight * overlayRect.scale}"></div>
+          <div class="top area" [ngStyle]="{'height.px': captureSettings.marginTop * overlayRect.scale}"></div>
+          <div class="bottom area" [ngStyle]="{'height.px': captureSettings.marginBottom * overlayRect.scale}"></div>
+        </div>
+      </div>
+    </div>
+    <div class="bottom">
+      <div class="camera-info" *ngIf="trackSettings">
+        <div class="ui list horizontal inverted">
+          <div class="item">
+            <div class="header">Width</div>
+            {{trackSettings.width}}
+          </div>
+          <div class="item">
+            <div class="header">Height</div>
+            {{trackSettings.height}}
+          </div>
+          <div class="item" *ngIf="trackSettings.frameRate">
+            <div class="header">Frame Rate</div>
+            {{trackSettings.frameRate}}
+          </div>
+        </div>
+      </div>
+      <div class="controls">
+        <div class="settings">
+          <form class="ui form equal width inverted">
+            <div class="fields">
+              <div class="field">
+                <label>Margin Left</label>
+                <input type="number" min="0" name="margin_left" [(ngModel)]="captureSettings.marginLeft">
+              </div>
+              <div class="field">
+                <label>Margin Right</label>
+                <input type="number" min="0" name="margin_right" [(ngModel)]="captureSettings.marginRight">
+              </div>
+              <div class="field">
+                <label>Margin Top</label>
+                <input type="number" min="0" name="margin_top" [(ngModel)]="captureSettings.marginTop">
+              </div>
+              <div class="field">
+                <label>Margin Bottom</label>
+                <input type="number" min="0" name="margin_bottom" [(ngModel)]="captureSettings.marginBottom">
+              </div>
+            </div>
+          </form>
+        </div>
+        <button class="ui button capture icon massive primary" (click)="takeShot()"><i class="icon camera"></i></button>
+      </div>
+    </div>
+  </div>
+  <div class="side">
+    <app-error [error]="error"></app-error>
+    <div class="shots">
+      <div class="ui card fluid" *ngFor="let shot of shots">
+        <div class="ui top attached progress" *ngIf="shot.uploading">
+          <div class="bar" [ngStyle]="{'width.%': shot.uploadProgress}"></div>
+        </div>
+        <div class="image">
+          <img [src]="shot.dataUrl">
+        </div>
+      </div>
+    </div>
+    <div class="navigation">
+      Navigation Placeholder
+    </div>
+  </div>
+</div>

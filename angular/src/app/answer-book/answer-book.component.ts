@@ -36,6 +36,8 @@ export class AnswerBookComponent implements OnInit {
 
   updatingBook: boolean;
 
+  captureShown: boolean;
+
   constructor(private accountService: AccountService,
               private taskService: TaskService,
               private answerService: AnswerService,
@@ -141,9 +143,17 @@ export class AnswerBookComponent implements OnInit {
     }
   }
 
-  addPages(files: FileList) {
-    if (!files.length)
+  addPages(fileList: FileList) {
+    if (!fileList.length)
       return;
+
+    const files = [];
+    let i = 0;
+    while (i < fileList.length) {
+      const file = fileList.item(i);
+      files.push(file);
+      ++i;
+    }
 
     this.addingPages = true;
     this.answerService.addPages(this.bookId, files).pipe(
@@ -173,6 +183,16 @@ export class AnswerBookComponent implements OnInit {
   hideAnnotator() {
     window.document.body.style.overflowY = null;
     this.annotatorShown = false;
+  }
+
+  showCapture() {
+    window.document.body.style.overflowY = 'hidden';
+    this.captureShown = true;
+  }
+
+  hideCapture() {
+    window.document.body.style.overflowY = null;
+    this.captureShown = false;
   }
 
   updateBook(studentName: string) {
@@ -211,5 +231,10 @@ export class AnswerBookComponent implements OnInit {
     if (target >= 0) {
       this.book.pages.splice(target, 1)
     }
+  }
+
+  afterCaptureNewPages(pages: AnswerPage[]){
+    this.processPages(pages);
+    this.book.pages.push(...pages)
   }
 }

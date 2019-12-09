@@ -42,10 +42,18 @@
     display: flex;
     flex-direction: column;
 
+    @media(max-width: 767px){
+      height: auto;
+    }
+
     & > .camera {
       flex: 1;
       position: relative;
       background: black;
+
+      @media(max-width: 767px){
+        min-height: 300px;
+      }
 
       video, canvas, .margin-areas, .cut-middle-lines {
         width: 100%;

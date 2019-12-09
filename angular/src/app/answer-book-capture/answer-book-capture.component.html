@@ -72,11 +72,11 @@
     <app-error [error]="error"></app-error>
     <div class="shots">
       <div class="ui card fluid" *ngFor="let shot of shots">
+        <div class="ui top attached progress blue" *ngIf="shot.uploading">
+          <div class="bar" [ngStyle]="{'width.%': shot.uploadProgress}"></div>
+        </div>
         <div class="image">
           <img [src]="shot.dataUrl">
-        </div>
-        <div class="ui bottom attached progress blue" *ngIf="shot.uploading">
-          <div class="bar" [ngStyle]="{'width.%': shot.uploadProgress}"></div>
         </div>
       </div>
     </div>

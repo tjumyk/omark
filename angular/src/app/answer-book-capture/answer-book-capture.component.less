@@ -30,6 +30,11 @@
   padding-top: 4rem;
   display: flex;
 
+  @media(max-width: 767px){
+    display: block;
+    overflow: auto;
+  }
+
   & > .main {
     position: relative;
     flex: 1;
@@ -108,6 +113,10 @@
     width: 300px;
     display: flex;
     flex-direction: column;
+
+    @media(max-width: 767px){
+      width: 100%;
+    }
 
     & > .shots{
       flex: 1;

@@ -63,6 +63,9 @@ export class AnswerBookCaptureComponent implements OnInit, AfterViewInit, OnDest
   @ViewChild('canvas', {static: false})
   canvas: ElementRef<HTMLCanvasElement>;
 
+  @ViewChild('audioShutter', {static: true})
+  audioShutter: ElementRef<HTMLAudioElement>;
+
   tracks: MediaStreamTrack[] ;
   trackSupportedConstraints: MediaTrackSupportedConstraints;
   trackCapabilities: MediaTrackCapabilities;
@@ -156,6 +159,7 @@ export class AnswerBookCaptureComponent implements OnInit, AfterViewInit, OnDest
   takeShot(){
     const video = this.video.nativeElement;
     const canvas = this.canvas.nativeElement;
+    const audioShutter = this.audioShutter.nativeElement;
     const ctx = canvas.getContext('2d');
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -169,6 +173,8 @@ export class AnswerBookCaptureComponent implements OnInit, AfterViewInit, OnDest
     const shot = new Shot();
     shot.dataUrl = dataUrl;
     this.shots.push(shot);
+
+    audioShutter.play();
 
     shot.uploading = true;
     this.answerService.addPages(this.book.id, [blobFile], this.captureSettings.serverOptions).pipe(

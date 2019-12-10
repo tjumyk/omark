@@ -6,6 +6,7 @@
     </div>
     <div class="right floated meta">
       <i class="ui link icon edit" (click)="startEditingPage()"></i>
+      <a href="api/answers/books/{{page.book_id}}/files/{{page.file_path}}" target="_blank"><i class="ui icon download"></i></a>
       <i *ngIf="enableAdmin" class="ui link icon red trash" (click)="deletePage(page, btnDeletePage)" #btnDeletePage></i>
     </div>
   </ng-container>

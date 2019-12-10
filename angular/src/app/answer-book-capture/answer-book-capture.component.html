@@ -2,8 +2,9 @@
   <div class="item">
     Book {{book.id}}
   </div>
-  <div *ngIf="book.student_id" class="item">
-    <app-user-mini-card [user]="book.student" [enablePopup]="false"></app-user-mini-card>
+  <div class="item">
+    <app-answer-book-student-card [book]="book" [enableAdmin]="false" [enablePopup]="false"
+                                  (error)="error=$event"></app-answer-book-student-card>
   </div>
   <div class="ui close button circular black icon" (click)="closed.emit()"><i class="icon times"></i></div>
 </div>

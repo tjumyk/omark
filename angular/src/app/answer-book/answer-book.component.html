@@ -10,16 +10,8 @@
       </div>
       <div class="item">
         <div class="header">Student</div>
-        <app-user-mini-card [enablePopup]="true" [user]="book.student" [enableAdmin]="isAdmin" *ngIf="book.student_id; else noStudent"></app-user-mini-card>
-        <ng-template #noStudent>
-          <div class="ui action input small" [class.disabled]="updatingBook">
-            <input type="text" #inputStudentName (keyup.enter)="updateBook(inputStudentName.value)">
-            <button class="ui icon button" (click)="updateBook(inputStudentName.value)"
-                    [ngClass]="{'loading disabled': updatingBook}">
-              <i class="icon save"></i>
-            </button>
-          </div>
-        </ng-template>
+        <app-answer-book-student-card [book]="book" [enableAdmin]="isAdmin" [enablePopup]="true"
+                                      (error)="error=$event"></app-answer-book-student-card>
       </div>
       <div class="item">
         <div class="header">Created At</div>

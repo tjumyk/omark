@@ -35,8 +35,6 @@ export class AnswerBookComponent implements OnInit {
   annotatorShown: boolean;
   annotatorStartPageIndex: number;
 
-  updatingBook: boolean;
-
   captureShown: boolean;
   captureSettings = new CaptureSettings();
 
@@ -195,30 +193,6 @@ export class AnswerBookComponent implements OnInit {
   hideCapture() {
     window.document.body.style.overflowY = null;
     this.captureShown = false;
-  }
-
-  updateBook(studentName: string) {
-    // Currently, for simplicity, no NgForm is used here.
-    const form = new UpdateAnswerBookForm();
-    form.student_name = studentName;
-
-    this.updatingBook = true;
-    this.answerService.updateBook(this.bookId, form).pipe(
-      finalize(() => this.updatingBook = false)
-    ).subscribe(
-      book => {
-        // Carefully copy possibly updated fields.
-        // Collection fields like 'markings' should not change.
-        // If any view elements are rendered statically according to some field, i.e. not bound by Angular, these
-        // elements should be updated as well.
-        this.book.student_id = book.student_id;
-        this.book.student = book.student;
-        this.book.modified_at = book.modified_at;
-        this.book.modifier_id = book.modifier_id;
-        this.book.modifier = book.modifier;
-      },
-      error => this.error = error.error
-    )
   }
 
   afterPageDeleted(page: AnswerPage) {

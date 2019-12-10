@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {HttpClient, HttpEvent, HttpRequest} from "@angular/common/http";
+import {HttpClient, HttpEvent, HttpParams, HttpRequest} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {Annotation, AnswerBook, AnswerPage, Marking} from "./models";
 import {PDFDocumentProxy, PDFPageProxy} from "pdfjs-dist/webpack";
@@ -49,15 +49,19 @@ export class AnswerService {
     return this.http.get<AnswerBook>(`${this.api}/books/${id}`)
   }
 
-  updateBook(id: number, form: UpdateAnswerBookForm):Observable<AnswerBook>{
+  updateBook(id: number, form: UpdateAnswerBookForm): Observable<AnswerBook> {
     return this.http.put<AnswerBook>(`${this.api}/books/${id}`, form)
   }
 
-  goToBook(fromId: number, isNext: boolean):Observable<AnswerBook>{
-    if(isNext)
-      return this.http.get<AnswerBook>(`${this.api}/books/${fromId}/next`);
+  goToBook(fromId: number, isNext: boolean, getPages: boolean = false): Observable<AnswerBook> {
+    let params = new HttpParams();
+    if (getPages)
+      params = params.append('pages', 'true');
+
+    if (isNext)
+      return this.http.get<AnswerBook>(`${this.api}/books/${fromId}/next`, {params});
     else
-      return this.http.get<AnswerBook>(`${this.api}/books/${fromId}/prev`);
+      return this.http.get<AnswerBook>(`${this.api}/books/${fromId}/prev`, {params});
   }
 
   addPages(book_id: number, files: File[], options?: PageOptions): Observable<HttpEvent<any>> {
@@ -75,7 +79,11 @@ export class AnswerService {
   }
 
   getPageFile(page: AnswerPage): Observable<ArrayBuffer> {
-    return this.http.get(`${this.api}/books/${page.book_id}/files/${page.file_path}`,
+    return this.getBookFile(page.book_id, page.file_path);
+  }
+
+  getBookFile(book_id: number, file_path:string): Observable<ArrayBuffer> {
+    return this.http.get(`${this.api}/books/${book_id}/files/${file_path}`,
       {responseType: "arraybuffer"});
   }
 

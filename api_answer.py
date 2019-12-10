@@ -63,7 +63,9 @@ def go_to_book(bid: int):
         book2 = AnswerService.go_to_book(book, request.path.endswith('/next'))
         if book2 is None:
             return "", 204
-        return jsonify(book2.to_dict())
+
+        request_pages = request.args.get('pages') == 'true'
+        return jsonify(book2.to_dict(with_pages=request_pages))
     except AnswerServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 

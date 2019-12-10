@@ -1,20 +1,26 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {AnswerBook, AnswerPage, BasicError, Task, User} from "../models";
-import {AnswerService, PDFCache, PDFCacheEntry, UpdateAnswerBookForm} from "../answer.service";
+import {AnswerService, PDFCache, PDFCacheEntry} from "../answer.service";
 import {ActivatedRoute} from "@angular/router";
-import {finalize} from "rxjs/operators";
+import {concatMap, finalize, takeUntil} from "rxjs/operators";
 import {HttpEventType} from "@angular/common/http";
 import * as pdfjsLib from "pdfjs-dist/webpack";
 import {TaskService} from "../task.service";
 import {AccountService} from "../account.service";
 import {CaptureSettings} from "../answer-book-capture/answer-book-capture.component";
+import {from, Subject, zip} from "rxjs";
+
+export class AnswerPageGroup {
+  filePath: string;
+  pages: AnswerPage[] = [];
+}
 
 @Component({
   selector: 'app-answer-book',
   templateUrl: './answer-book.component.html',
   styleUrls: ['./answer-book.component.less']
 })
-export class AnswerBookComponent implements OnInit {
+export class AnswerBookComponent implements OnInit, OnDestroy {
   error: BasicError;
 
   user: User;
@@ -38,10 +44,19 @@ export class AnswerBookComponent implements OnInit {
   captureShown: boolean;
   captureSettings = new CaptureSettings();
 
+  preloadNextCheckerHandler: number;
+
+  abortLoadFiles = new Subject<void>();
+
   constructor(private accountService: AccountService,
               private taskService: TaskService,
               private answerService: AnswerService,
               private route: ActivatedRoute) {
+  }
+
+  ngOnDestroy(): void {
+    clearInterval(this.preloadNextCheckerHandler);
+    this.abortLoadFiles.next();
   }
 
   ngOnInit() {
@@ -57,10 +72,14 @@ export class AnswerBookComponent implements OnInit {
             this.task = task;
 
             this.route.paramMap.subscribe(
-              val=>{
+              val => {
                 this.book = undefined;
                 this.pdfCache = {};
                 this.annotatorStartPageIndex = undefined;
+
+                clearInterval(this.preloadNextCheckerHandler);
+                this.abortLoadFiles.next();
+
                 this.bookId = parseInt(val.get('book_id'));
 
                 this.loadingBook = true;
@@ -76,6 +95,7 @@ export class AnswerBookComponent implements OnInit {
                     this.book = book;
 
                     this.processPages(book.pages);
+                    this.setupNextBookPreload();
                   },
                   error => this.error = error.error
                 )
@@ -90,57 +110,66 @@ export class AnswerBookComponent implements OnInit {
   }
 
   private processPages(pages: AnswerPage[]) {
-    for(let page of pages){
-      if (page.file_path.toLowerCase().endsWith('.pdf')) {
-        if (this.pdfCache[page.file_path] === undefined) {
-          this.pdfCache[page.file_path] = null;  // mark null to indicate requested
-          this.answerService.getPageFile(page).subscribe(
-            data => {
-              pdfjsLib.getDocument(data).promise.then(
-                doc => {
-                  const entry = new PDFCacheEntry();
-                  this.pdfCache[page.file_path] = entry;
-                  entry.document = doc;
+    if (pages.length == 0)
+      return;
+    const bookId = pages[0].book_id;
+    const pageGroups = this.groupPagesByFilePath(pages);
+    const loadTasks = from(pageGroups).pipe(
+      concatMap(group => this.answerService.getBookFile(bookId, group.filePath))
+    );
+    zip(pageGroups, loadTasks).pipe(
+      takeUntil(this.abortLoadFiles)
+    ).subscribe(
+      ([group, data]) => {
+        if (group.filePath.toLowerCase().endsWith('.pdf')) {
+          pdfjsLib.getDocument(data).promise.then(
+            doc => {
+              if (bookId != this.bookId)
+                return; // stop processing if bookId has been changed
 
-                  const processPage = (i)=>{
-                    doc.getPage(i).then(
-                      _page => {
-                        entry.pages[i - 1] = _page;
-                        for(let __page of pages){
-                          if(__page.file_path == page.file_path && i == __page.file_index){
-                            __page['_loaded']  = true;
-                            break;
-                          }
-                        }
-                      },
-                      error => this.error = {msg: 'Failed to get PDF page', detail: error}
-                    );
-                  };
+              const entry = new PDFCacheEntry();
+              this.pdfCache[group.filePath] = entry;
+              entry.document = doc;
 
-                  const numPages = doc.numPages;
-                  let i = 1;
-                  while(i <= numPages){
-                    processPage(i);
-                    ++i;
-                  }
-                },
-                error => {
-                  this.error = {msg: 'Failed to load PDF Document', detail: error}
+              const numPages = doc.numPages;
+              let currentPageIndex = 1; // start from 1
+
+              const processNextPage = () => {
+                if (currentPageIndex > numPages || this.bookId != bookId) {
+                  return // stop processing if all pages are processed or bookId has been changed
                 }
-              )
+                doc.getPage(currentPageIndex).then(
+                  pdfPage => {
+                    entry.pages[currentPageIndex - 1] = pdfPage;
+                    for (let page of group.pages) {
+                      if (currentPageIndex == page.file_index) {
+                        page['_loaded'] = true;
+                      }
+                    }
+
+                    ++currentPageIndex;
+                    processNextPage()  // recursive call
+                  },
+                  error => this.error = {
+                    msg: `Failed to load PDF page (page ${currentPageIndex})`,
+                    detail: error
+                  }
+                );
+              };
+              processNextPage();
             },
-            error => this.error = error.error
+            error => {
+              this.error = {msg: 'Failed to load PDF Document', detail: error}
+            }
           )
-        }
-      } else {
-        this.answerService.getPageFile(page).subscribe(
-          data => {
+        } else {
+          for (let page of group.pages) {
             page['_loaded'] = true;
-          },
-          error => this.error = error.error
-        )
-      }
-    }
+          }
+        }
+      },
+      error => this.error = error.error
+    )
   }
 
   addPages(fileList: FileList) {
@@ -209,8 +238,60 @@ export class AnswerBookComponent implements OnInit {
     }
   }
 
-  afterCaptureNewPages(pages: AnswerPage[]){
+  afterCaptureNewPages(pages: AnswerPage[]) {
     this.processPages(pages);
     this.book.pages.push(...pages)
+  }
+
+  private groupPagesByFilePath(pages: AnswerPage[]): AnswerPageGroup[] {
+    const groupMap: { [filePath: string]: AnswerPageGroup } = {};
+    for (let page of pages) {
+      let group = groupMap[page.file_path];
+      if (!group) {
+        group = new AnswerPageGroup();
+        group.filePath = page.file_path;
+        groupMap[page.file_path] = group;
+      }
+      group.pages.push(page)
+    }
+    const groups: AnswerPageGroup[] = [];
+    for (let key in groupMap) {
+      groups.push(groupMap[key])
+    }
+    return groups;
+  }
+
+  private setupNextBookPreload() {
+    this.preloadNextCheckerHandler = setInterval(() => {
+      let currentAllLoaded = true;
+      for (let page of this.book.pages) {
+        if (!page['_loaded']) {
+          currentAllLoaded = false;
+          break;
+        }
+      }
+
+      if (currentAllLoaded) {
+        clearInterval(this.preloadNextCheckerHandler);
+        this.answerService.goToBook(this.bookId, true, true).subscribe(
+          _book => {
+            if(!_book) // no next book
+              return;
+
+            const groups = this.groupPagesByFilePath(_book.pages);
+            from(groups).pipe(
+              concatMap(group => this.answerService.getBookFile(_book.id, group.filePath)),
+              takeUntil(this.abortLoadFiles)
+            ).subscribe(
+              data => {
+                // do nothing
+              },
+              error => this.error = error.error
+            )
+          },
+          error => this.error = error.error
+        )
+      }
+    }, 5000)
   }
 }

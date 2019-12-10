@@ -140,7 +140,7 @@
     </div>
     <div class="navigation">
       <div class="ui divider horizontal inverted">Navigation</div>
-      <app-answer-book-navigation-card [darkMode]="true" [currentBook]="book"></app-answer-book-navigation-card>
+      <app-answer-book-navigation-card [darkMode]="true" [currentBook]="book" (error)="error=$event"></app-answer-book-navigation-card>
     </div>
   </div>
 </div>

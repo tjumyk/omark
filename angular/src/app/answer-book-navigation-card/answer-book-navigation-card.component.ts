@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {AnswerBook} from "../models";
+import {AnswerBook, BasicError} from "../models";
 import {finalize} from "rxjs/operators";
 import {AnswerService} from "../answer.service";
 import {ActivatedRoute, Router} from "@angular/router";
@@ -16,7 +16,7 @@ export class AnswerBookNavigationCardComponent implements OnInit {
   currentBook:AnswerBook;
 
   @Output()
-  error = new EventEmitter<void>();
+  error = new EventEmitter<BasicError>();
 
   constructor(private answerService: AnswerService,
               private router: Router) { }

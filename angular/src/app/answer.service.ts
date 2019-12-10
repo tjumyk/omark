@@ -31,6 +31,7 @@ export class NewAnnotationForm{
 export class PageOptions{
   cutMiddle: boolean;
   discardFirst: boolean;
+  discardSecond: boolean;
   fitMaxWidth?: number;
   fitMaxHeight?: number;
 }

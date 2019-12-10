@@ -101,18 +101,35 @@
         }
       }
 
-      .cut-middle-lines{
+      .cut-middle{
         .line{
           border-style: dashed;
           border-color: yellow;
           position: absolute;
+
+          &.vertical{
+            left: 50%;
+            top: 0;
+            width: 0;
+            height: 100%;
+            border-width: 0 0 0 1px;
+          }
         }
-        .vertical{
-          left: 50%;
-          top: 0;
-          width: 0;
-          height: 100%;
-          border-width: 0 0 0 1px;
+        .discard.area{
+          position: absolute;
+          background: rgba(255, 0, 0, 0.3);
+
+          &.left, &.right{
+            top: 0;
+            width: 50%;
+            height: 100%;
+          }
+          &.left{
+            left: 0;
+          }
+          &.right{
+            left: 50%;
+          }
         }
       }
     }

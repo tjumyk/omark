@@ -18,7 +18,9 @@
         <div class="canvas-wrapper" [ngStyle]="{'left.px': captureSettings.marginLeft * overlayRect.scale, 'width.px': overlayRect.width - (captureSettings.marginLeft + captureSettings.marginRight) * overlayRect.scale, 'top.px': captureSettings.marginTop * overlayRect.scale, 'height.px': overlayRect.height - (captureSettings.marginTop + captureSettings.marginBottom) * overlayRect.scale}">
           <canvas #canvas [width]="overlayRect.width / overlayRect.scale - captureSettings.marginLeft - captureSettings.marginRight"
                   [height]="overlayRect.height / overlayRect.scale  - captureSettings.marginTop - captureSettings.marginBottom"></canvas>
-          <div class="cut-middle-lines" *ngIf="captureSettings.serverOptions.cutMiddle">
+          <div class="cut-middle" *ngIf="captureSettings.serverOptions.cutMiddle">
+            <div class="discard area left" *ngIf="captureSettings.serverOptions.discardFirst"></div>
+            <div class="discard area right" *ngIf="captureSettings.serverOptions.discardSecond"></div>
             <div class="vertical line"></div>
           </div>
         </div>
@@ -84,13 +86,24 @@
                   <label (click)="inputCheckboxCutMiddle.click()"></label>
                 </div>
               </div>
-              <div class="field">
-                <label>Discard First Page</label>
-                <div class="ui toggle checkbox">
-                  <input type="checkbox" name="discard_first" [(ngModel)]="captureSettings.serverOptions.discardFirst" class="hidden" #inputCheckboxDiscardFirst>
-                  <label (click)="inputCheckboxDiscardFirst.click()"></label>
+              <ng-container *ngIf="captureSettings.serverOptions.cutMiddle">
+                <div class="field">
+                  <label>Discard Left Page</label>
+                  <div class="ui toggle checkbox" [class.disabled]="captureSettings.serverOptions.discardSecond">
+                    <input type="checkbox" name="discard_first" [(ngModel)]="captureSettings.serverOptions.discardFirst" class="hidden"
+                           #inputCheckboxDiscardFirst [disabled]="captureSettings.serverOptions.discardSecond">
+                    <label (click)="inputCheckboxDiscardFirst.click()"></label>
+                  </div>
                 </div>
-              </div>
+                <div class="field">
+                  <label>Discard Right Page</label>
+                  <div class="ui toggle checkbox" [class.disabled]="captureSettings.serverOptions.discardFirst">
+                    <input type="checkbox" name="discard_second" [(ngModel)]="captureSettings.serverOptions.discardSecond" class="hidden"
+                           #inputCheckboxDiscardSecond [disabled]="captureSettings.serverOptions.discardFirst">
+                    <label (click)="inputCheckboxDiscardSecond.click()"></label>
+                  </div>
+                </div>
+              </ng-container>
             </div>
           </form>
         </div>
@@ -108,6 +121,20 @@
         </div>
         <div class="image">
           <img [src]="shot.dataUrl">
+        </div>
+        <div class="content">
+          <div class="left floated meta">
+            <ng-container *ngIf="shot.uploading">Uploading...</ng-container>
+            <ng-container *ngIf="shot.pages">Page <span *ngFor="let p of shot.pages">{{p.index}}</span></ng-container>
+          </div>
+          <div class="right floated meta">
+            <ng-container *ngIf="shot.options.cutMiddle">
+              <i class="icon cut"></i>
+              <i class="icon red times" *ngIf="shot.options.discardFirst; else notDiscarded"></i>
+              <i class="icon red times" *ngIf="shot.options.discardSecond; else notDiscarded"></i>
+              <ng-template #notDiscarded><i class="icon green check"></i></ng-template>
+            </ng-container>
+          </div>
         </div>
       </div>
     </div>

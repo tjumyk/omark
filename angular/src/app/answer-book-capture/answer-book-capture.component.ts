@@ -35,6 +35,9 @@ export class Shot{
   dataUrl: string;
   uploading: boolean;
   uploadProgress: number;
+  pages: AnswerPage[];
+
+  options: PageOptions;
 }
 
 @Component({
@@ -170,14 +173,22 @@ export class AnswerBookCaptureComponent implements OnInit, AfterViewInit, OnDest
     const dataBlob = this.dataURItoBlob(dataUrl);
     const blobFile = new File([dataBlob], 'shot.png');
 
+    const options = this.captureSettings.serverOptions;
+
     const shot = new Shot();
     shot.dataUrl = dataUrl;
+    shot.options = new PageOptions();
+    shot.options.cutMiddle = options.cutMiddle;
+    shot.options.discardFirst = options.discardFirst;
+    shot.options.discardSecond = options.discardSecond;
+    shot.options.fitMaxWidth = options.fitMaxWidth;
+    shot.options.fitMaxHeight = options.fitMaxHeight;
     this.shots.push(shot);
 
     audioShutter.play();
 
     shot.uploading = true;
-    this.answerService.addPages(this.book.id, [blobFile], this.captureSettings.serverOptions).pipe(
+    this.answerService.addPages(this.book.id, [blobFile], options).pipe(
       finalize(() => {
         shot.uploading = false;
         URL.revokeObjectURL(shot.dataUrl);
@@ -190,6 +201,7 @@ export class AnswerBookCaptureComponent implements OnInit, AfterViewInit, OnDest
             break;
           case HttpEventType.Response:
             const pages = event.body as AnswerPage[];
+            shot.pages = pages;
             this.newPages.emit(pages)
         }
       },

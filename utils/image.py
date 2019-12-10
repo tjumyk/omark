@@ -8,6 +8,7 @@ import numpy as np
 def process_cut_middle(images: List[np.ndarray], options: dict) -> List[np.ndarray]:
     cut_middle = options.get('cutMiddle')
     discard_first = options.get('discardFirst')
+    discard_second = options.get('discardSecond')
 
     if not cut_middle:
         return images
@@ -16,13 +17,12 @@ def process_cut_middle(images: List[np.ndarray], options: dict) -> List[np.ndarr
     for img in images:
         height, width = img.shape[:2]
         cut = round(width / 2)
-        if discard_first:
-            output_images.append(img[:, cut:])
-        else:
-            output_images.extend([
-                img[:, :cut],
-                img[:, cut:]
-            ])
+        cut_images = []
+        if not discard_first:
+            cut_images.append(img[:, :cut])
+        if not discard_second:
+            cut_images.append(img[:, cut:])
+        output_images.extend(cut_images)
     return output_images
 
 

@@ -100,7 +100,8 @@
   </div>
   <div class="side">
     <app-error [error]="error"></app-error>
-    <div class="shots">
+    <div class="main">
+      <div class="ui divider horizontal inverted">Shots</div>
       <div class="ui card fluid" *ngFor="let shot of shots">
         <div class="ui top attached progress blue" *ngIf="shot.uploading">
           <div class="bar" [ngStyle]="{'width.%': shot.uploadProgress}"></div>
@@ -111,7 +112,8 @@
       </div>
     </div>
     <div class="navigation">
-      Navigation Placeholder
+      <div class="ui divider horizontal inverted">Navigation</div>
+      <app-answer-book-navigation-card [darkMode]="true" [currentBook]="book"></app-answer-book-navigation-card>
     </div>
   </div>
 </div>

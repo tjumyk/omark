@@ -31,6 +31,7 @@ import { PageWideComponent } from './page-wide/page-wide.component';
 import { PageFooterComponent } from './page-footer/page-footer.component';
 import { PageHeaderComponent } from './page-header/page-header.component';
 import { AnswerBookCaptureComponent } from './answer-book-capture/answer-book-capture.component';
+import { AnswerBookNavigationCardComponent } from './answer-book-navigation-card/answer-book-navigation-card.component';
 
 @NgModule({
   declarations: [
@@ -61,6 +62,7 @@ import { AnswerBookCaptureComponent } from './answer-book-capture/answer-book-ca
     PageFooterComponent,
     PageHeaderComponent,
     AnswerBookCaptureComponent,
+    AnswerBookNavigationCardComponent,
   ],
   imports: [
     BrowserModule,

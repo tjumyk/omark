@@ -38,9 +38,7 @@ export class AnswerBookMarkingsViewComponent implements OnInit {
 
   constructor(private accountService: AccountService,
               private answerService: AnswerService,
-              private markingService: MarkingService,
-              private router: Router,
-              private route: ActivatedRoute) {
+              private markingService: MarkingService) {
   }
 
   ngOnInit() {
@@ -146,24 +144,5 @@ export class AnswerBookMarkingsViewComponent implements OnInit {
     } else {
       this.total = undefined;
     }
-  }
-
-  goToBook(btn: HTMLButtonElement, isNext: boolean) {
-    btn.classList.add('loading', 'disabled');
-    this.answerService.goToBook(this.book.id, isNext).pipe(
-      finalize(()=>{btn.classList.remove('loading', 'disabled')})
-    ).subscribe(
-      _book => {
-        if (_book) {
-          this.router.navigate([`books/${_book.id}`], {relativeTo: this.route.parent});
-        } else {
-          if (isNext)
-            alert('No more next books');
-          else
-            alert('No more previous books');
-        }
-      },
-      error => this.error.emit(error.error)
-    )
   }
 }

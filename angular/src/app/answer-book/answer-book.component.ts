@@ -292,6 +292,6 @@ export class AnswerBookComponent implements OnInit, OnDestroy {
           error => this.error = error.error
         )
       }
-    }, 5000)
+    }, 1000)
   }
 }

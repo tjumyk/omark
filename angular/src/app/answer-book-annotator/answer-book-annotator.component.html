@@ -22,7 +22,7 @@
       <ng-container *ngIf="page['_loaded']">
         <div class="content">
           <app-answer-page-view [pdfCache]="pdfCache" [page]="page"></app-answer-page-view>
-          <app-annotation-layer class="annotations" [page]="page" [tool]="tool" (error)="error=$event"></app-annotation-layer>
+          <app-answer-page-annotation-layer class="annotations" [page]="page" [tool]="tool" (error)="error=$event"></app-answer-page-annotation-layer>
         </div>
         <div class="footer">Page {{page.index}}</div>
       </ng-container>

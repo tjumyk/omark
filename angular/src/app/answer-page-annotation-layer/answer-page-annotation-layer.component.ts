@@ -17,11 +17,11 @@ import {AccountService} from "../account.service";
 
 
 @Component({
-  selector: 'app-annotation-layer',
-  templateUrl: './annotation-layer.component.html',
-  styleUrls: ['./annotation-layer.component.less']
+  selector: 'app-answer-page-annotation-layer',
+  templateUrl: './answer-page-annotation-layer.component.html',
+  styleUrls: ['./answer-page-annotation-layer.component.less']
 })
-export class AnnotationLayerComponent implements OnInit, AfterViewInit, OnDestroy {
+export class AnswerPageAnnotationLayerComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input()
   page: AnswerPage;
 

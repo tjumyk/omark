@@ -26,7 +26,7 @@ import { PdfPageViewComponent } from './pdf-page-view/pdf-page-view.component';
 import { AnswerBookAnnotatorComponent } from './answer-book-annotator/answer-book-annotator.component';
 import { AnswerPageViewComponent } from './answer-page-view/answer-page-view.component';
 import { AnswerBookMarkingsViewComponent } from './answer-book-markings-view/answer-book-markings-view.component';
-import { AnnotationLayerComponent } from './annotation-layer/annotation-layer.component';
+import { AnswerPageAnnotationLayerComponent } from './answer-page-annotation-layer/answer-page-annotation-layer.component';
 import { PageWideComponent } from './page-wide/page-wide.component';
 import { PageFooterComponent } from './page-footer/page-footer.component';
 import { PageHeaderComponent } from './page-header/page-header.component';
@@ -58,7 +58,7 @@ import { AnswerBookStudentCardComponent } from './answer-book-student-card/answe
     AnswerBookAnnotatorComponent,
     AnswerPageViewComponent,
     AnswerBookMarkingsViewComponent,
-    AnnotationLayerComponent,
+    AnswerPageAnnotationLayerComponent,
     PageWideComponent,
     PageFooterComponent,
     PageHeaderComponent,

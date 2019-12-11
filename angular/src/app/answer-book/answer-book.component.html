@@ -58,7 +58,10 @@
     </div>
     <div class="side">
       <a class="ui button fluid" href="api/answers/books/{{bookId}}/download-zip"><i class="icon file archive"></i> Download as Zip</a>
+      <div class="ui divider horizontal">Markings</div>
       <app-answer-book-markings-view *ngIf="!annotatorShown" [task]="task" [book]="book" (error)="error=$event"></app-answer-book-markings-view>
+      <div class="ui divider horizontal">Navigation</div>
+      <app-answer-book-navigation-card [task]="task" [currentBook]="book" (error)="error=$event"></app-answer-book-navigation-card>
     </div>
   </div>
 

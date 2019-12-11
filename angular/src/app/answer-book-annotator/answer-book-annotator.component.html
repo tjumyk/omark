@@ -30,6 +30,9 @@
   </div>
   <div class="marking-wrapper">
     <app-error [error]="error"></app-error>
-    <app-answer-book-markings-view [task]="task" [book]="book" [darkMode]="true" (error)="error=$event"></app-answer-book-markings-view>
+    <div class="ui divider horizontal inverted">Markings</div>
+    <app-answer-book-markings-view [task]="task" [book]="book" (error)="error=$event"></app-answer-book-markings-view>
+    <div class="ui divider horizontal inverted">Navigation</div>
+    <app-answer-book-navigation-card [darkMode]="true" [task]="task" [currentBook]="book" (error)="error=$event"></app-answer-book-navigation-card>
   </div>
 </div>

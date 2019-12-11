@@ -1,4 +1,3 @@
-<div class="ui divider horizontal" [class.inverted]="darkMode">Markings</div>
 <table class="ui table unstackable celled compact">
   <thead><tr><th>Q</th><th>Marks</th><th>Marker</th></tr></thead>
   <tbody>
@@ -49,6 +48,3 @@
   <tr><td><b>Total</b></td><td colspan="2"><b>{{total}}</b></td></tr>
   </tbody>
 </table>
-
-<div class="ui divider horizontal" [class.inverted]="darkMode">Navigation</div>
-<app-answer-book-navigation-card [darkMode]="darkMode" [task]="task" [currentBook]="book" (error)="error.emit($event)"></app-answer-book-navigation-card>

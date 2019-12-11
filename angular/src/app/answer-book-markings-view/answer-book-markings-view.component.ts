@@ -25,8 +25,6 @@ export class AnswerBookMarkingsViewComponent implements OnInit {
   task: Task;
   @Input()
   book: AnswerBook;
-  @Input()
-  darkMode: boolean;
 
   @Output()
   error = new EventEmitter<BasicError>();

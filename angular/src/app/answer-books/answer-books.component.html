@@ -39,7 +39,8 @@
       <td>{{bookPages.startRow + i}}</td>
       <td>{{book.id}}</td>
       <td>
-        <app-user-mini-card *ngIf="book.student_id" [user]="book.student" [enablePopup]="true" [enableAdmin]="isAdmin"></app-user-mini-card>
+        <app-user-mini-card *ngIf="book.student_id" [user]="book.student" [preferNickname]="false"
+                            [enablePopup]="true" [enableAdmin]="isAdmin"></app-user-mini-card>
       </td>
       <td *ngFor="let q of task.questions">
         <ng-container *ngIf="book['_marks_' + q.index] != null">

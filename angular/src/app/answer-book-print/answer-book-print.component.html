@@ -17,7 +17,7 @@
       <div class="item">
         <div class="header">Student</div>
         <app-user-mini-card [enablePopup]="false" [user]="book.student" [enableAdmin]="false"
-                            *ngIf="book.student_id; else noStudent"></app-user-mini-card>
+                            [preferNickname]="false" *ngIf="book.student_id; else noStudent"></app-user-mini-card>
         <ng-template #noStudent>(No Student Info)</ng-template>
       </div>
       <div class="item">

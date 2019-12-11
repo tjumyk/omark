@@ -33,6 +33,11 @@
 
       <div class="ui grid centered stackable four column doubling">
         <div class="column">
+          <div class="ui progress" *ngIf="preloadingNext">
+            <div class="bar" [ngStyle]="{'width.%': preloadNextProgress}"></div>
+            <div class="label">Preloading Next Book...</div>
+          </div>
+
           <div class="ui segment">
             <div class="ui top attached progress" *ngIf="addingPages">
               <div class="bar" [ngStyle]="{'width.%': addPagesProgress}"></div>

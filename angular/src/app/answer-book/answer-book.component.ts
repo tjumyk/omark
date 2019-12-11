@@ -45,6 +45,8 @@ export class AnswerBookComponent implements OnInit, OnDestroy {
   captureSettings = new CaptureSettings();
 
   preloadNextCheckerHandler: number;
+  preloadingNext: boolean;
+  preloadNextProgress: number;
 
   abortLoadFiles = new Subject<void>();
 
@@ -185,6 +187,7 @@ export class AnswerBookComponent implements OnInit, OnDestroy {
     }
 
     this.addingPages = true;
+    this.addPagesProgress = 0;
     this.answerService.addPages(this.bookId, files).pipe(
       finalize(() => this.addingPages = false)
     ).subscribe(
@@ -278,13 +281,18 @@ export class AnswerBookComponent implements OnInit, OnDestroy {
             if(!_book) // no next book
               return;
 
+            this.preloadingNext = true;
+            this.preloadNextProgress = 0;
+            let countLoaded = 0;
             const groups = this.groupPagesByFilePath(_book.pages);
             from(groups).pipe(
               concatMap(group => this.answerService.getBookFile(_book.id, group.filePath)),
-              takeUntil(this.abortLoadFiles)
+              takeUntil(this.abortLoadFiles),
+              finalize(()=>this.preloadingNext = false)
             ).subscribe(
               data => {
-                // do nothing
+                ++countLoaded;
+                this.preloadNextProgress = Math.round(100 * countLoaded / groups.length);
               },
               error => this.error = error.error
             )

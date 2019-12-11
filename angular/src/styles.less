@@ -9,3 +9,14 @@
     display: block;
   }
 }
+
+// for printing in A4
+@A4-width: 21cm;
+@A4-height: 29.7cm;
+@media print{
+  body{
+    width: @A4-width;
+    height: @A4-height;
+    margin: 0;
+  }
+}

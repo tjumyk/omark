@@ -1,6 +1,6 @@
 <app-error [error]="error"></app-error>
 
-<ng-container *ngIf="book">
+<ng-container *ngIf="book && !printMode">
   <div class="ui segment">
     <ng-template #system>System</ng-template>
     <div class="ui list horizontal">
@@ -57,7 +57,10 @@
       </div>
     </div>
     <div class="side">
-      <a class="ui button fluid" href="api/answers/books/{{bookId}}/download-zip"><i class="icon file archive"></i> Download as Zip</a>
+      <div class="ui buttons fluid vertical icon labeled">
+        <a class="ui button" href="api/answers/books/{{bookId}}/download-zip"><i class="icon file archive"></i> Download as Zip</a>
+        <button class="ui button" (click)="printMode=true"><i class="icon print"></i> Printer-Friendly View</button>
+      </div>
       <div class="ui divider horizontal">Markings</div>
       <app-answer-book-markings-view *ngIf="!annotatorShown" [task]="task" [book]="book" (error)="error=$event"></app-answer-book-markings-view>
       <div class="ui divider horizontal">Navigation</div>
@@ -71,3 +74,6 @@
                            (newPages)="afterCaptureNewPages($event)"
                            (closed)="hideCapture()"></app-answer-book-capture>
 </ng-container>
+
+<app-answer-book-print *ngIf="book && printMode" [task]="task" [book]="book" [pdfCache]="pdfCache"
+                       (closed)="printMode=false"></app-answer-book-print>

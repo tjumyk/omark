@@ -50,6 +50,8 @@ export class AnswerBookComponent implements OnInit, OnDestroy {
 
   abortLoadFiles = new Subject<void>();
 
+  printMode: boolean;
+
   constructor(private accountService: AccountService,
               private taskService: TaskService,
               private answerService: AnswerService,

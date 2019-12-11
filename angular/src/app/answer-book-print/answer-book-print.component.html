@@ -1,0 +1,39 @@
+<div class="ui basic segment center aligned printer-hidden">
+  <div class="ui buttons">
+    <button class="ui button primary" (click)="print()"><i class="icon print"></i> Print</button>
+    <button class="ui button" (click)="closed.emit()"><i class="icon reply"></i>Back to Normal View</button>
+  </div>
+</div>
+
+<app-error [error]="error"></app-error>
+
+<div class="cover page">
+  <div class="ui segment">
+    <div class="ui list horizontal">
+      <div class="item">
+        <div class="header">ID</div>
+        {{book.id}}
+      </div>
+      <div class="item">
+        <div class="header">Student</div>
+        <app-user-mini-card [enablePopup]="false" [user]="book.student" [enableAdmin]="false"
+                            *ngIf="book.student_id; else noStudent"></app-user-mini-card>
+        <ng-template #noStudent>(No Student Info)</ng-template>
+      </div>
+      <div class="item">
+        <div class="header">Created At</div>
+        {{book.created_at | date: 'medium'}}
+      </div>
+    </div>
+  </div>
+
+  <div class="ui divider horizontal">Markings</div>
+  <app-answer-book-markings-view [task]="task" [book]="book" (error)="error=$event"></app-answer-book-markings-view>
+</div>
+
+<div class="content page" *ngFor="let page of book.pages">
+  <div *ngIf="page['_loaded']" class="inner">
+    <app-answer-page-view [pdfCache]="pdfCache" [page]="page"></app-answer-page-view>
+    <app-answer-page-annotation-layer class="annotations" [page]="page" [tool]="'hand'" (error)="error=$event"></app-answer-page-annotation-layer>
+  </div>
+</div>

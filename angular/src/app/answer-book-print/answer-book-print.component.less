@@ -1,0 +1,48 @@
+@A4-width: 21cm;
+@A4-height: 29.7cm;
+
+.page{
+  margin: 5mm auto;
+  position: relative;
+  width: @A4-width;
+  overflow-x: hidden;
+  page-break-after: always;
+
+  @media print{
+    margin: 0;
+
+    &.cover{
+      margin: 1rem 0 0;
+    }
+  }
+
+  &.content{
+    height: @A4-height;
+    overflow-y: hidden;
+
+    @media screen{
+      background: white;
+      box-shadow: 0 .5mm 2mm rgba(0,0,0,.3)
+    }
+
+    &>.inner{
+      position: relative;
+      width: 100%;
+      height: auto;
+    }
+  }
+}
+
+.annotations{
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+@media print {
+  .printer-hidden{
+    display: none;
+  }
+}

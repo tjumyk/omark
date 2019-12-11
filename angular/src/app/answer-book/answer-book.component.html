@@ -1,79 +1,79 @@
 <app-error [error]="error"></app-error>
 
-<ng-container *ngIf="book && !printMode">
-  <div class="ui segment">
-    <ng-template #system>System</ng-template>
-    <div class="ui list horizontal">
-      <div class="item">
-        <div class="header">ID</div>
-        {{book.id}}
-      </div>
-      <div class="item">
-        <div class="header">Student</div>
-        <app-answer-book-student-card [book]="book" [enableAdmin]="isAdmin" [enablePopup]="true"
-                                      (error)="error=$event"></app-answer-book-student-card>
-      </div>
-      <div class="item">
-        <div class="header">Created At</div>
-        {{book.created_at | date: 'medium'}}
-      </div>
-    </div>
-  </div>
-
-  <div class="main-wrapper">
-    <div class="main">
-      <div class="ui grid doubling four column">
-        <div class="column" *ngFor="let page of book.pages; index as i">
-          <app-answer-page-preview [page]="page" [pdfCache]="pdfCache" [enableAdmin]="isAdmin"
-                                   (zoomIn)="showAnnotator(i + 1)"
-                                   (deleted)="afterPageDeleted(page)"
-                                   (error)="error=$event"></app-answer-page-preview>
+<ng-container *ngIf="book">
+  <ng-container *ngIf="!printMode && !annotatorShown">
+    <div class="ui segment">
+      <div class="ui list horizontal">
+        <div class="item">
+          <div class="header">ID</div>
+          {{book.id}}
+        </div>
+        <div class="item">
+          <div class="header">Student</div>
+          <app-answer-book-student-card [book]="book" [enableAdmin]="isAdmin" [enablePopup]="true"
+                                        (error)="error=$event"></app-answer-book-student-card>
+        </div>
+        <div class="item">
+          <div class="header">Created At</div>
+          {{book.created_at | date: 'medium'}}
         </div>
       </div>
+    </div>
 
-      <div class="ui grid centered stackable four column doubling">
-        <div class="column">
-          <div class="ui progress" *ngIf="preloadingNext">
-            <div class="bar" [ngStyle]="{'width.%': preloadNextProgress}"></div>
-            <div class="label">Preloading Next Book...</div>
+    <div class="main-wrapper">
+      <div class="main">
+        <div class="ui grid doubling four column">
+          <div class="column" *ngFor="let page of book.pages; index as i">
+            <app-answer-page-preview [page]="page" [pdfCache]="pdfCache" [enableAdmin]="isAdmin"
+                                     (zoomIn)="showAnnotator(i + 1)"
+                                     (deleted)="afterPageDeleted(page)"
+                                     (error)="error=$event"></app-answer-page-preview>
           </div>
+        </div>
 
-          <div class="ui segment">
-            <div class="ui top attached progress" *ngIf="addingPages">
-              <div class="bar" [ngStyle]="{'width.%': addPagesProgress}"></div>
+        <div class="ui grid centered stackable four column doubling">
+          <div class="column">
+            <div class="ui progress" *ngIf="preloadingNext">
+              <div class="bar" [ngStyle]="{'width.%': preloadNextProgress}"></div>
+              <div class="label">Preloading Next Book...</div>
             </div>
-            <form class="ui form" #f="ngForm" (ngSubmit)="addPages(inputFile.files)" [class.loading]="addingPages">
-              <div class="field required">
-                <label>File</label>
-                <input type="file" name="file" accept="image/*,.pdf" required #inputFile multiple>
-              </div>
-              <button type="submit" class="ui button primary fluid"><i class="icon upload"></i> Upload Page Files</button>
-            </form>
 
-            <div class="ui horizontal divider">Or</div>
-            <button class="ui button primary fluid" (click)="showCapture()"><i class="icon camera"></i> Capture from Camera</button>
+            <div class="ui segment">
+              <div class="ui top attached progress" *ngIf="addingPages">
+                <div class="bar" [ngStyle]="{'width.%': addPagesProgress}"></div>
+              </div>
+              <form class="ui form" #f="ngForm" (ngSubmit)="addPages(inputFile.files)" [class.loading]="addingPages">
+                <div class="field required">
+                  <label>File</label>
+                  <input type="file" name="file" accept="image/*,.pdf" required #inputFile multiple>
+                </div>
+                <button type="submit" class="ui button primary fluid"><i class="icon upload"></i> Upload Page Files</button>
+              </form>
+
+              <div class="ui horizontal divider">Or</div>
+              <button class="ui button primary fluid" (click)="showCapture()"><i class="icon camera"></i> Capture from Camera</button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    <div class="side">
-      <div class="ui buttons fluid vertical icon labeled">
-        <a class="ui button" href="api/answers/books/{{bookId}}/download-zip"><i class="icon file archive"></i> Download as Zip</a>
-        <button class="ui button" (click)="printMode=true"><i class="icon print"></i> Printer-Friendly View</button>
+      <div class="side">
+        <div class="ui buttons fluid vertical icon labeled">
+          <a class="ui button" href="api/answers/books/{{bookId}}/download-zip"><i class="icon file archive"></i> Download as Zip</a>
+          <button class="ui button" (click)="printMode=true"><i class="icon print"></i> Printer-Friendly View</button>
+        </div>
+        <div class="ui divider horizontal">Markings</div>
+        <app-answer-book-markings-view *ngIf="!annotatorShown" [task]="task" [book]="book" (error)="error=$event"></app-answer-book-markings-view>
+        <div class="ui divider horizontal">Navigation</div>
+        <app-answer-book-navigation-card [task]="task" [currentBook]="book" (error)="error=$event"></app-answer-book-navigation-card>
       </div>
-      <div class="ui divider horizontal">Markings</div>
-      <app-answer-book-markings-view *ngIf="!annotatorShown" [task]="task" [book]="book" (error)="error=$event"></app-answer-book-markings-view>
-      <div class="ui divider horizontal">Navigation</div>
-      <app-answer-book-navigation-card [task]="task" [currentBook]="book" (error)="error=$event"></app-answer-book-navigation-card>
     </div>
-  </div>
+  </ng-container>
 
   <app-answer-book-annotator *ngIf="annotatorShown" [startPageIndex]="annotatorStartPageIndex" (closed)="hideAnnotator()"
                              [task]="task" [book]="book" [pdfCache]="pdfCache"></app-answer-book-annotator>
   <app-answer-book-capture *ngIf="captureShown" [task]="task" [captureSettings]="captureSettings" [book]="book"
                            (newPages)="afterCaptureNewPages($event)"
                            (closed)="hideCapture()"></app-answer-book-capture>
+  <app-answer-book-print *ngIf="printMode" [task]="task" [book]="book" [pdfCache]="pdfCache"
+                         (closed)="printMode=false"></app-answer-book-print>
 </ng-container>
-
-<app-answer-book-print *ngIf="book && printMode" [task]="task" [book]="book" [pdfCache]="pdfCache"
-                       (closed)="printMode=false"></app-answer-book-print>

@@ -50,6 +50,8 @@ export class AnswerPageAnnotationLayerComponent implements OnInit, AfterViewInit
 
   windowResizeListener;
 
+  checkSetupHandler: number;
+
   constructor(private element: ElementRef<HTMLElement>,
               private accountService: AccountService,
               private answerService: AnswerService,
@@ -61,6 +63,10 @@ export class AnswerPageAnnotationLayerComponent implements OnInit, AfterViewInit
   }
 
   ngOnDestroy(): void {
+    if (this.checkSetupHandler) {
+      clearInterval(this.checkSetupHandler);
+    }
+
     if (this.windowResizeListener) {
       window.removeEventListener('resize', this.windowResizeListener);
       this.windowResizeListener = null;
@@ -73,8 +79,24 @@ export class AnswerPageAnnotationLayerComponent implements OnInit, AfterViewInit
   }
 
   ngAfterViewInit(): void {
-    this.setupCanvas();
-    this.loadData();
+    const setupChecker = () => {
+      if (this.checkReadyToSetup()) {
+        clearInterval(this.checkSetupHandler);
+        this.setupCanvas();
+        this.loadData();
+      }
+    };
+    this.checkSetupHandler = setInterval(setupChecker, 500);
+    setupChecker();
+  }
+
+  private checkReadyToSetup():boolean{
+    const element = this.element.nativeElement;
+
+    const width = element.clientWidth;
+    const height = element.clientHeight;
+
+    return width > 0 && height > 0;
   }
 
   private setupCanvas(){

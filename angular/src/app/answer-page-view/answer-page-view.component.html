@@ -1,4 +1,4 @@
-<ng-container *ngIf="page['_loaded']; else loading">
+<ng-container *ngIf="page['_loaded']">
   <ng-container *ngIf="isPdf; else imageView">
     <app-pdf-page-view [page]="pdfCache[page.file_path].pages[page.file_index-1]" [renderText]="pdfRenderText"></app-pdf-page-view>
   </ng-container>
@@ -6,9 +6,3 @@
     <img src="api/answers/books/{{page.book_id}}/files/{{page.file_path}}">
   </ng-template>
 </ng-container>
-
-<ng-template #loading>
-  <div class="ui segment basic very padded">
-    <div class="ui loader active inline centered"></div>
-  </div>
-</ng-template>

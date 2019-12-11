@@ -1,4 +1,13 @@
-<app-answer-page-view [page]="page" [pdfCache]="pdfCache" [pdfRenderText]="false" class="page-view" (click)="zoomIn.emit()"></app-answer-page-view>
+<div class="page-wrapper" *ngIf="page['_loaded']; else loading" (click)="zoomIn.emit()">
+  <app-answer-page-view [page]="page" [pdfCache]="pdfCache" [pdfRenderText]="false" class="page-view"></app-answer-page-view>
+  <app-answer-page-annotation-layer class="annotations" [page]="page" [tool]="'hand'" (error)="error.emit($event)"></app-answer-page-annotation-layer>
+</div>
+<ng-template #loading>
+  <div class="ui segment basic very padded">
+    <div class="ui loader active inline centered"></div>
+  </div>
+</ng-template>
+
 <div class="content">
   <ng-container *ngIf="!editing; else pageEditor">
     <div class="left floated meta">

@@ -3,6 +3,7 @@ import os
 import shutil
 import tempfile
 import uuid
+import zipfile
 
 from flask import Blueprint, jsonify, request, current_app as app, send_from_directory
 
@@ -228,4 +229,40 @@ def do_page_annotations(pid: int):
         db.session.commit()
         return jsonify(ann.to_dict(with_creator=True)), 201
     except (AccountServiceError, AnswerServiceError, MarkingServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@answer_api.route('/books/<int:bid>/download-zip')
+@requires_login
+def download_zip(bid: int):
+    try:
+        book = AnswerService.get_book(bid)
+        if book is None:
+            return jsonify(msg='book not found'), 404
+
+        data_folder = app.config['DATA_FOLDER']
+        if book.student_id:
+            target_name = book.student.name
+        else:
+            target_name = 'book_%d' % bid
+
+        # sort file paths according to the minimal index among the pages linked to each file path
+        file_indices = {}
+        for page in book.pages:
+            index = file_indices.get(page.file_path)
+            if index is None or page.index < index:
+                file_indices[page.file_path] = page.index
+        file_paths = [path for path, index in sorted(file_indices.items(), key=lambda x: x[1])]
+
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            zip_name = '%s.zip' % target_name
+            zip_path = os.path.join(tmp_dir, zip_name)
+            with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as f_zip:
+                for i, file_path in enumerate(file_paths):
+                    ext = os.path.splitext(file_path)[-1]
+                    f_zip.write(os.path.join(data_folder, 'answer_books', str(bid), file_path),
+                                os.path.join(target_name, '%d%s' % (i + 1, ext)))
+            return send_from_directory(tmp_dir, zip_name, as_attachment=True, attachment_filename=zip_name,
+                                       cache_timeout=0)
+    except AnswerServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400

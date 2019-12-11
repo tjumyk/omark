@@ -23,7 +23,7 @@ class TaskService:
 
     @staticmethod
     def get_all() -> List[Task]:
-        return Task.query.all()
+        return db.session.query(Task).order_by(Task.id).all()
 
     @staticmethod
     def add(name: str) -> Task:

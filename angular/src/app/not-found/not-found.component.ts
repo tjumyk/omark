@@ -12,6 +12,6 @@ export class NotFoundComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.titleService.setTitle('Forbidden')
+    this.titleService.setTitle('Not Found')
   }
 }

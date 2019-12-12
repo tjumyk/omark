@@ -1,7 +1,7 @@
 <table class="ui table unstackable celled compact">
   <thead><tr><th>Q</th><th>Marks</th><th>Marker</th></tr></thead>
   <tbody>
-  <tr *ngFor="let item of qMap|keyvalue">
+  <tr *ngFor="let item of qMap|keyvalue: compareQMapItems">
     <td>Q{{item.value.question.index}}</td>
     <ng-container *ngIf="item.value.editing; else notEditing">
       <td colspan="2">

@@ -4,7 +4,7 @@ import {AccountService} from "../account.service";
 import {MarkingService, UpdateMarkingForm} from "../marking.service";
 import {AnswerService, NewMarkingForm} from "../answer.service";
 import {finalize} from "rxjs/operators";
-import {ActivatedRoute, Router} from "@angular/router";
+import {KeyValue} from "@angular/common";
 
 export class QuestionInfo{
   question: Question;
@@ -142,5 +142,9 @@ export class AnswerBookMarkingsViewComponent implements OnInit {
     } else {
       this.total = undefined;
     }
+  }
+
+  compareQMapItems(a: KeyValue<number, QuestionInfo>, b: KeyValue<number, QuestionInfo>): number {
+    return a.value.question.index - b.value.question.index
   }
 }

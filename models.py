@@ -76,7 +76,8 @@ class Task(db.Model):
         d = dict(id=self.id, name=self.name, is_locked=self.is_locked,
                  created_at=self.created_at, modified_at=self.modified_at)
         if with_questions:
-            d['questions'] = [q.to_dict(with_marker_assignments=with_assignments) for q in self.questions]
+            d['questions'] = [q.to_dict(with_marker_assignments=with_assignments)
+                              for q in sorted(self.questions, key=lambda q: q.index)]
         return d
 
 

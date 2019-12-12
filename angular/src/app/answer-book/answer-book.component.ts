@@ -79,7 +79,7 @@ export class AnswerBookComponent implements OnInit, OnDestroy {
               val => {
                 this.book = undefined;
                 this.pdfCache = {};
-                this.annotatorShown = false;
+                this.hideAnnotator();
                 this.annotatorStartPageIndex = undefined;
 
                 clearInterval(this.preloadNextCheckerHandler);

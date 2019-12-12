@@ -9,6 +9,7 @@ import {TaskService} from "../task.service";
 import {AccountService} from "../account.service";
 import {CaptureSettings} from "../answer-book-capture/answer-book-capture.component";
 import {from, Subject, zip} from "rxjs";
+import {TitleService} from "../title.service";
 
 export class AnswerPageGroup {
   filePath: string;
@@ -55,6 +56,7 @@ export class AnswerBookComponent implements OnInit, OnDestroy {
   constructor(private accountService: AccountService,
               private taskService: TaskService,
               private answerService: AnswerService,
+              private titleService: TitleService,
               private route: ActivatedRoute) {
   }
 
@@ -97,6 +99,11 @@ export class AnswerBookComponent implements OnInit, OnDestroy {
                       return;
                     }
 
+                    let bookTitle = `Book ${book.id}`;
+                    if(book.student){
+                      bookTitle += ` (${book.student.name})`
+                    }
+                    this.titleService.setTitle(bookTitle, this.task.name);
                     this.book = book;
 
                     this.processPages(book.pages);

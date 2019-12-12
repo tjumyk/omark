@@ -8,6 +8,7 @@ import {NgForm} from "@angular/forms";
 import {AccountService} from "../account.service";
 import {Subject} from "rxjs";
 import {AdminService} from "../admin.service";
+import {TitleService} from "../title.service";
 
 @Component({
   selector: 'app-answer-books',
@@ -35,6 +36,7 @@ export class AnswerBooksComponent implements OnInit {
   constructor(private accountService: AccountService,
               private adminService: AdminService,
               private taskService: TaskService,
+              private titleService: TitleService,
               private route: ActivatedRoute) {
   }
 
@@ -49,6 +51,7 @@ export class AnswerBooksComponent implements OnInit {
         this.taskService.getCachedTask(this.taskId).subscribe(
           task => {
             this.task = task;
+            this.titleService.setTitle(task.name);
 
             this.loadingBooks = true;
             this.taskService.getAnswerBooks(this.taskId).pipe(

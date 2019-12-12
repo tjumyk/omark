@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import {TitleService} from "../title.service";
 
 @Component({
   selector: 'app-forbidden',
@@ -6,6 +7,11 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./forbidden.component.less']
 })
 export class ForbiddenComponent implements OnInit {
-  ngOnInit(): void {
+  constructor(
+    private titleService: TitleService
+  ) { }
+
+  ngOnInit() {
+    this.titleService.setTitle('Forbidden')
   }
 }

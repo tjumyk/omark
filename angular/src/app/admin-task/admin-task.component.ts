@@ -6,6 +6,7 @@ import {finalize} from "rxjs/operators";
 import {NgForm} from "@angular/forms";
 import {AdminService, ImportGiveResponse, NewMarkerQuestionAssignmentForm, NewQuestionForm} from "../admin.service";
 import {HttpEventType} from "@angular/common/http";
+import {TitleService} from "../title.service";
 
 @Component({
   selector: 'app-admin-task',
@@ -32,6 +33,7 @@ export class AdminTaskComponent implements OnInit {
 
   constructor(private taskService: TaskService,
               private adminService: AdminService,
+              private titleService: TitleService,
               private route: ActivatedRoute) {
   }
 
@@ -43,6 +45,7 @@ export class AdminTaskComponent implements OnInit {
       finalize(() => this.loadingTask = false)
     ).subscribe(
       task => {
+        this.titleService.setTitle(task.name, 'Management');
         this.task = task;
       },
       error => this.error = error.error

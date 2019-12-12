@@ -3,6 +3,7 @@ import {BasicError, Task, User} from "../models";
 import {AccountService} from "../account.service";
 import {finalize} from "rxjs/operators";
 import {TaskService} from "../task.service";
+import {TitleService} from "../title.service";
 
 @Component({
   selector: 'app-home',
@@ -20,10 +21,12 @@ export class HomeComponent implements OnInit {
   loadingTasks: boolean;
 
   constructor(private accountService: AccountService,
-              private taskService: TaskService) {
+              private taskService: TaskService,
+              private titleService: TitleService) {
   }
 
   ngOnInit() {
+    this.titleService.setTitle();
     this.loadingUser = true;
     this.accountService.getCurrentUser().pipe(
       finalize(() => {

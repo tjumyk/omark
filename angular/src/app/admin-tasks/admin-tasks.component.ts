@@ -4,6 +4,7 @@ import {BasicError, Task} from "../models";
 import {finalize} from "rxjs/operators";
 import {NgForm} from "@angular/forms";
 import {AdminService, NewTaskForm} from "../admin.service";
+import {TitleService} from "../title.service";
 
 @Component({
   selector: 'app-admin-tasks',
@@ -21,10 +22,13 @@ export class AdminTasksComponent implements OnInit {
 
 
   constructor(private taskService: TaskService,
-              private adminService: AdminService) {
+              private adminService: AdminService,
+              private titleService: TitleService) {
   }
 
   ngOnInit() {
+    this.titleService.setTitle('Management');
+
     this.loadingTasks = true;
     this.taskService.getTasks().pipe(
       finalize(() => this.loadingTasks = false)

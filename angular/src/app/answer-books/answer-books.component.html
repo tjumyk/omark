@@ -43,7 +43,7 @@
                             [enablePopup]="true" [enableAdmin]="isAdmin"></app-user-mini-card>
       </td>
       <td *ngFor="let q of task.questions">
-        <ng-container *ngIf="book['_marks_' + q.index] != null">
+        <ng-container *ngIf="book['_marks_' + q.id] != null">
           {{book['_marks_' + q.id]}}
         </ng-container>
       </td>

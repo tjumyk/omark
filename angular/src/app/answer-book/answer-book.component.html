@@ -57,13 +57,10 @@
         </div>
       </div>
       <div class="side">
-        <div class="ui grid">
-          <div class="column">
-            <div class="ui buttons fluid vertical icon labeled">
-              <a class="ui button" href="api/answers/books/{{bookId}}/download-zip"><i class="icon file archive"></i> Download as Zip</a>
-              <button class="ui button" (click)="printMode=true"><i class="icon print"></i> Printer-Friendly View</button>
-            </div>
-          </div>
+        <div class="ui divider horizontal">Export</div>
+        <div class="ui buttons fluid vertical icon labeled">
+          <a class="ui button" href="api/answers/books/{{bookId}}/download-zip"><i class="icon file archive"></i> Download as Zip</a>
+          <button class="ui button" (click)="printMode=true"><i class="icon print"></i> Printer-Friendly View</button>
         </div>
         <div class="ui divider horizontal">Markings</div>
         <app-answer-book-markings-view *ngIf="!annotatorShown" [task]="task" [book]="book" (error)="error=$event"></app-answer-book-markings-view>

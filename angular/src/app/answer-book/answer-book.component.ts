@@ -63,6 +63,7 @@ export class AnswerBookComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     clearInterval(this.preloadNextCheckerHandler);
     this.abortLoadFiles.next();
+    window.document.body.style.overflowY = null;
   }
 
   ngOnInit() {

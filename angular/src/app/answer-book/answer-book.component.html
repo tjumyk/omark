@@ -44,7 +44,7 @@
               </div>
               <form class="ui form" #f="ngForm" (ngSubmit)="addPages(inputFile.files)" [class.loading]="addingPages">
                 <div class="field required">
-                  <label>File</label>
+                  <label>Files</label>
                   <input type="file" name="file" accept="image/*,.pdf" required #inputFile multiple>
                 </div>
                 <button type="submit" class="ui button primary fluid"><i class="icon upload"></i> Upload Page Files</button>

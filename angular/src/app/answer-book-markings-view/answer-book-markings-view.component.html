@@ -7,7 +7,7 @@
       <td colspan="2">
         <div class="ui action input fluid" [class.disabled]="item.value.submitting">
           <ng-container *ngIf="item.value.marking; else addMark">
-            <input type="number" min="0" [max]="item.value.question.marks" placeholder="Marks..." #inputUpdateMarks
+            <input type="number" min="0" [max]="item.value.question.marks" placeholder="0-{{item.value.question.marks}}" #inputUpdateMarks
                    [value]="item.value.initialMarks" (keyup.enter)="updateMarking(item.value.question, item.value.marking, inputUpdateMarks.value)">
             <button  class="ui icon button" (click)="updateMarking(item.value.question, item.value.marking, inputUpdateMarks.value)"
                      [ngClass]="{'loading disabled': item.value.submitting}">
@@ -19,7 +19,7 @@
             </button>
           </ng-container>
           <ng-template #addMark>
-            <input type="number" min="0" [max]="item.value.question.marks" placeholder="Marks..." #inputMarks
+            <input type="number" min="0" [max]="item.value.question.marks" placeholder="0-{{item.value.question.marks}}" #inputMarks
                    (keyup.enter)="addMarking(item.value.question, inputMarks.value)">
             <button class="ui icon button" (click)="addMarking(item.value.question, inputMarks.value)"
                     [ngClass]="{'loading disabled': item.value.submitting}">

@@ -43,6 +43,8 @@ def process_fit_max_size(images: List[np.ndarray], options: dict) -> List[np.nda
             scale = min(scale, fit_max_width / img_width)
         if scale < 1:
             output_images.append(cv2.resize(img, dsize=None, fx=scale, fy=scale, interpolation=cv2.INTER_AREA))
+        else:
+            output_images.append(img)
     return output_images
 
 

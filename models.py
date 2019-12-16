@@ -248,7 +248,7 @@ class Marking(db.Model):
 
 class Annotation(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    page_id = db.Column(db.Integer, db.ForeignKey('answer_page.id'), nullable=False)
+    page_id = db.Column(db.Integer, db.ForeignKey('answer_page.id'), nullable=False, index=True)
 
     data = db.Column(db.Text, nullable=False)
 

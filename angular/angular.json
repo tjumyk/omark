@@ -52,7 +52,8 @@
               "node_modules/semantic-ui/dist/semantic.min.css",
               "src/styles.less"
             ],
-            "scripts": []
+            "scripts": [],
+            "i18nLocale": "en-AU"
           },
           "configurations": {
             "production": {

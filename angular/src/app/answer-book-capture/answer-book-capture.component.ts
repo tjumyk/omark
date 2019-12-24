@@ -19,7 +19,7 @@ export class CameraConfig {
   constraints: MediaStreamConstraints;
 }
 
-const cameraConfigs = [
+const cameraConfigs: CameraConfig[] = [
   {
     name: '720P',
     constraints: {audio: false, video: {width: {exact: 1280}, height: {exact: 720}, facingMode: 'environment'}}
@@ -103,7 +103,7 @@ export class AnswerBookCaptureComponent implements OnInit, AfterViewInit, OnDest
 
   shots: Shot[] = [];
 
-  cameraConfigs = cameraConfigs;
+  cameraConfigs: CameraConfig[] = cameraConfigs;
 
   constructor(private answerService: AnswerService) {
   }

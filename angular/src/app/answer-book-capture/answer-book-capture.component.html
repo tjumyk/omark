@@ -34,21 +34,31 @@
       </div>
     </div>
     <div class="bottom">
-      <div class="camera-info" *ngIf="trackSettings">
-        <div class="ui list horizontal inverted">
-          <div class="item">
-            <div class="header">Width</div>
-            {{trackSettings.width}}
+      <div class="camera-info">
+        <form class="ui form inverted">
+          <div class="fields">
+            <div class="field">
+              <label>Resolution</label>
+              <select name="camera_config" [(ngModel)]="captureSettings.cameraConfig" (ngModelChange)="openCamera()">
+                <option *ngFor="let opt of cameraConfigs" [ngValue]="opt">{{opt.name}}</option>
+              </select>
+            </div>
+            <ng-container *ngIf="trackSettings">
+              <div class="field">
+                <label>Width</label>
+                {{trackSettings.width}}
+              </div>
+              <div class="field">
+                <label>Height</label>
+                {{trackSettings.height}}
+              </div>
+              <div class="field" *ngIf="trackSettings.frameRate">
+                <label>Frame Rate</label>
+                {{trackSettings.frameRate}}
+              </div>
+            </ng-container>
           </div>
-          <div class="item">
-            <div class="header">Height</div>
-            {{trackSettings.height}}
-          </div>
-          <div class="item" *ngIf="trackSettings.frameRate">
-            <div class="header">Frame Rate</div>
-            {{trackSettings.frameRate}}
-          </div>
-        </div>
+        </form>
       </div>
       <div class="controls">
         <div class="settings">

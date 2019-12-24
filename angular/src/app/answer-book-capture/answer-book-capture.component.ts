@@ -14,7 +14,29 @@ import {AnswerService, PageOptions} from "../answer.service";
 import {finalize} from "rxjs/operators";
 import {HttpEventType} from "@angular/common/http";
 
+export class CameraConfig {
+  name: string;
+  constraints: MediaStreamConstraints;
+}
+
+const cameraConfigs = [
+  {
+    name: '720P',
+    constraints: {audio: false, video: {width: {exact: 1280}, height: {exact: 720}, facingMode: 'environment'}}
+  },
+  {
+    name: '1080P',
+    constraints: {audio: false, video: {width: {exact: 1920}, height: {exact: 1080}, facingMode: 'environment'}}
+  },
+  {
+    name: '4K',
+    constraints: {audio: false, video: {width: {exact: 3840}, height: {exact: 2160}, facingMode: 'environment'}}
+  }
+];
+
 export class CaptureSettings {
+  cameraConfig: CameraConfig = cameraConfigs[1];  // 1080p as default
+
   marginLeft: number = 0;
   marginRight: number = 0;
   marginTop: number = 0;
@@ -31,7 +53,7 @@ export class OverlayRect{
   scale: number = 1;
 }
 
-export class Shot{
+export class Shot {
   dataUrl: string;
   uploading: boolean;
   uploadProgress: number;
@@ -69,7 +91,7 @@ export class AnswerBookCaptureComponent implements OnInit, AfterViewInit, OnDest
   @ViewChild('audioShutter', {static: true})
   audioShutter: ElementRef<HTMLAudioElement>;
 
-  tracks: MediaStreamTrack[] ;
+  stream: MediaStream;
   trackSupportedConstraints: MediaTrackSupportedConstraints;
   trackCapabilities: MediaTrackCapabilities;
   trackConstraints: MediaTrackConstraints;
@@ -79,20 +101,23 @@ export class AnswerBookCaptureComponent implements OnInit, AfterViewInit, OnDest
 
   windowResizeHandler;
 
-  shots:Shot[] = [];
+  shots: Shot[] = [];
 
-  constructor(private answerService: AnswerService) { }
+  cameraConfigs = cameraConfigs;
+
+  constructor(private answerService: AnswerService) {
+  }
 
   ngOnInit() {
   }
 
   ngOnDestroy(): void {
-    if(this.windowResizeHandler){
+    if (this.windowResizeHandler) {
       window.removeEventListener('resize', this.windowResizeHandler);
       this.windowResizeHandler = null;
     }
-    if(this.tracks){
-      for(let track of this.tracks){
+    if (this.stream) {
+      for (let track of this.stream.getTracks()) {
         track.stop()
       }
     }
@@ -102,32 +127,52 @@ export class AnswerBookCaptureComponent implements OnInit, AfterViewInit, OnDest
     const video = this.video.nativeElement;
     this.trackSupportedConstraints = navigator.mediaDevices.getSupportedConstraints();
 
-    const constraints = {audio: false, video: {width: 1920, height: 1080, facingMode: 'environment'}};
-    navigator.mediaDevices.getUserMedia(constraints).then(stream=>{
-      this.tracks = stream.getVideoTracks();
-      if(this.tracks.length){
-        const track = this.tracks[0]; // assume only one track exists
-        if(track.getCapabilities)
-          this.trackCapabilities = track.getCapabilities();
-        if(track.getConstraints)
-          this.trackConstraints = track.getConstraints();
-        if(track.getSettings)
-          this.trackSettings = track.getSettings();
-      }
+    this.windowResizeHandler = () => {
+      this.updateOverlayRect();
+    };
+    window.addEventListener('resize', this.windowResizeHandler);
+    video.onloadedmetadata = e => {
+      video.play();
+      this.windowResizeHandler();
+    };
 
-      video.srcObject = stream;
-      video.onloadedmetadata = e=>{
-        video.play();
+    this.openCamera();
+  }
 
-        this.windowResizeHandler = ()=>{
-          this.updateOverlayRect();
-        };
-        this.windowResizeHandler();
-        window.addEventListener('resize', this.windowResizeHandler)
+  openCamera() {
+    const video = this.video.nativeElement;
+
+    if (this.stream) {  // stop previous stream if exists
+      for (let track of this.stream.getTracks()) {
+        track.stop()
       }
-    }).catch(error=>{
-      this.error = {msg:'Failed to access camera', detail: `${error.name}: ${error.message}`}
-    })
+      this.trackCapabilities = undefined;
+      this.trackConstraints = undefined;
+      this.trackSettings = undefined;
+
+      video.srcObject = undefined;
+      this.stream = undefined;
+      this.windowResizeHandler();
+    }
+
+    if (this.captureSettings && this.captureSettings.cameraConfig) {
+      navigator.mediaDevices.getUserMedia(this.captureSettings.cameraConfig.constraints).then(stream => {
+        this.stream = stream;
+        const tracks = stream.getVideoTracks();
+        if (tracks.length) {
+          const track = tracks[0]; // assume only one track exists
+          if (track.getCapabilities)
+            this.trackCapabilities = track.getCapabilities();
+          if (track.getConstraints)
+            this.trackConstraints = track.getConstraints();
+          if (track.getSettings)
+            this.trackSettings = track.getSettings();
+        }
+        video.srcObject = stream;
+      }).catch(error => {
+        this.error = {msg: 'Failed to access camera', detail: `${error.name}: ${error.message}`}
+      })
+    }
   }
 
   updateOverlayRect(){

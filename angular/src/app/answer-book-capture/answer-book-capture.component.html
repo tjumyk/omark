@@ -2,11 +2,11 @@
   <div class="item">
     Book {{book.id}}
   </div>
-  <div class="item">
+  <div class="item" [class.shrink]="!book.student">
     <app-answer-book-student-card [book]="book" [enableAdmin]="false" [enablePopup]="false"
                                   (error)="error=$event"></app-answer-book-student-card>
   </div>
-  <div class="ui close button circular black icon" (click)="closed.emit()"><i class="icon times"></i></div>
+  <div class="ui close button circular black icon large" (click)="closed.emit()"><i class="icon times"></i></div>
 </div>
 
 <audio src="static/assets/camera-shutter-click.mp3" #audioShutter></audio>

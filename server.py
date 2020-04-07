@@ -1,7 +1,7 @@
 import os
 import subprocess
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 
 from api_account import account_api
 from api_admin import admin_api
@@ -12,7 +12,30 @@ from auth_connect import oauth
 from models import db
 from services.account import AccountService, AccountServiceError
 
-app = Flask(__name__)
+
+class MyFlask(Flask):
+    _hashed_static_file_pattern = re.compile(r'^.+\.[a-z0-9]{20}\.\w+$')
+    _hashed_static_file_cache_timeout = 365 * 24 * 60 * 60  # 1 year
+    _index_page_cache_timeout = 5 * 60  # 5 minutes
+
+    def send_static_file(self, filename):
+        """Identify hashed static files and send them with a longer cache timeout.
+        For 'index.html', send it with a short cache timeout.
+        For other static files, the default cache timeout is used.
+        """
+        if not self.has_static_folder:
+            raise RuntimeError('No static folder for this object')
+        if filename == 'index.html':
+            cache_timeout = self._index_page_cache_timeout
+        elif self._hashed_static_file_pattern.fullmatch(filename):
+            cache_timeout = self._hashed_static_file_cache_timeout
+        else:
+            cache_timeout = self.get_send_file_max_age(filename)
+        return send_from_directory(self.static_folder, filename,
+                                   cache_timeout=cache_timeout)
+    
+
+app = MyFlask(__name__)
 app.config.from_json('config.json')
 
 db.init_app(app)

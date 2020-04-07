@@ -1,0 +1,16 @@
+{
+  "SECRET_KEY": "secretSecret",
+  "SQLALCHEMY_DATABASE_URI": "sqlite:///test.db",
+  "SQLALCHEMY_TRACK_MODIFICATIONS": false,
+  "MAX_CONTENT_LENGTH": 2147483648,
+  "SESSION_COOKIE_NAME": "omark_session",
+
+  "SITE": {
+    "name": "Online Marking System",
+    "root_url": "https://example.com",
+    "base_url": "/",
+    "behind_proxy": false
+  },
+
+  "DATA_FOLDER": "data"
+}

@@ -16,23 +16,31 @@
   <div class="ui close button circular black icon" (click)="closed.emit()"><i class="icon times"></i></div>
 </div>
 
+<div class="error-wrapper" *ngIf="error">
+  <app-error [error]="error"></app-error>
+</div>
+
 <div class="content-wrapper">
-  <div class="inner" #pageWrappers>
-    <div class="page-wrapper" *ngFor="let page of book.pages">
-      <ng-container *ngIf="page['_loaded']">
-        <div class="content">
-          <app-answer-page-view [pdfCache]="pdfCache" [page]="page"></app-answer-page-view>
-          <app-answer-page-annotation-layer class="annotations" [page]="page" [tool]="tool" (error)="error=$event"></app-answer-page-annotation-layer>
-        </div>
-        <div class="footer">Page {{page.index}}</div>
-      </ng-container>
+  <div class="wrapper">
+    <div class="inner" #pageWrappers>
+      <div class="page-wrapper" *ngFor="let page of book.pages">
+        <ng-container *ngIf="page['_loaded']">
+          <div class="content">
+            <app-answer-page-view [pdfCache]="pdfCache" [page]="page"></app-answer-page-view>
+            <app-answer-page-annotation-layer class="annotations" [page]="page" [tool]="tool" (error)="error=$event"></app-answer-page-annotation-layer>
+          </div>
+          <div class="footer">Page {{page.index}}</div>
+        </ng-container>
+      </div>
     </div>
-  </div>
-  <div class="marking-wrapper">
-    <app-error [error]="error"></app-error>
-    <div class="ui divider horizontal inverted">Markings</div>
-    <app-answer-book-markings-view [task]="task" [book]="book" (error)="error=$event"></app-answer-book-markings-view>
-    <div class="ui divider horizontal inverted">Navigation</div>
-    <app-answer-book-navigation-card [darkMode]="true" [task]="task" [currentBook]="book" (error)="error=$event"></app-answer-book-navigation-card>
+    <div class="marking-wrapper" [ngClass]="{'mobile-active': mobileActive}">
+      <div class="ui divider horizontal inverted">Markings</div>
+      <app-answer-book-markings-view [task]="task" [book]="book" (error)="error=$event"></app-answer-book-markings-view>
+      <div class="ui divider horizontal inverted">Navigation</div>
+      <app-answer-book-navigation-card [darkMode]="true" [task]="task" [currentBook]="book" (error)="error=$event"></app-answer-book-navigation-card>
+    </div>
+    <div class="marking-toggle ui button icon orange" (click)="mobileActive=!mobileActive" [ngClass]="{'mobile-active': mobileActive}">
+      <i class="icon bars"></i>
+    </div>
   </div>
 </div>

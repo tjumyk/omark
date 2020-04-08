@@ -39,6 +39,8 @@ export class AnswerBookAnnotatorComponent implements OnInit, AfterViewInit, OnDe
 
   tool: string = 'hand';
 
+  mobileActive: boolean;
+
   constructor() { }
 
   ngOnInit() {

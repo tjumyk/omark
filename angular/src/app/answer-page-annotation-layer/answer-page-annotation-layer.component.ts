@@ -158,7 +158,10 @@ export class AnswerPageAnnotationLayerComponent implements OnInit, AfterViewInit
           this.page.annotations.push(ann);
           path['_annotation_id'] = ann.id;
         },
-        error=>this.error.emit(error.error)
+        error=>{
+          this.fabricCanvas.remove(path);
+          this.error.emit(error.error);
+        }
       )
     });
 

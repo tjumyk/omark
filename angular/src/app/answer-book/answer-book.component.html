@@ -10,7 +10,7 @@
         </div>
         <div class="item">
           <div class="header">Student</div>
-          <app-answer-book-student-card [book]="book" [enableAdmin]="isAdmin" [enablePopup]="true"
+          <app-answer-book-student-card [task]="task" [book]="book" [enableAdmin]="isAdmin" [enablePopup]="true"
                                         (error)="error=$event"></app-answer-book-student-card>
         </div>
         <div class="item">
@@ -24,7 +24,7 @@
       <div class="main">
         <div class="ui grid doubling four column">
           <div class="column" *ngFor="let page of book.pages; index as i">
-            <app-answer-page-preview [page]="page" [pdfCache]="pdfCache" [enableAdmin]="isAdmin"
+            <app-answer-page-preview [task]="task" [page]="page" [pdfCache]="pdfCache" [enableAdmin]="isAdmin"
                                      (zoomIn)="showAnnotator(i + 1)"
                                      (deleted)="afterPageDeleted(page)"
                                      (error)="error=$event"></app-answer-page-preview>
@@ -38,7 +38,7 @@
               <div class="label">Preloading Next Book...</div>
             </div>
 
-            <div class="ui segment">
+            <div class="ui segment" *ngIf="!task.is_locked">
               <div class="ui top attached progress" *ngIf="addingPages">
                 <div class="bar" [ngStyle]="{'width.%': addPagesProgress}"></div>
               </div>

@@ -2,11 +2,11 @@
   <div class="item">
     Book {{book.id}}
   </div>
-  <div class="item">
-    <app-answer-book-student-card [book]="book" [enableAdmin]="false" [enablePopup]="false"
+  <div class="item" [class.shrink]="!book.student">
+    <app-answer-book-student-card [task]="task" [book]="book" [enableAdmin]="false" [enablePopup]="false"
                                   (error)="error=$event"></app-answer-book-student-card>
   </div>
-  <div class="item">
+  <div class="item" *ngIf="!task.is_locked">
     <div class="ui mini buttons">
       <button class="ui button icon" (click)="tool='hand'" [class.active]="tool=='hand'"><i class="icon hand pointer"></i></button>
       <button class="ui button icon" (click)="tool='pen'" [class.active]="tool=='pen'"><i class="icon pencil"></i></button>

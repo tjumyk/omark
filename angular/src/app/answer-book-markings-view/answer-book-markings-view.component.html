@@ -33,7 +33,7 @@
       <ng-container *ngIf="item.value.marking; else notMarked">
         <td>
           {{item.value.marking.marks}}
-          <i class="icon edit link" (click)="startUpdateMarking(item.value.question)" *ngIf="item.value.assigned"></i>
+          <i class="icon edit link" (click)="startUpdateMarking(item.value.question)" *ngIf="!task.is_locked && item.value.assigned"></i>
         </td>
         <td>
           <app-user-mini-card [enablePopup]="false" [user]="item.value.marking.modifier || item.value.marking.creator"></app-user-mini-card>

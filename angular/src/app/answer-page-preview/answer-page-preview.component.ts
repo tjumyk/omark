@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {AnswerPage, BasicError} from "../models";
+import {AnswerPage, BasicError, Task} from "../models";
 import {AnswerService, PDFCache, UpdateAnswerPageForm} from "../answer.service";
 import {AdminService} from "../admin.service";
 import {finalize} from "rxjs/operators";
@@ -11,6 +11,8 @@ import {finalize} from "rxjs/operators";
   host: {'class': 'ui card fluid'}
 })
 export class AnswerPagePreviewComponent implements OnInit {
+  @Input()
+  task: Task;
   @Input()
   page: AnswerPage;
   @Input()

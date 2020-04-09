@@ -3,7 +3,7 @@
     Book {{book.id}}
   </div>
   <div class="item" [class.shrink]="!book.student">
-    <app-answer-book-student-card [book]="book" [enableAdmin]="false" [enablePopup]="false"
+    <app-answer-book-student-card [task]="task" [book]="book" [enableAdmin]="false" [enablePopup]="false"
                                   (error)="error=$event"></app-answer-book-student-card>
   </div>
   <div class="ui close button circular black icon large" (click)="closed.emit()"><i class="icon times"></i></div>

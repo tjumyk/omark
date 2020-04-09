@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {AnswerBook, BasicError} from "../models";
+import {AnswerBook, BasicError, Task} from "../models";
 import {AnswerService, UpdateAnswerBookForm} from "../answer.service";
 import {finalize} from "rxjs/operators";
 
@@ -9,6 +9,8 @@ import {finalize} from "rxjs/operators";
   styleUrls: ['./answer-book-student-card.component.less']
 })
 export class AnswerBookStudentCardComponent implements OnInit {
+  @Input()
+  task: Task;
   @Input()
   book: AnswerBook;
   @Input()

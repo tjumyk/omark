@@ -51,7 +51,7 @@
       <td>
         <div class="ui mini buttons">
           <a routerLink="{{book.id}}" class="ui button icon"><i class="icon horizontal ellipsis"></i></a>
-          <button *ngIf="isAdmin" class="ui button icon red" (click)="deleteBook(book, btnDeleteBook, bookPages.startRow + i - 1)" #btnDeleteBook><i class="icon trash"></i></button>
+          <button *ngIf="isAdmin && !task.is_locked" class="ui button icon red" (click)="deleteBook(book, btnDeleteBook, bookPages.startRow + i - 1)" #btnDeleteBook><i class="icon trash"></i></button>
         </div>
       </td>
     </tr>
@@ -61,7 +61,7 @@
 </ng-container>
 
 
-<div class="ui grid stackable centered">
+<div class="ui grid stackable centered" *ngIf="task && !task.is_locked">
   <div class="column four wide">
     <div class="ui segment">
       <form class="ui form" #f="ngForm" (ngSubmit)="addBook(f)" [class.loading]="addingBook">

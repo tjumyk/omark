@@ -24,8 +24,8 @@ export class NewMarkingForm{
   remarks?:string;
 }
 
-export class NewAnnotationForm{
-  data: string;
+export class NewAnnotationsForm{
+  data: string[];
 }
 
 export class PageOptions{
@@ -91,8 +91,8 @@ export class AnswerService {
     return this.http.post<Marking>(`${this.api}/books/${book_id}/markings`, form)
   }
 
-  addAnnotation(page_id: number, form: NewAnnotationForm):Observable<Annotation> {
-    return this.http.post<Annotation>(`${this.api}/pages/${page_id}/annotations`, form)
+  addAnnotations(page_id: number, form: NewAnnotationsForm):Observable<Annotation[]> {
+    return this.http.post<Annotation[]>(`${this.api}/pages/${page_id}/annotations`, form)
   }
 
   updatePage(page_id: number, form: UpdateAnswerPageForm):Observable<AnswerPage> {

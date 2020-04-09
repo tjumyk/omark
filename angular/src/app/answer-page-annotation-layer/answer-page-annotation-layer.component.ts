@@ -12,9 +12,13 @@ import {
 import {AnswerPage, BasicError, User} from "../models";
 import {fabric} from "fabric";
 import {MarkingService} from "../marking.service";
-import {AnswerService, NewAnnotationForm} from "../answer.service";
+import {AnswerService, NewAnnotationsForm} from "../answer.service";
 import {AccountService} from "../account.service";
 
+export class AnnotationItem {
+  path: fabric.Path;
+  data: string;
+}
 
 @Component({
   selector: 'app-answer-page-annotation-layer',
@@ -52,6 +56,10 @@ export class AnswerPageAnnotationLayerComponent implements OnInit, AfterViewInit
 
   checkSetupHandler: number;
 
+  delayedUploadAnnotationsHandler: number;
+  uploadAnnotationsDelay: number = 1000;
+  annotationUploadQueue: AnnotationItem[] = [];
+
   constructor(private element: ElementRef<HTMLElement>,
               private accountService: AccountService,
               private answerService: AnswerService,
@@ -75,6 +83,11 @@ export class AnswerPageAnnotationLayerComponent implements OnInit, AfterViewInit
     if (this.fabricCanvas) {
       this.fabricCanvas.dispose();
       this.fabricCanvas = null;
+    }
+
+    if (this.delayedUploadAnnotationsHandler) {  // cancel delayed upload and upload now (if queue is not empty)
+      clearTimeout(this.delayedUploadAnnotationsHandler);
+      this.uploadAnnotations();
     }
   }
 
@@ -151,18 +164,15 @@ export class AnswerPageAnnotationLayerComponent implements OnInit, AfterViewInit
       data.scaleX = 1 / canvasWidth;
       data.scaleY = 1 / canvasHeight;
 
-      const form = new NewAnnotationForm();
-      form.data = JSON.stringify(data);
-      this.answerService.addAnnotation(this.page.id, form).subscribe(
-        ann=>{
-          this.page.annotations.push(ann);
-          path['_annotation_id'] = ann.id;
-        },
-        error=>{
-          this.fabricCanvas.remove(path);
-          this.error.emit(error.error);
-        }
-      )
+      // create data item and push it into queue
+      let dataItem = new AnnotationItem();
+      dataItem.path = path;
+      dataItem.data = JSON.stringify(data);
+      this.annotationUploadQueue.push(dataItem);
+
+      clearTimeout(this.delayedUploadAnnotationsHandler);
+      this.delayedUploadAnnotationsHandler =
+        setTimeout(() => this.uploadAnnotations(), this.uploadAnnotationsDelay);
     });
 
     this.fabricCanvas.on('mouse:down', (event)=>{
@@ -182,23 +192,58 @@ export class AnswerPageAnnotationLayerComponent implements OnInit, AfterViewInit
                 }
                 ++i;
               }
-              if(annIndex >= 0){
+              if (annIndex >= 0) {
                 this.page.annotations.splice(annIndex, 1)
               }
             },
-            error=>this.error.emit(error.error)
+            error => this.error.emit(error.error)
           )
+        } else {
+          alert('Annotation has not yet been synced.\nPlease wait for a few seconds.')
         }
       }
     });
   }
 
-  private loadData(){
+  private uploadAnnotations() {
+    if (!this.annotationUploadQueue || !this.annotationUploadQueue.length)
+      return;
+
+    let pathList: fabric.Path[] = [], dataList: string[] = [];
+    for (let _path of this.annotationUploadQueue) {
+      pathList.push(_path.path);
+      dataList.push(_path.data)
+    }
+    this.annotationUploadQueue = [];  // clear queue after data copy
+
+    const form = new NewAnnotationsForm();
+    form.data = dataList;
+    this.answerService.addAnnotations(this.page.id, form).subscribe(
+      annotations => {
+        let i = 0;
+        for (let ann of annotations) {
+          this.page.annotations.push(ann);
+          pathList[i]['_annotation_id'] = ann.id;
+          ++i;
+        }
+      },
+      error => {
+        if (this.fabricCanvas) {
+          for (let path of pathList) {
+            this.fabricCanvas.remove(path);
+          }
+        }
+        this.error.emit(error.error);
+      }
+    )
+  }
+
+  private loadData() {
     this.accountService.getCurrentUser().subscribe(
-      user=>{
+      user => {
         this.user = user;
 
-        for(let ann of this.page.annotations){
+        for (let ann of this.page.annotations) {
           const data = JSON.parse(ann.data);
 
           // convert from canvas-independent data to canvas-dependent data

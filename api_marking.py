@@ -44,7 +44,7 @@ def do_annotation(aid: int):
             params = request.json
             MarkingService.update_annotation(ann, params.get('data'), modifier=user)
             db.session.commit()
-            return jsonify(ann.to_dict(with_creator=True))
+            return jsonify(ann.to_dict())
         else:  # DELETE
             MarkingService.delete_annotation(ann, requester=user)
             db.session.commit()

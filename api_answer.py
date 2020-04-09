@@ -225,9 +225,17 @@ def do_page_annotations(pid: int):
             return jsonify(msg='page not found'), 404
 
         params = request.json
-        ann = MarkingService.add_annotation(page, data=params.get('data'), creator=user)
-        db.session.commit()
-        return jsonify(ann.to_dict(with_creator=True)), 201
+        all_data = params.get('data')
+        if isinstance(all_data, list):  # batch post
+            annotations = []
+            for data_item in all_data:
+                annotations.append(MarkingService.add_annotation(page, data=data_item, creator=user))
+            db.session.commit()
+            return jsonify([ann.to_dict() for ann in annotations]), 201
+        else:  # single post
+            ann = MarkingService.add_annotation(page, data=all_data, creator=user)
+            db.session.commit()
+            return jsonify(ann.to_dict()), 201
     except (AccountServiceError, AnswerServiceError, MarkingServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 

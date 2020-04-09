@@ -116,7 +116,6 @@ class MarkingService:
             raise MarkingServiceError('no permission')
 
         ann.data = data
-        ann.modifier = modifier
 
     @staticmethod
     def delete_annotation(ann: Annotation, requester: UserAlias = None):

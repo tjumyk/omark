@@ -9,7 +9,7 @@ import {
   Output,
   ViewChild
 } from '@angular/core';
-import {AnswerPage, BasicError, User} from "../models";
+import {Annotation, AnswerPage, BasicError, User} from "../models";
 import {fabric} from "fabric";
 import {MarkingService} from "../marking.service";
 import {AnswerService, NewAnnotationsForm} from "../answer.service";
@@ -219,9 +219,15 @@ export class AnswerPageAnnotationLayerComponent implements OnInit, AfterViewInit
     const form = new NewAnnotationsForm();
     form.data = dataList;
     this.answerService.addAnnotations(this.page.id, form).subscribe(
-      annotations => {
+      annotation_ids => {
         let i = 0;
-        for (let ann of annotations) {
+        for (let ann_id of annotation_ids) {
+          let ann = new Annotation();
+          ann.id = ann_id
+          ann.creator_id = this.user.id;
+          ann.page_id = this.page.id;
+          ann.data = dataList[i];  // fill in the data from the request
+          // TODO other attributes of ann are not retrieved
           this.page.annotations.push(ann);
           pathList[i]['_annotation_id'] = ann.id;
           ++i;

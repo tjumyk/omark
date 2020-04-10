@@ -231,7 +231,7 @@ def do_page_annotations(pid: int):
             for data_item in all_data:
                 annotations.append(MarkingService.add_annotation(page, data=data_item, creator=user))
             db.session.commit()
-            return jsonify([ann.to_dict() for ann in annotations]), 201
+            return jsonify([ann.id for ann in annotations]), 201  # return ids only
         else:  # single post
             ann = MarkingService.add_annotation(page, data=all_data, creator=user)
             db.session.commit()

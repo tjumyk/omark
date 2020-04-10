@@ -262,13 +262,13 @@ class Annotation(db.Model):
     def __repr__(self):
         return '<Annotation %r>' % self.id
 
-    def to_dict(self, with_page: bool = False,
-                with_creator: bool = False) -> dict:
-        d = dict(id=self.id, page_id=self.page_id, data=self.data,
-                 creator_id=self.creator_id,
-                 created_at=self.created_at, modified_at=self.modified_at)
+    def to_dict(self, with_data: bool = True, with_page: bool = False, with_creator: bool = False) -> dict:
+        d = dict(id=self.id, page_id=self.page_id,
+                 creator_id=self.creator_id, created_at=self.created_at, modified_at=self.modified_at)
+        if with_data:
+            d['data'] = self.data
         if with_page:
             d['page'] = self.page.to_dict()
         if with_creator:
-            d['creator'] = self.creator.to_dict()
+            d['creator'] = self.creator.to_dict() if self.creator else None
         return d

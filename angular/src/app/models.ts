@@ -122,7 +122,7 @@ export class Annotation {
   id: number;
   page_id: number;
 
-  data: string;
+  data?: string;
 
   creator_id?: number;
   created_at: string;

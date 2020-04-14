@@ -36,7 +36,7 @@
     <div class="marking-wrapper" [ngClass]="{'mobile-active': mobileActive}">
       <div class="ui divider horizontal inverted">Markings</div>
       <app-answer-book-markings-view [task]="task" [book]="book" (error)="error=$event"></app-answer-book-markings-view>
-      <div class="ui divider horizontal inverted">Comments</div>
+      <div class="ui divider horizontal inverted" *ngIf="!task.is_locked||book.comments.length">Comments</div>
       <app-answer-book-comments-view [task]="task" [book]="book" (error)="error=$event" [darkMode]="true"></app-answer-book-comments-view>
       <div class="ui divider horizontal inverted">Navigation</div>
       <app-answer-book-navigation-card [darkMode]="true" [task]="task" [currentBook]="book" (error)="error=$event"></app-answer-book-navigation-card>

@@ -64,7 +64,7 @@
         </div>
         <div class="ui divider horizontal">Markings</div>
         <app-answer-book-markings-view *ngIf="!annotatorShown" [task]="task" [book]="book" (error)="error=$event"></app-answer-book-markings-view>
-        <div class="ui divider horizontal">Comments</div>
+        <div class="ui divider horizontal" *ngIf="!task.is_locked||book.comments.length">Comments</div>
         <app-answer-book-comments-view *ngIf="!annotatorShown" [task]="task" [book]="book" (error)="error=$event"></app-answer-book-comments-view>
         <div class="ui divider horizontal">Navigation</div>
         <app-answer-book-navigation-card [task]="task" [currentBook]="book" (error)="error=$event"></app-answer-book-navigation-card>

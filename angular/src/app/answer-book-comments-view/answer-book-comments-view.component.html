@@ -1,0 +1,56 @@
+<div class="ui comments" [class.inverted]="darkMode" *ngIf="book.comments.length">
+  <div class="comment" *ngFor="let comment of book.comments; index as i">
+    <div class="avatar">
+      <ng-container *ngIf="comment.creator; else sysAvatar">
+        <ng-container *ngIf="comment.creator.avatar; else authorNoAvatar">
+          <img src="{{comment.creator.avatar}}?size=64">
+        </ng-container>
+      </ng-container>
+      <ng-template #sysAvatar><img src="static/assets/logo-64.png"></ng-template>
+      <ng-template #authorNoAvatar><i class="icon big user circle" [class.inverted]="darkMode"></i></ng-template>
+    </div>
+    <div class="content">
+      <span class="author">
+        <ng-container *ngIf="comment.creator; else sysName">
+          <app-user-mini-card [user]="comment.creator" [enablePopup]="false" [enableAvatar]="false" [enableAdmin]="isAdmin"></app-user-mini-card>
+        </ng-container>
+        <ng-template #sysName>System</ng-template>
+      </span>
+      <div class="metadata">
+        <span class="date" *ngIf="comment._modified_at_from_now">{{comment._modified_at_from_now}}</span>
+      </div>
+      <div class="text">{{comment.content}}</div>
+      <div class="actions" *ngIf="user.id === comment.creator_id">
+        <a class="edit" (click)="editComment(comment)">Edit</a>
+        <a class="delete" (click)="removeComment(comment, btnRemoveComment, i)" #btnRemoveComment></a>
+      </div>
+      <form *ngIf="comment._editing" class="ui reply form" #fUpdate="ngForm" (ngSubmit)="updateComment(fUpdate, comment)"
+            [ngClass]="{'loading': comment._updating}">
+        <div class="field">
+            <textarea [(ngModel)]="comment._editor_content" name="content" required #updateEditorContentModel="ngModel"
+                      placeholder="Your comment..." rows="2"></textarea>
+        </div>
+        <div class="ui fluid buttons">
+          <button type="submit" class="ui button green"
+                  [ngClass]="{'disabled': updateEditorContentModel.invalid && (updateEditorContentModel.touched || updateEditorContentModel.dirty || fUpdate.submitted)}">
+            <i class="icon check"></i> Save
+          </button>
+          <button type="button" class="ui button red" (click)="cancelEditComment(comment)">
+            <i class="icon times"></i> Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<form class="ui reply form" #f="ngForm" (ngSubmit)="addComment(f)" [ngClass]="{'loading': addingComment}">
+  <div class="field">
+      <textarea [(ngModel)]="newCommentForm.content" name="content" required #editorContentModel="ngModel"
+                placeholder="Your comment..." rows="2"></textarea>
+  </div>
+  <button type="submit" class="ui labeled icon button fluid"
+          [ngClass]="{'disabled': editorContentModel.invalid && (editorContentModel.touched || editorContentModel.dirty || f.submitted)}">
+    <i class="icon edit"></i> Add Comment
+  </button>
+</form>

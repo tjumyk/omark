@@ -51,3 +51,28 @@ def do_annotation(aid: int):
             return "", 204
     except (AccountServiceError, MarkingServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@marking_api.route('/comments/<int:cid>', methods=['PUT', 'DELETE'])
+@requires_login
+def do_comment(cid: int):
+    try:
+        user = AccountService.get_current_user()
+        if user is None:
+            return jsonify(msg='user info required'), 500
+
+        comment = MarkingService.get_comment(cid)
+        if comment is None:
+            return jsonify(msg='comment not found'), 404
+
+        if request.method == 'PUT':
+            params = request.json
+            MarkingService.update_comment(comment, params.get('content'), modifier=user)
+            db.session.commit()
+            return jsonify(comment.to_dict(with_creator=True))
+        else:  # DELETE
+            MarkingService.delete_comment(comment, requester=user)
+            db.session.commit()
+            return "", 204
+    except (AccountServiceError, MarkingServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400

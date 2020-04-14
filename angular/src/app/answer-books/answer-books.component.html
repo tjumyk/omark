@@ -30,6 +30,7 @@
       <th (click)="sortField('id', thID)" #thID>ID</th>
       <th (click)="sortField('student.name', thStudent)" #thStudent>Student</th>
       <th (click)="sortField('_marks_'+q.id, thQuestion)" #thQuestion *ngFor="let q of task.questions">Q{{q.index}}</th>
+      <th (click)="sortField('comments.length', thComments)" #thComments>Comments</th>
       <th (click)="sortField('_total_marks', thTotal)" #thTotal>Total</th>
       <th>Actions</th>
     </tr>
@@ -46,6 +47,11 @@
         <ng-container *ngIf="book['_marks_' + q.id] != null">
           {{book['_marks_' + q.id]}}
         </ng-container>
+      </td>
+      <td class="comments">
+        <div class="ui label" *ngFor="let comment of book.comments">
+          {{comment.content}}
+        </div>
       </td>
       <td>{{book['_total_marks']}}</td>
       <td>

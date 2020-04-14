@@ -3,7 +3,7 @@ from typing import Optional
 from sqlalchemy import func
 
 from error import BasicError
-from models import Marking, AnswerBook, Question, UserAlias, db, Annotation, AnswerPage
+from models import Marking, AnswerBook, Question, UserAlias, db, Annotation, AnswerPage, Comment
 
 
 class MarkingServiceError(BasicError):
@@ -129,3 +129,53 @@ class MarkingService:
             raise MarkingServiceError('no permission')
 
         db.session.delete(ann)
+
+    @staticmethod
+    def get_comment(_id: int) -> Optional[Comment]:
+        if _id is None:
+            raise MarkingServiceError('id is required')
+        if not isinstance(_id, int):
+            raise MarkingServiceError('id must be an integer')
+
+        return Comment.query.get(_id)
+
+    @staticmethod
+    def add_comment(book: AnswerBook, content: str, creator: UserAlias = None) -> Comment:
+        if book is None:
+            raise MarkingServiceError('book is required')
+        if not content:
+            raise MarkingServiceError('content is required')
+
+        if book.task.is_locked:
+            raise MarkingServiceError('task has been locked')
+
+        comment = Comment(book=book, content=content, creator=creator)
+        db.session.add(comment)
+        return comment
+
+    @staticmethod
+    def update_comment(comment: Comment, content: str, modifier: UserAlias = None):
+        if comment is None:
+            raise MarkingServiceError('comment is required')
+        if not content:
+            raise MarkingServiceError('content is required')
+
+        if comment.book.task.is_locked:
+            raise MarkingServiceError('task has been locked')
+
+        if modifier and (comment.creator_id is None or comment.creator_id != modifier.id):
+            raise MarkingServiceError('no permission')
+
+        comment.content = content
+
+    @staticmethod
+    def delete_comment(comment: Comment, requester: UserAlias = None):
+        if comment is None:
+            raise MarkingServiceError('comment is required')
+
+        if comment.book.task.is_locked:
+            raise MarkingServiceError('task has been locked')
+
+        if requester and (comment.creator_id is None or comment.creator_id != requester.id):
+            raise MarkingServiceError('no permission')
+        db.session.delete(comment)

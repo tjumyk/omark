@@ -1,10 +1,11 @@
+from collections import defaultdict
 from typing import Optional, List
 
 from sqlalchemy import func
 from sqlalchemy.orm import joinedload
 
 from error import BasicError
-from models import Task, db, Question, UserAlias, MarkerQuestionAssignment, AnswerBook
+from models import Task, db, Question, UserAlias, MarkerQuestionAssignment, AnswerBook, Marking, Comment
 
 
 class TaskServiceError(BasicError):
@@ -50,13 +51,34 @@ class TaskService:
         task.is_locked = False
 
     @staticmethod
-    def get_books_with_markings_and_students(task: Task) -> List[AnswerBook]:
+    def get_books(task: Task, joined_load_student: bool = False) -> List[AnswerBook]:
         if task is None:
             raise TaskServiceError('task is required')
 
-        return AnswerBook.query.with_parent(task) \
-            .options(joinedload(AnswerBook.markings), joinedload(AnswerBook.student)) \
-            .order_by(AnswerBook.id) \
+        query = AnswerBook.query.with_parent(task)
+        if joined_load_student:
+            query = query.options(joinedload(AnswerBook.student))
+        return query.order_by(AnswerBook.id).all()
+
+    @staticmethod
+    def get_markings(task: Task) -> List[Marking]:
+        if task is None:
+            raise TaskServiceError('task is required')
+
+        return db.session.query(Marking) \
+            .filter(Marking.book_id == AnswerBook.id,
+                    AnswerBook.task_id == task.id) \
+            .all()
+
+    @staticmethod
+    def get_comments(task: Task) -> List[Comment]:
+        if task is None:
+            raise TaskServiceError('task is required')
+
+        return db.session.query(Comment) \
+            .filter(Comment.book_id == AnswerBook.id,
+                    AnswerBook.task_id == task.id) \
+            .order_by(Comment.id) \
             .all()
 
     @staticmethod

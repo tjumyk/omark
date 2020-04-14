@@ -151,6 +151,7 @@ class AnswerBook(db.Model):
 
     def to_dict(self, with_task: bool = False, with_student: bool = False,
                 with_pages: bool = False, with_markings: bool = False, with_annotations: bool = False,
+                with_comments: bool = False,
                 with_creator: bool = False, with_modifier: bool = False) -> dict:
         d = dict(id=self.id, task_id=self.task_id, student_id=self.student_id,
                  creator_id=self.creator_id, modifier_id=self.modifier_id,
@@ -164,6 +165,8 @@ class AnswerBook(db.Model):
                           for p in sorted(self.pages, key=lambda p: p.index)]
         if with_markings:
             d['markings'] = [m.to_dict(with_creator=with_creator, with_modifier=with_modifier) for m in self.markings]
+        if with_comments:
+            d['comments'] = [c.to_dict(with_creator=with_creator) for c in sorted(self.comments, key=lambda c:c.id)]
         if with_creator:
             d['creator'] = self.creator.to_dict() if self.creator else None
         if with_modifier:
@@ -269,6 +272,32 @@ class Annotation(db.Model):
             d['data'] = self.data
         if with_page:
             d['page'] = self.page.to_dict()
+        if with_creator:
+            d['creator'] = self.creator.to_dict() if self.creator else None
+        return d
+
+
+class Comment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    book_id = db.Column(db.Integer, db.ForeignKey('answer_book.id'), nullable=False, index=True)
+
+    content = db.Column(db.Text, nullable=False)
+
+    creator_id = db.Column(db.Integer, db.ForeignKey('user_alias.id'))
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    modified_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    book = db.relationship('AnswerBook', backref=db.backref('comments'))
+    creator = db.relationship('UserAlias')
+
+    def __repr__(self):
+        return '<Comment %r>' % self.id
+
+    def to_dict(self, with_book: bool = False, with_creator: bool = False) -> dict:
+        d = dict(id=self.id, book_id=self.book_id, content=self.content,
+                 creator_id=self.creator_id, created_at=self.created_at, modified_at=self.modified_at)
+        if with_book:
+            d['book'] = self.book.to_dict()
         if with_creator:
             d['creator'] = self.creator.to_dict() if self.creator else None
         return d

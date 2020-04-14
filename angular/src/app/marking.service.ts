@@ -1,11 +1,15 @@
 import { Injectable } from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
-import {Marking} from "./models";
+import {Marking, Comment} from "./models";
 
 export class UpdateMarkingForm{
   marks: number;
   remarks?: string;
+}
+
+export class UpdateCommentForm{
+  content: string;
 }
 
 @Injectable({
@@ -22,5 +26,13 @@ export class MarkingService {
 
   deleteAnnotation(aid: number):Observable<any>{
     return this.http.delete(`${this.api}/annotations/${aid}`)
+  }
+
+  updateComment(cid: number, form: UpdateCommentForm): Observable<Comment>{
+    return this.http.put<Comment>(`${this.api}/comments/${cid}`, form)
+  }
+
+  deleteComment(cid: number):Observable<any>{
+    return this.http.delete(`${this.api}/comments/${cid}`)
   }
 }

@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from flask import Blueprint, jsonify, request
 
 from auth_connect.oauth import requires_login
@@ -45,8 +47,22 @@ def do_task_books(tid: int):
             return jsonify(msg='task not found'), 404
 
         if request.method == 'GET':
-            books = TaskService.get_books_with_markings_and_students(task)
-            return jsonify([b.to_dict(with_student=True, with_markings=True) for b in books])
+            books = TaskService.get_books(task, joined_load_student=True)
+            markings = TaskService.get_markings(task)
+            comments = TaskService.get_comments(task)
+            marking_map = defaultdict(list)
+            comment_map = defaultdict(list)
+            for m in markings:
+                marking_map[m.book_id].append(m.to_dict())
+            for c in comments:
+                comment_map[c.book_id].append(c.to_dict())
+            book_dicts = []
+            for b in books:
+                d = b.to_dict(with_student=True)
+                d['markings'] = marking_map.get(b.id, [])
+                d['comments'] = comment_map.get(b.id, [])
+                book_dicts.append(d)
+            return jsonify(book_dicts)
         else:  # POST
             params = request.json
             student_name = params.get('student_name')
@@ -71,31 +87,44 @@ def export_markings(tid: int):
         if task is None:
             return jsonify(msg='task not found'), 404
 
-        books = TaskService.get_books_with_markings_and_students(task)
+        books = TaskService.get_books(task, joined_load_student=True)
+        markings = TaskService.get_markings(task)
+        comments = TaskService.get_comments(task)
+        marking_map = defaultdict(list)
+        comment_map = defaultdict(list)
+        for m in markings:
+            marking_map[m.book_id].append(m)
+        for c in comments:
+            comment_map[c.book_id].append(c)
 
         tsv = []
         columns = ['BookID', 'UserID', 'UserName']
         questions = task.questions
         for q in questions:
             columns.append('Q%d' % q.index)
+        columns.append('Comments')
         columns.append('Total')
         tsv.append('\t'.join(columns))
 
         for book in books:
+            book_markings = marking_map.get(book.id, [])
+            book_comments = comment_map.get(book.id, [])
             student_name = book.student.name if book.student_id else None
             book_columns = [book.id, book.student_id, student_name]
-            marking_map = {m.question_id: m for m in book.markings}
+            marking_map = {m.question_id: m for m in book_markings}
             total = 0
             for q in questions:
                 marking = marking_map.get(q.id)
                 if marking:
                     marks = marking.marks
                     if int(marks) == marks:
-                        marks = int(marks)  # convert to int for str()
+                        marks = int(marks)  # convert to int
                     book_columns.append(marks)
                     total += marks
                 else:
                     book_columns.append(None)
+
+            book_columns.append(' || '.join(c.content for c in book_comments))
             book_columns.append(total if marking_map else None)
             tsv.append('\t'.join([str(c) for c in book_columns]))
         return '\n'.join(tsv), {'Content-Type': 'text/plain'}

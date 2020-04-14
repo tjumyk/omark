@@ -76,6 +76,7 @@ export class AnswerBook {
 
   pages?: AnswerPage[];
   markings?: Marking[];
+  comments?: Comment[];
 }
 
 export class AnswerPage {
@@ -134,4 +135,18 @@ export class Annotation {
 
 export class VersionInfo {
   version: string;
+}
+
+export class Comment {
+  id: number;
+  book_id: number;
+
+  content: string;
+
+  creator_id: number;
+  created_at: string;
+  modified_at: string;
+
+  book?: AnswerBook;
+  creator?: User;
 }

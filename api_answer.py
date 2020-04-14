@@ -29,7 +29,7 @@ def do_book(bid: int):
 
         if request.method == 'GET':
             return jsonify(book.to_dict(with_student=True, with_pages=True, with_markings=True, with_annotations=True,
-                                        with_creator=True, with_modifier=True))
+                                        with_comments=True, with_creator=True, with_modifier=True))
         else:  # PUT
             user = AccountService.get_current_user()
             if user is None:
@@ -47,7 +47,7 @@ def do_book(bid: int):
             AnswerService.update_book(book, student, modifier=user)
             db.session.commit()
             return jsonify(book.to_dict(with_student=True, with_pages=True, with_markings=True, with_annotations=True,
-                                        with_creator=True, with_modifier=True))
+                                        with_comments=True, with_creator=True, with_modifier=True))
     except (AccountServiceError, AnswerServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
@@ -273,4 +273,24 @@ def download_zip(bid: int):
             return send_from_directory(tmp_dir, zip_name, as_attachment=True, attachment_filename=zip_name,
                                        cache_timeout=0)
     except AnswerServiceError as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@answer_api.route('/books/<int:bid>/comments', methods=['POST'])
+@requires_login
+def do_book_comments(bid: int):
+    try:
+        user = AccountService.get_current_user()
+        if user is None:
+            return jsonify(msg='user info required'), 500
+
+        book = AnswerService.get_book(bid)
+        if book is None:
+            return jsonify(msg='book not found'), 404
+
+        params = request.json
+        comment = MarkingService.add_comment(book, params.get('content'), creator=user)
+        db.session.commit()
+        return jsonify(comment.to_dict(with_creator=True)), 201
+    except (AccountServiceError, AnswerServiceError, TaskServiceError, MarkingServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400

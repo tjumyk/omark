@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpEvent, HttpParams, HttpRequest} from "@angular/common/http";
 import {Observable} from "rxjs";
-import {Annotation, AnswerBook, AnswerPage, Marking} from "./models";
+import {Annotation, AnswerBook, AnswerPage, Marking, Comment} from "./models";
 import {PDFDocumentProxy, PDFPageProxy} from "pdfjs-dist/webpack";
 
 export class PDFCacheEntry{
@@ -26,6 +26,10 @@ export class NewMarkingForm{
 
 export class NewAnnotationsForm{
   data: string[];
+}
+
+export class NewCommentForm{
+  content: string;
 }
 
 export class PageOptions{
@@ -93,6 +97,10 @@ export class AnswerService {
 
   addAnnotations(page_id: number, form: NewAnnotationsForm):Observable<number[]> {
     return this.http.post<number[]>(`${this.api}/pages/${page_id}/annotations`, form)
+  }
+
+  addComment(book_id: number, form: NewCommentForm):Observable<Comment> {
+    return this.http.post<Comment>(`${this.api}/books/${book_id}/comments`, form)
   }
 
   updatePage(page_id: number, form: UpdateAnswerPageForm):Observable<AnswerPage> {

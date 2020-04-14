@@ -1,0 +1,50 @@
+:host {
+  display: block;
+}
+
+.ui.comments {
+  max-width: none;
+}
+
+.actions > a {
+  &.disabled {
+    cursor: default;
+    pointer-events: none !important;
+  }
+
+  &.delete {
+    &:after {
+      content: 'Delete';
+    }
+
+    &.loading:after {
+      content: 'Deleting...';
+    }
+  }
+}
+
+.comment .text {
+  white-space: pre-wrap;
+}
+
+.ui.comments .reply.form textarea{
+  height: inherit;
+}
+.ui.comments.inverted {
+  .comment {
+    .author, .text {
+      color: rgba(255, 255, 255, .87);
+    }
+
+    .metadata {
+      color: rgba(255, 255, 255, .4);
+    }
+
+    .actions a {
+      color: rgba(255, 255, 255, .4);
+      &:hover{
+        color: rgba(255, 255, 255, .8);
+      }
+    }
+  }
+}

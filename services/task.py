@@ -40,12 +40,16 @@ class TaskService:
 
     @staticmethod
     def lock(task: Task):
+        if task is None:
+            raise TaskServiceError('task is required')
         if task.is_locked:
             raise TaskServiceError('already locked')
         task.is_locked = True
 
     @staticmethod
     def unlock(task: Task):
+        if task is None:
+            raise TaskServiceError('task is required')
         if not task.is_locked:
             raise TaskServiceError('not locked')
         task.is_locked = False

@@ -124,7 +124,7 @@ def export_markings(tid: int):
                 else:
                     book_columns.append(None)
 
-            book_columns.append(' || '.join(c.content for c in book_comments))
+            book_columns.append(' || '.join(c.content.replace('\n', ' ').replace('\t', ' ') for c in book_comments))
             book_columns.append(total if question_marking_map else None)
             tsv.append('\t'.join([str(c) for c in book_columns]))
         return '\n'.join(tsv), {'Content-Type': 'text/plain'}

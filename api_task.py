@@ -111,10 +111,10 @@ def export_markings(tid: int):
             book_comments = comment_map.get(book.id, [])
             student_name = book.student.name if book.student_id else None
             book_columns = [book.id, book.student_id, student_name]
-            marking_map = {m.question_id: m for m in book_markings}
+            question_marking_map = {m.question_id: m for m in book_markings}
             total = 0
             for q in questions:
-                marking = marking_map.get(q.id)
+                marking = question_marking_map.get(q.id)
                 if marking:
                     marks = marking.marks
                     if int(marks) == marks:
@@ -125,7 +125,7 @@ def export_markings(tid: int):
                     book_columns.append(None)
 
             book_columns.append(' || '.join(c.content for c in book_comments))
-            book_columns.append(total if marking_map else None)
+            book_columns.append(total if question_marking_map else None)
             tsv.append('\t'.join([str(c) for c in book_columns]))
         return '\n'.join(tsv), {'Content-Type': 'text/plain'}
     except TaskServiceError as e:

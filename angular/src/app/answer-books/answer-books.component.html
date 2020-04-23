@@ -30,8 +30,8 @@
       <th (click)="sortField('id', thID)" #thID>ID</th>
       <th (click)="sortField('student.name', thStudent)" #thStudent>Student</th>
       <th (click)="sortField('_marks_'+q.id, thQuestion)" #thQuestion *ngFor="let q of task.questions">Q{{q.index}}</th>
-      <th (click)="sortField('comments.length', thComments)" #thComments>Comments</th>
       <th (click)="sortField('_total_marks', thTotal)" #thTotal>Total</th>
+      <th (click)="sortField('comments.length', thComments)" #thComments>Comments</th>
       <th>Actions</th>
     </tr>
     </thead>
@@ -48,12 +48,12 @@
           {{book['_marks_' + q.id]}}
         </ng-container>
       </td>
+      <td>{{book['_total_marks']}}</td>
       <td class="comments">
         <div class="ui label" *ngFor="let comment of book.comments">
           {{comment.content}}
         </div>
       </td>
-      <td>{{book['_total_marks']}}</td>
       <td>
         <div class="ui mini buttons">
           <a routerLink="{{book.id}}" class="ui button icon"><i class="icon horizontal ellipsis"></i></a>

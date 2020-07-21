@@ -140,6 +140,7 @@ class AnswerBook(db.Model):
     modifier_id = db.Column(db.Integer, db.ForeignKey('user_alias.id'))
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     modified_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+    submitted_at = db.Column(db.DateTime)
 
     task = db.relationship('Task', backref=db.backref('answer_books'))
     student = db.relationship('UserAlias', backref=db.backref('answer_books'), foreign_keys='[AnswerBook.student_id]')
@@ -155,7 +156,8 @@ class AnswerBook(db.Model):
                 with_creator: bool = False, with_modifier: bool = False) -> dict:
         d = dict(id=self.id, task_id=self.task_id, student_id=self.student_id,
                  creator_id=self.creator_id, modifier_id=self.modifier_id,
-                 created_at=self.created_at, modified_at=self.modified_at)
+                 created_at=self.created_at, modified_at=self.modified_at,
+                 submitted_at=self.submitted_at)
         if with_task:
             d['task'] = self.task.to_dict()
         if with_student:

@@ -17,6 +17,10 @@
           <div class="header">Created At</div>
           {{book.created_at | date: 'medium'}}
         </div>
+        <div class="item" *ngIf="book.submitted_at">
+          <div class="header">Submitted At</div>
+          {{book.submitted_at | date: 'medium'}}
+        </div>
       </div>
     </div>
 

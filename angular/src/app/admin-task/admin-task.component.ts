@@ -104,7 +104,7 @@ export class AdminTaskComponent implements OnInit {
             break;
           case HttpEventType.Response:
             const resp = event.body as ImportGiveResponse;
-            alert(`Imported books: ${resp.num_books}`)
+            alert(`Imported books: ${resp.num_new_books} new, ${resp.num_updated_books} updated, ${resp.num_skipped_books} skipped`)
         }
       },
       error => this.error = error.error

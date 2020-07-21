@@ -19,7 +19,9 @@ export class NewMarkerQuestionAssignmentForm{
 }
 
 export class ImportGiveResponse{
-  num_books: number;
+  num_new_books: number;
+  num_skipped_books: number;
+  num_updated_books: number;
 }
 
 @Injectable({

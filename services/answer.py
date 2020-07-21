@@ -1,9 +1,10 @@
+from datetime import datetime
 from typing import Optional, Set, List
 
 from sqlalchemy import func
 
 from error import BasicError
-from models import AnswerBook, Task, UserAlias, db, AnswerPage, Annotation, Marking
+from models import AnswerBook, Task, UserAlias, db, AnswerPage, Annotation, Marking, Comment
 
 
 class AnswerServiceError(BasicError):
@@ -21,6 +22,17 @@ class AnswerService:
         return AnswerBook.query.get(_id)
 
     @staticmethod
+    def get_book_by_task_student(task: Task, student: UserAlias) -> Optional[AnswerBook]:
+        if task is None:
+            raise AnswerServiceError('task is required')
+        if student is None:
+            raise AnswerServiceError('student is required')
+
+        return db.session.query(AnswerBook) \
+            .filter(AnswerBook.task_id == task.id,
+                    AnswerBook.student_id == student.id).first()
+
+    @staticmethod
     def go_to_book(from_book: AnswerBook, is_next: bool = True) -> Optional[AnswerBook]:
         if from_book is None:
             raise AnswerServiceError('from book is required')
@@ -35,7 +47,8 @@ class AnswerService:
         return db.session.query(AnswerBook).filter(*filters).order_by(order_by).first()
 
     @staticmethod
-    def add_book(task: Task, student: UserAlias = None, creator: UserAlias = None) -> AnswerBook:
+    def add_book(task: Task, student: UserAlias = None, creator: UserAlias = None, submitted_at: datetime = None) \
+            -> AnswerBook:
         if task is None:
             raise AnswerServiceError('task is required')
 
@@ -48,7 +61,7 @@ class AnswerService:
                 .scalar():
             raise AnswerServiceError('duplicate book')
 
-        book = AnswerBook(task=task, creator=creator, student=student)
+        book = AnswerBook(task=task, creator=creator, student=student, submitted_at=submitted_at)
         db.session.add(book)
         return book
 

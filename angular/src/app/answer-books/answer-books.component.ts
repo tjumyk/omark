@@ -9,6 +9,7 @@ import {AccountService} from "../account.service";
 import {Subject} from "rxjs";
 import {AdminService} from "../admin.service";
 import {TitleService} from "../title.service";
+import * as moment from "moment";
 
 @Component({
   selector: 'app-answer-books',
@@ -32,6 +33,8 @@ export class AnswerBooksComponent implements OnInit {
 
   newBookForm = new NewAnswerBookForm();
   addingBook: boolean;
+
+  hasSubmittedAt: boolean;
 
   constructor(private accountService: AccountService,
               private adminService: AdminService,
@@ -71,6 +74,10 @@ export class AnswerBooksComponent implements OnInit {
   }
 
   private setupBook(book: AnswerBook){
+    if(book.submitted_at){
+      book['_submitted_at_time'] = moment(book.submitted_at).unix()
+    }
+
     if(book.markings){
       let total = 0;
       for(let marking of book.markings){
@@ -85,8 +92,12 @@ export class AnswerBooksComponent implements OnInit {
   private setupBooks(books: AnswerBook[]) {
     this.books = books;
 
+    this.hasSubmittedAt = false;
     for(let book of books){
-      this.setupBook(book)
+      this.setupBook(book);
+      if(book.submitted_at){
+        this.hasSubmittedAt = true;
+      }
     }
 
     this.bookPages = new Pagination(books, 500);

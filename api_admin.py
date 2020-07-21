@@ -2,6 +2,7 @@ import os
 import shutil
 import sys
 import tempfile
+from collections import defaultdict
 
 from flask import Blueprint, jsonify, request, current_app as app
 
@@ -10,6 +11,7 @@ from models import db
 from services.account import AccountService, AccountServiceError
 from services.answer import AnswerService, AnswerServiceError
 from services.task import TaskService, TaskServiceError
+from utils.crypt import md5sum
 from utils.give import GiveImporter, GiveImporterError
 from utils.pdf import get_pdf_pages
 
@@ -115,7 +117,9 @@ def import_give(tid: int):
 
         data_folder = app.config['DATA_FOLDER']
 
-        num_books = 0
+        num_new_books = 0
+        num_skipped_books = 0
+        num_updated_books = 0
         with tempfile.TemporaryDirectory() as work_dir:
             archive_path = os.path.join(work_dir, archive.filename)
             archive.save(archive_path)
@@ -125,11 +129,12 @@ def import_give(tid: int):
             copy_info = []
             for student_id, submissions_info in GiveImporter(file_names).import_archive(archive_path, extract_dir):
                 student = AccountService.sync_user_by_name(student_id)
-                book = AnswerService.add_book(task, student)
-                num_books += 1
+                if not submissions_info:  # no submission
+                    continue  # ignore
 
                 files_to_find = set(file_names)
                 files_found = {}
+                submission_time = None
                 for i, (_time, files) in enumerate(reversed(submissions_info)):  # from the latest to the oldest
                     for name, tmp_path in files.items():
                         if name in files_to_find:  # not yet found
@@ -138,18 +143,60 @@ def import_give(tid: int):
                                       % (name, student_id), file=sys.stderr)
                             files_to_find.remove(name)
                             files_found[name] = (_time, tmp_path)
+                            if submission_time is None or submission_time < _time:
+                                submission_time = _time
                     if not files_to_find:  # all files found
                         break
 
-                for file_name, (_time, tmp_path) in files_found.items():
-                    path = file_name  # directly use the file name as path since no conflict could occur here
-                    ext = os.path.splitext(file_name)[-1]
-                    if ext == '.pdf':  # split pdf pages
-                        num_pages = get_pdf_pages(tmp_path)
-                        AnswerService.add_multi_pages(book, path, num_pages)
-                    else:
-                        AnswerService.add_page(book, path)
-                    copy_info.append((tmp_path, book, path))
+                # find if a book exists
+                book = AnswerService.get_book_by_task_student(task, student)
+                if book is not None:  # already imported
+                    if book.submitted_at is not None and book.submitted_at == submission_time:  # same version
+                        num_skipped_books += 1
+                        continue
+                    else:  # update to latest version
+                        book_folder = os.path.join(data_folder, 'answer_books', str(book.id))
+                        old_path_pages = defaultdict(list)
+                        for page in book.pages:
+                            old_path_pages[page.file_path].append(page)
+
+                        has_content_change = False
+                        for file_name, (_time, tmp_path) in files_found.items():
+                            path = file_name  # directly use the file name as path
+                            old_pages = old_path_pages.get(path)
+                            if old_pages:  # file exists
+                                if md5sum(os.path.join(book_folder, path)) == md5sum(tmp_path):  # same file content
+                                    continue  # skip importing this file
+                                for page in old_pages:  # delete outdated pages
+                                    # file will be overwritten, so no file deletion is required
+                                    AnswerService.delete_page(page)
+                            ext = os.path.splitext(file_name)[-1]
+                            if ext == '.pdf':  # split pdf pages
+                                num_pages = get_pdf_pages(tmp_path)
+                                AnswerService.add_multi_pages(book, path, num_pages)
+                            else:
+                                AnswerService.add_page(book, path)
+                            has_content_change = True
+                            copy_info.append((tmp_path, book, path))
+
+                        book.submitted_at = submission_time
+                        if has_content_change:  # invalidate existing markings because content has changed
+                            for m in book.markings:
+                                db.session.delete(m)
+                        num_updated_books += 1
+                else:  # create new book
+                    book = AnswerService.add_book(task, student, submitted_at=submission_time)
+                    num_new_books += 1
+
+                    for file_name, (_time, tmp_path) in files_found.items():
+                        path = file_name  # directly use the file name as path since no conflict could occur here
+                        ext = os.path.splitext(file_name)[-1]
+                        if ext == '.pdf':  # split pdf pages
+                            num_pages = get_pdf_pages(tmp_path)
+                            AnswerService.add_multi_pages(book, path, num_pages)
+                        else:
+                            AnswerService.add_page(book, path)
+                        copy_info.append((tmp_path, book, path))
 
             # do actual file copies at last
             for tmp_path, book, path in copy_info:
@@ -161,7 +208,8 @@ def import_give(tid: int):
                 shutil.copy(tmp_path, to_path)
 
         db.session.commit()
-        return jsonify(num_books=num_books)
+        return jsonify(num_new_books=num_new_books, num_skipped_books=num_skipped_books,
+                       num_updated_books=num_updated_books)
     except (TaskServiceError, GiveImporterError, AccountServiceError, AnswerServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 

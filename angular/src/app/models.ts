@@ -68,6 +68,7 @@ export class AnswerBook {
   modifier_id?: number;
   created_at: string;
   modified_at: string;
+  submitted_at: string;
 
   task?: Task;
   student?: User;

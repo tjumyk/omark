@@ -172,6 +172,10 @@ class AnswerService:
         stmt_delete_markings = Marking.__table__.delete().where(Marking.book_id == book.id)
         db.session.execute(stmt_delete_markings)
 
+        # batch deletion of comments
+        stmt_delete_comments = Comment.__table__.delete().where(Comment.book_id == book.id)
+        db.session.execute(stmt_delete_comments)
+
         # keep a copy of file paths of the deleted pages
         # note: use set due to possible duplicate file_paths among pages
         file_paths_to_delete = set()

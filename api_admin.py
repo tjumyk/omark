@@ -1,5 +1,6 @@
 import os
 import shutil
+import sys
 import tempfile
 
 from flask import Blueprint, jsonify, request, current_app as app
@@ -122,16 +123,25 @@ def import_give(tid: int):
             os.mkdir(extract_dir)
 
             copy_info = []
-            for student_id, files in GiveImporter(file_names).import_archive(archive_path, extract_dir):
+            for student_id, submissions_info in GiveImporter(file_names).import_archive(archive_path, extract_dir):
                 student = AccountService.sync_user_by_name(student_id)
                 book = AnswerService.add_book(task, student)
                 num_books += 1
 
-                for file_name in file_names:  # keep the original order
-                    tmp_path = files.get(file_name)
-                    if not tmp_path:  # file not found in submission
-                        continue
+                files_to_find = set(file_names)
+                files_found = {}
+                for i, (_time, files) in enumerate(reversed(submissions_info)):  # from the latest to the oldest
+                    for name, tmp_path in files.items():
+                        if name in files_to_find:  # not yet found
+                            if i != 0:  # not the latest
+                                print('[Warning] Importing "%s" from non-default submission for student "%s"'
+                                      % (name, student_id), file=sys.stderr)
+                            files_to_find.remove(name)
+                            files_found[name] = (_time, tmp_path)
+                    if not files_to_find:  # all files found
+                        break
 
+                for file_name, (_time, tmp_path) in files_found.items():
                     path = file_name  # directly use the file name as path since no conflict could occur here
                     ext = os.path.splitext(file_name)[-1]
                     if ext == '.pdf':  # split pdf pages

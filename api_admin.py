@@ -1,5 +1,6 @@
 import os
 import shutil
+import subprocess
 import sys
 import tempfile
 from collections import defaultdict
@@ -172,7 +173,11 @@ def import_give(tid: int):
                                     AnswerService.delete_page(page)
                             ext = os.path.splitext(file_name)[-1]
                             if ext == '.pdf':  # split pdf pages
-                                num_pages = get_pdf_pages(tmp_path)
+                                try:
+                                    num_pages = get_pdf_pages(tmp_path)
+                                except subprocess.CalledProcessError:
+                                    print('[Warning] Failed to get pdf info of: %s' % tmp_path, file=sys.stderr)
+                                    continue
                                 AnswerService.add_multi_pages(book, path, num_pages)
                             else:
                                 AnswerService.add_page(book, path)
@@ -192,7 +197,11 @@ def import_give(tid: int):
                         path = file_name  # directly use the file name as path since no conflict could occur here
                         ext = os.path.splitext(file_name)[-1]
                         if ext == '.pdf':  # split pdf pages
-                            num_pages = get_pdf_pages(tmp_path)
+                            try:
+                                num_pages = get_pdf_pages(tmp_path)
+                            except subprocess.CalledProcessError:
+                                print('[Warning] Failed to get pdf info of: %s' % tmp_path, file=sys.stderr)
+                                continue
                             AnswerService.add_multi_pages(book, path, num_pages)
                         else:
                             AnswerService.add_page(book, path)

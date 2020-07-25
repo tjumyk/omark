@@ -12,5 +12,10 @@
     "behind_proxy": false
   },
 
-  "DATA_FOLDER": "data"
+  "DATA_FOLDER": "data",
+
+  "GEOIP": {
+    "country": null
+  },
+  "DETECT_REQUEST_REGIONS": []
 }

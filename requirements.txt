@@ -5,4 +5,3 @@ requests
 opencv-python
 numpy
 python-dateutil
-geoip2

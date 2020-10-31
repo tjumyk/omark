@@ -49,8 +49,16 @@ export class AdminService {
     return this.http.post<Question>(`${this.api}/tasks/${taskId}/questions`, form)
   }
 
+  deleteQuestion(qId: number): Observable<any> {
+    return this.http.delete(`${this.api}/questions/${qId}`)
+  }
+
   addAssignment(taskId: number, form: NewMarkerQuestionAssignmentForm):Observable<MarkerQuestionAssignment> {
     return this.http.post<MarkerQuestionAssignment>(`${this.api}/tasks/${taskId}/assignments`, form)
+  }
+
+  deleteAssignment(qId: number, uId: number):Observable<any> {
+    return this.http.delete(`${this.api}/questions/${qId}/assignments/${uId}`)
   }
 
   importGiveSubmissions(taskId: number, archive: File, fileNames: string): Observable<HttpEvent<any>>{

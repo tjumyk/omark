@@ -1,4 +1,4 @@
-from collections import defaultdict
+from operator import or_
 from typing import Optional, List
 
 from sqlalchemy import func
@@ -122,6 +122,20 @@ class TaskService:
         return q
 
     @staticmethod
+    def remove_question(q: Question):
+        if q is None:
+            raise TaskServiceError('question is required')
+
+        if q.task.config_locked:
+            raise TaskServiceError('task config locked')
+
+        if db.session.query(func.count()).filter(Marking.question_id == q.id).scalar():
+            raise TaskServiceError('question already marked')
+        db.session.execute(MarkerQuestionAssignment.__table__.delete()
+                           .where(MarkerQuestionAssignment.question_id == q.id))
+        db.session.delete(q)
+
+    @staticmethod
     def get_marker_question_assignment(question: Question, marker: UserAlias) -> Optional[MarkerQuestionAssignment]:
         if question is None:
             raise TaskServiceError('question is required')
@@ -149,3 +163,24 @@ class TaskService:
             raise TaskServiceError('already assigned')
         ass = MarkerQuestionAssignment(question=question, marker=marker)
         return ass
+
+    @classmethod
+    def remove_marker_question_assignment(cls, q: Question, marker: UserAlias):
+        if q is None:
+            raise TaskServiceError('question is required')
+        if marker is None:
+            raise TaskServiceError('marker is required')
+
+        if q.task.config_locked:
+            raise TaskServiceError('task config locked')
+
+        if db.session.query(func.count()) \
+                .filter(Marking.question_id == q.id,
+                        or_(Marking.creator_id == marker.id, Marking.modifier_id == marker.id)) \
+                .scalar():
+            raise TaskServiceError('marker already marked question')
+
+        ass = cls.get_marker_question_assignment(q, marker)
+        if ass is None:
+            raise TaskServiceError('assignment not found')
+        db.session.delete(ass)

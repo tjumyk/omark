@@ -65,7 +65,22 @@ def do_task_questions(tid: int):
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
-@admin_api.route('/tasks/<int:tid>/assignments', methods=['POST', 'DELETE'])
+@admin_api.route('/questions/<int:qid>', methods=['DELETE'])
+@requires_admin
+def do_question(qid: int):
+    try:
+        q = TaskService.get_question(qid)
+        if q is None:
+            return jsonify(msg='question not found'), 404
+
+        TaskService.remove_question(q)
+        db.session.commit()
+        return "", 204
+    except TaskServiceError as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@admin_api.route('/tasks/<int:tid>/assignments', methods=['POST'])
 @requires_admin
 def do_task_assignments(tid):
     try:
@@ -77,17 +92,27 @@ def do_task_assignments(tid):
         question = TaskService.get_question(params.get('qid'))
         marker = AccountService.sync_user_by_name(params.get('marker_name'))
 
-        if request.method == 'POST':
-            ass = TaskService.add_marker_question_assignment(question, marker)
-            db.session.commit()
-            return jsonify(ass.to_dict(with_marker=True)), 201
-        else:  # DELETE
-            ass = TaskService.get_marker_question_assignment(question, marker)
-            if ass is None:
-                return jsonify(msg='assignment not found'), 404
-            db.session.delete(ass)
-            db.session.commit()
-            return "", 204
+        ass = TaskService.add_marker_question_assignment(question, marker)
+        db.session.commit()
+        return jsonify(ass.to_dict(with_marker=True)), 201
+    except (TaskServiceError, AccountServiceError) as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@admin_api.route('/questions/<int:qid>/assignments/<int:uid>', methods=['DELETE'])
+@requires_admin
+def do_question_assignment(qid: int, uid: int):
+    try:
+        question = TaskService.get_question(qid)
+        if question is None:
+            return jsonify(msg='question not found'), 404
+        marker = AccountService.get_user(uid)
+        if marker is None:
+            return jsonify(msg='marker not found'), 404
+
+        TaskService.remove_marker_question_assignment(question, marker)
+        db.session.commit()
+        return "", 204
     except (TaskServiceError, AccountServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
@@ -99,6 +124,9 @@ def import_give(tid: int):
         task = TaskService.get(tid)
         if task is None:
             return jsonify(msg='task not found'), 404
+
+        if task.answer_locked:
+            return jsonify(msg='task answer locked'), 400
 
         archive = request.files.get('archive')
         file_names_str = request.form.get('file_names')

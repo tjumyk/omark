@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {BasicError, Task} from "../models";
+import {BasicError, MarkerQuestionAssignment, Question, Task} from "../models";
 import {TaskService} from "../task.service";
 import {ActivatedRoute} from "@angular/router";
 import {finalize} from "rxjs/operators";
@@ -131,4 +131,33 @@ export class AdminTaskComponent implements OnInit {
     }
   }
 
+  deleteQuestion(q: Question, index: number, btn: HTMLElement) {
+    if(!confirm(`Really want to delete Q${q.index} (ID=${q.id})?`))
+      return;
+
+    btn.classList.add('loading', 'disabled');
+    this.adminService.deleteQuestion(q.id).pipe(
+      finalize(()=>btn.classList.remove('loading', 'disabled'))
+    ).subscribe(
+      ()=>{
+        this.task.questions.splice(index, 1)
+      },
+      error=>this.error = error.error
+    )
+  }
+
+  deleteAssignment(ass: MarkerQuestionAssignment, q: Question, index: number, btn: HTMLElement) {
+    if(!confirm(`Really want to remove ${ass.marker.name} from the markers for Q${q.index}?`))
+      return;
+
+    btn.classList.add('loading', 'disabled');
+    this.adminService.deleteAssignment(ass.question_id, ass.marker_id).pipe(
+      finalize(()=>btn.classList.remove('loading', 'disabled'))
+    ).subscribe(
+      ()=>{
+        q.marker_assignments.splice(index, 1)
+      },
+      error=>this.error = error.error
+    )
+  }
 }

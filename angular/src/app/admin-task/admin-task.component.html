@@ -30,16 +30,21 @@
   </div>
 
   <table class="ui table unstackable">
-    <thead><tr><th>#</th><th>ID</th><th>Index</th><th>Marks</th><th>Assignments</th></tr></thead>
+    <thead><tr><th>Question ID</th><th>Question Number</th><th>Marks</th><th>Markers</th><th>Actions</th></tr></thead>
     <tbody>
     <tr *ngFor="let q of task.questions; index as i">
-      <td>{{i+1}}</td>
       <td>{{q.id}}</td>
       <td>{{q.index}}</td>
       <td>{{q.marks}}</td>
       <td>
-        <div *ngFor="let ass of q.marker_assignments" class="ui label">
+        <div *ngFor="let ass of q.marker_assignments; index as j" class="ui label">
           <app-user-mini-card  [enableAdmin]="true" [enableAvatar]="true" [enablePopup]="true" [user]="ass.marker"></app-user-mini-card>
+          <i *ngIf="!task.config_locked" class="icon times circle red link btn-delete-assign" (click)="deleteAssignment(ass, q, j, btnDeleteAssignment)" #btnDeleteAssignment title="Delete"></i>
+        </div>
+      </td>
+      <td>
+        <div class="ui mini buttons" *ngIf="!task.config_locked">
+          <button class="ui button icon red" (click)="deleteQuestion(q, i, btnDeleteQuestion)" #btnDeleteQuestion><i class="icon trash"></i></button>
         </div>
       </td>
     </tr>
@@ -51,10 +56,10 @@
       <div class="ui segment">
         <form class="ui form" #f="ngForm" (ngSubmit)="addQuestion(f)" [ngClass]="{'loading': addingQuestion}">
           <div class="field required" [ngClass]="{'error': (indexModel.touched || indexModel.dirty || f.submitted) && indexModel.invalid}">
-            <label>Index</label>
+            <label>Question Number</label>
             <input type="number" name="index" required min="1" step="1" [(ngModel)]="newQuestionForm.index" #indexModel="ngModel">
             <div class="errors">
-              <label *ngIf="indexModel.errors?.required"><i class="icon times"></i> Index is required</label>
+              <label *ngIf="indexModel.errors?.required"><i class="icon times"></i> Question number is required</label>
             </div>
           </div>
           <div class="field required" [ngClass]="{'error': (marksModel.touched || marksModel.dirty || f.submitted) && marksModel.invalid}">
@@ -88,7 +93,7 @@
               <label *ngIf="markerNameModel.errors?.required"><i class="icon times"></i> Marker name is required</label>
             </div>
           </div>
-          <button type="submit" class="ui button primary fluid"><i class="icon plus"></i> Add Assignment</button>
+          <button type="submit" class="ui button primary fluid"><i class="icon plus"></i> Add Marker for Question</button>
         </form>
       </div>
     </div>

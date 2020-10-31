@@ -23,7 +23,9 @@ export class Group {
 export class Task {
   id: number;
   name: string;
-  is_locked: boolean;
+  config_locked: boolean;
+  answer_locked: boolean;
+  marking_locked: boolean;
 
   created_at: string;
   modified_at: string;

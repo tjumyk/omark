@@ -39,20 +39,21 @@ class TaskService:
         return task
 
     @staticmethod
-    def lock(task: Task):
+    def set_lock(task: Task, lock_type: str, locked: bool):
         if task is None:
             raise TaskServiceError('task is required')
-        if task.is_locked:
-            raise TaskServiceError('already locked')
-        task.is_locked = True
-
-    @staticmethod
-    def unlock(task: Task):
-        if task is None:
-            raise TaskServiceError('task is required')
-        if not task.is_locked:
-            raise TaskServiceError('not locked')
-        task.is_locked = False
+        if lock_type in {'config', 'answer', 'marking'}:
+            attr = lock_type + '_locked'
+            if locked:
+                if getattr(task, attr):
+                    raise TaskServiceError('already locked')
+                setattr(task, attr, True)
+            else:
+                if not getattr(task, attr):
+                    raise TaskServiceError('not yet locked')
+                setattr(task, attr, False)
+        else:
+            raise TaskServiceError('invalid lock type')
 
     @staticmethod
     def get_books(task: Task, joined_load_student: bool = False) -> List[AnswerBook]:
@@ -107,8 +108,8 @@ class TaskService:
         if not isinstance(marks, (int, float)):
             raise TaskServiceError('marks must be an integer or float')
 
-        if task.is_locked:
-            raise TaskServiceError('task has been locked')
+        if task.config_locked:
+            raise TaskServiceError('task config locked')
 
         if db.session.query(func.count()) \
                 .filter(Question.task_id == task.id,
@@ -138,8 +139,8 @@ class TaskService:
         if marker is None:
             raise TaskServiceError('marker is required')
 
-        if question.task.is_locked:
-            raise TaskServiceError('task has been locked')
+        if question.task.config_locked:
+            raise TaskServiceError('task config locked')
 
         if db.session.query(func.count()) \
                 .filter(MarkerQuestionAssignment.question_id == question.id,

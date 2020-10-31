@@ -61,7 +61,7 @@ export class AnswerBookMarkingsViewComponent implements OnInit {
           info.marking = marking;
         }
 
-        if(!this.task.is_locked){
+        if(!this.task.marking_locked){
           for(let question of this.task.questions){
             const info = this.qMap[question.id];
             info.editing = info.assigned && !info.marking;

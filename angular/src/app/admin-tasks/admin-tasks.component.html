@@ -2,7 +2,7 @@
 
 <table class="ui table unstackable" *ngIf="tasks">
   <thead>
-  <tr><th>#</th><th>ID</th><th>Name</th><th>Status</th><th>Created At</th><th>Updated At</th><th>Actions</th></tr>
+  <tr><th>#</th><th>ID</th><th>Name</th><th>Locks</th><th>Created At</th><th>Updated At</th><th>Actions</th></tr>
   </thead>
   <tbody>
   <tr *ngFor="let task of tasks; index as i">
@@ -10,14 +10,15 @@
     <td>{{task.id}}</td>
     <td>{{task.name}}</td>
     <td>
-      <i class="ui icon lock red" *ngIf="task.is_locked; else task_open"></i>
-      <ng-template #task_open><i class="ui icon lock open green"></i></ng-template>
+      <div class="ui basic label"><i class="ui icon lock red" *ngIf="task.config_locked; else unlocked"></i>Config</div>
+      <div class="ui basic label"><i class="ui icon lock red" *ngIf="task.answer_locked; else unlocked"></i>Answer</div>
+      <div class="ui basic label"><i class="ui icon lock red" *ngIf="task.marking_locked; else unlocked"></i>Marking</div>
+      <ng-template #unlocked><i class="ui icon lock open green"></i></ng-template>
     </td>
     <td>{{task.created_at | date: 'medium'}}</td>
     <td>{{task.modified_at | date: 'medium'}}</td>
     <td>
       <div class="ui mini buttons">
-        <button class="ui icon button" #btnToggleTaskLock (click)="toggleTaskLock(task, btnToggleTaskLock)"><i class="icon lock"></i></button>
         <a class="ui icon button" routerLink="{{task.id}}"><i class="icon horizontal ellipsis"></i></a>
       </div>
     </td>

@@ -52,8 +52,8 @@ class AnswerService:
         if task is None:
             raise AnswerServiceError('task is required')
 
-        if task.is_locked:
-            raise AnswerServiceError('task has been locked')
+        if task.answer_locked:
+            raise AnswerServiceError('task answer locked')
 
         if student and db.session.query(func.count()) \
                 .filter(AnswerBook.task_id == task.id,
@@ -72,8 +72,8 @@ class AnswerService:
         if modifier is None:
             raise AnswerServiceError('modifier is required')
 
-        if book.task.is_locked:
-            raise AnswerServiceError('task has been locked')
+        if book.task.answer_locked:
+            raise AnswerServiceError('task answer locked')
 
         if student and db.session.query(func.count()) \
                 .filter(AnswerBook.task_id == book.task_id,
@@ -101,8 +101,8 @@ class AnswerService:
         if not file_path:
             raise AnswerServiceError('file path is required')
 
-        if book.task.is_locked:
-            raise AnswerServiceError('task has been locked')
+        if book.task.answer_locked:
+            raise AnswerServiceError('task answer locked')
 
         if index is None:  # auto increment (may break if race condition occurs)
             max_page_index = db.session.query(func.max(AnswerPage.index)).filter(AnswerPage.book_id == book.id).scalar()
@@ -130,8 +130,8 @@ class AnswerService:
         if not isinstance(num_pages, int):
             raise AnswerServiceError('num_pages must be an integer')
 
-        if book.task.is_locked:
-            raise AnswerServiceError('task has been locked')
+        if book.task.answer_locked:
+            raise AnswerServiceError('task answer locked')
 
         if start_index is None:  # auto increment (may break if race condition occurs)
             max_page_index = db.session.query(func.max(AnswerPage.index)).filter(AnswerPage.book_id == book.id).scalar()
@@ -159,8 +159,8 @@ class AnswerService:
         if not isinstance(index, int):
             raise AnswerServiceError('index must be an integer')
 
-        if page.book.task.is_locked:
-            raise AnswerServiceError('task has been locked')
+        if page.book.task.answer_locked:
+            raise AnswerServiceError('task answer locked')
 
         if db.session.query(func.count()) \
                 .filter(AnswerPage.book_id == page.book_id,
@@ -178,8 +178,8 @@ class AnswerService:
         if book is None:
             raise AnswerServiceError('book is required')
 
-        if book.task.is_locked:
-            raise AnswerServiceError('task has been locked')
+        if book.task.answer_locked:
+            raise AnswerServiceError('task answer locked')
 
         # batch deletion of markings
         stmt_delete_markings = Marking.__table__.delete().where(Marking.book_id == book.id)
@@ -207,8 +207,8 @@ class AnswerService:
         if page is None:
             raise AnswerServiceError('page is required')
 
-        if page.book.task.is_locked:
-            raise AnswerServiceError('task has been locked')
+        if page.book.task.answer_locked:
+            raise AnswerServiceError('task answer locked')
 
         # batch deletion of annotations
         stmt_delete_annotations = Annotation.__table__.delete().where(Annotation.page_id == page.id)

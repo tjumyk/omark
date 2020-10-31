@@ -29,7 +29,7 @@
 
   <div class="ui divider horizontal">Markings</div>
   <app-answer-book-markings-view [task]="task" [book]="book" (error)="error=$event"></app-answer-book-markings-view>
-  <div class="ui divider horizontal" *ngIf="!task.is_locked||book.comments.length">Comments</div>
+  <div class="ui divider horizontal" *ngIf="!task.marking_locked||book.comments.length">Comments</div>
   <app-answer-book-comments-view [task]="task" [book]="book" (error)="error=$event"></app-answer-book-comments-view>
 </div>
 

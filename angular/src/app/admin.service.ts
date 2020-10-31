@@ -37,12 +37,12 @@ export class AdminService {
     return this.http.post<Task>(`${this.api}/tasks`, form)
   }
 
-  lockTask(taskId: number): Observable<any>{
-    return this.http.put(`${this.api}/tasks/${taskId}/lock`, null)
+  lockTask(taskId: number, lock_type: string): Observable<any>{
+    return this.http.put(`${this.api}/tasks/${taskId}/${lock_type}-lock`, null)
   }
 
-  unlockTask(taskId: number): Observable<any>{
-    return this.http.delete(`${this.api}/tasks/${taskId}/lock`)
+  unlockTask(taskId: number, lock_type: string): Observable<any>{
+    return this.http.delete(`${this.api}/tasks/${taskId}/${lock_type}-lock`)
   }
 
   addQuestion(taskId: number, form: NewQuestionForm) :Observable<Question>{

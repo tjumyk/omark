@@ -31,18 +31,18 @@ def do_tasks():
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
-@admin_api.route('/tasks/<int:tid>/lock', methods=['PUT', 'DELETE'])
+@admin_api.route('/tasks/<int:tid>/<string:lock_type>-lock', methods=['PUT', 'DELETE'])
 @requires_admin
-def do_task_lock(tid: int):
+def do_task_lock(tid: int, lock_type):
     try:
         task = TaskService.get(tid)
         if task is None:
             return jsonify(msg='task not found'), 404
 
         if request.method == 'PUT':
-            TaskService.lock(task)
+            TaskService.set_lock(task, lock_type, True)
         else:  # DELETE
-            TaskService.unlock(task)
+            TaskService.set_lock(task, lock_type, False)
         db.session.commit()
         return "", 204
     except TaskServiceError as e:

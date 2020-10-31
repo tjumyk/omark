@@ -20,7 +20,7 @@
         <span class="date" *ngIf="comment._modified_at_from_now">{{comment._modified_at_from_now}}</span>
       </div>
       <div class="text">{{comment.content}}</div>
-      <div class="actions" *ngIf="!task.is_locked && user.id === comment.creator_id">
+      <div class="actions" *ngIf="!task.marking_locked && user.id === comment.creator_id">
         <a class="edit" (click)="editComment(comment)">Edit</a>
         <a class="delete" (click)="removeComment(comment, btnRemoveComment, i)" #btnRemoveComment></a>
       </div>
@@ -44,7 +44,7 @@
   </div>
 </div>
 
-<form class="ui reply form" #f="ngForm" (ngSubmit)="addComment(f)" [ngClass]="{'loading': addingComment}" *ngIf="!task.is_locked">
+<form class="ui reply form" #f="ngForm" (ngSubmit)="addComment(f)" [ngClass]="{'loading': addingComment}" *ngIf="!task.marking_locked">
   <div class="field">
       <textarea [(ngModel)]="newCommentForm.content" name="content" required #editorContentModel="ngModel"
                 placeholder="Your comment..." rows="2"></textarea>

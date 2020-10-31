@@ -64,7 +64,9 @@ class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     name = db.Column(db.String(64), unique=True, nullable=False)
-    is_locked = db.Column(db.Boolean, nullable=False, default=False)
+    config_locked = db.Column(db.Boolean, nullable=False, default=False)
+    answer_locked = db.Column(db.Boolean, nullable=False, default=False)
+    marking_locked = db.Column(db.Boolean, nullable=False, default=False)
 
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     modified_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -73,7 +75,8 @@ class Task(db.Model):
         return '<Task %r>' % self.name
 
     def to_dict(self, with_questions: bool = False, with_assignments: bool = False) -> dict:
-        d = dict(id=self.id, name=self.name, is_locked=self.is_locked,
+        d = dict(id=self.id, name=self.name,
+                 config_locked=self.config_locked, answer_locked=self.answer_locked, marking_locked=self.marking_locked,
                  created_at=self.created_at, modified_at=self.modified_at)
         if with_questions:
             d['questions'] = [q.to_dict(with_marker_assignments=with_assignments)

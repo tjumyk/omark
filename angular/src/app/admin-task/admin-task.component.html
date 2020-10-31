@@ -12,11 +12,6 @@
         {{task.name}}
       </div>
       <div class="item">
-        <div class="header">Status</div>
-        <i class="ui icon lock red" *ngIf="task.is_locked; else task_open"></i>
-        <ng-template #task_open><i class="ui icon lock open green"></i></ng-template>
-      </div>
-      <div class="item">
         <div class="header">Created At</div>
         {{task.created_at | date: 'medium'}}
       </div>
@@ -25,6 +20,13 @@
         {{task.modified_at | date: 'medium'}}
       </div>
     </div>
+  </div>
+
+  <div class="ui buttons">
+    <button class="ui button" (click)="toggleTaskLock(task, 'config', btnToggleConfigLock)" #btnToggleConfigLock><i class="ui icon lock red" *ngIf="task.config_locked; else unlocked"></i> Config Lock</button>
+    <button class="ui button" (click)="toggleTaskLock(task, 'answer', btnToggleAnswerLock)" #btnToggleAnswerLock><i class="ui icon lock red" *ngIf="task.answer_locked; else unlocked"></i> Answer Lock</button>
+    <button class="ui button" (click)="toggleTaskLock(task, 'marking', btnToggleMarkingLock)" #btnToggleMarkingLock><i class="ui icon lock red" *ngIf="task.marking_locked; else unlocked"></i> Marking Lock</button>
+    <ng-template #unlocked><i class="ui icon lock open green"></i></ng-template>
   </div>
 
   <table class="ui table unstackable">
@@ -44,8 +46,8 @@
     </tbody>
   </table>
 
-  <div class="ui grid stackable centered three column">
-    <div class="column">
+  <div class="ui grid stackable centered three column" *ngIf="!task.config_locked || !task.answer_locked">
+    <div class="column" *ngIf="!task.config_locked">
       <div class="ui segment">
         <form class="ui form" #f="ngForm" (ngSubmit)="addQuestion(f)" [ngClass]="{'loading': addingQuestion}">
           <div class="field required" [ngClass]="{'error': (indexModel.touched || indexModel.dirty || f.submitted) && indexModel.invalid}">
@@ -67,7 +69,7 @@
       </div>
     </div>
 
-    <div class="column">
+    <div class="column" *ngIf="!task.config_locked">
       <div class="ui segment">
         <form class="ui form" #f2="ngForm" (ngSubmit)="addAssignment(f2)" [ngClass]="{'loading': addingAssignment}">
           <div class="field required" [ngClass]="{'error': (qidModel.touched || qidModel.dirty || f2.submitted) && qidModel.invalid}">
@@ -91,7 +93,7 @@
       </div>
     </div>
 
-    <div class="column">
+    <div class="column" *ngIf="!task.answer_locked">
       <div class="ui segment">
         <div class="ui top attached progress" *ngIf="importingGive">
           <div class="bar" [ngStyle]="{'width.%': importGiveProgress}"></div>

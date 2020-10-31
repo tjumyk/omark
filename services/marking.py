@@ -32,8 +32,8 @@ class MarkingService:
         if not isinstance(marks, (int, float)):
             raise MarkingServiceError('marks must be an integer or float')
 
-        if book.task.is_locked:
-            raise MarkingServiceError('task has been locked')
+        if book.task.marking_locked:
+            raise MarkingServiceError('task marking locked')
 
         if creator:
             from .task import TaskService
@@ -63,8 +63,8 @@ class MarkingService:
         if not isinstance(marks, (int, float)):
             raise MarkingServiceError('marks must be an integer or float')
 
-        if marking.book.task.is_locked:
-            raise MarkingServiceError('task has been locked')
+        if marking.book.task.marking_locked:
+            raise MarkingServiceError('task marking locked')
 
         if modifier:
             from .task import TaskService
@@ -95,8 +95,8 @@ class MarkingService:
         if not data:
             raise MarkingServiceError('data is required')
 
-        if page.book.task.is_locked:
-            raise MarkingServiceError('task has been locked')
+        if page.book.task.marking_locked:
+            raise MarkingServiceError('task marking locked')
 
         ann = Annotation(page=page, data=data, creator=creator)
         db.session.add(ann)
@@ -109,8 +109,8 @@ class MarkingService:
         if not data:
             raise MarkingServiceError('data is required')
 
-        if ann.page.book.task.is_locked:
-            raise MarkingServiceError('task has been locked')
+        if ann.page.book.task.marking_locked:
+            raise MarkingServiceError('task marking locked')
 
         if modifier and (ann.creator_id is None or ann.creator_id != modifier.id):
             raise MarkingServiceError('no permission')
@@ -122,8 +122,8 @@ class MarkingService:
         if ann is None:
             raise MarkingServiceError('annotation is required')
 
-        if ann.page.book.task.is_locked:
-            raise MarkingServiceError('task has been locked')
+        if ann.page.book.task.marking_locked:
+            raise MarkingServiceError('task marking locked')
 
         if requester and (ann.creator_id is None or ann.creator_id != requester.id):
             raise MarkingServiceError('no permission')
@@ -146,8 +146,8 @@ class MarkingService:
         if not content:
             raise MarkingServiceError('content is required')
 
-        if book.task.is_locked:
-            raise MarkingServiceError('task has been locked')
+        if book.task.marking_locked:
+            raise MarkingServiceError('task marking locked')
 
         comment = Comment(book=book, content=content, creator=creator)
         db.session.add(comment)
@@ -160,8 +160,8 @@ class MarkingService:
         if not content:
             raise MarkingServiceError('content is required')
 
-        if comment.book.task.is_locked:
-            raise MarkingServiceError('task has been locked')
+        if comment.book.task.marking_locked:
+            raise MarkingServiceError('task marking locked')
 
         if modifier and (comment.creator_id is None or comment.creator_id != modifier.id):
             raise MarkingServiceError('no permission')
@@ -173,8 +173,8 @@ class MarkingService:
         if comment is None:
             raise MarkingServiceError('comment is required')
 
-        if comment.book.task.is_locked:
-            raise MarkingServiceError('task has been locked')
+        if comment.book.task.marking_locked:
+            raise MarkingServiceError('task marking locked')
 
         if requester and (comment.creator_id is None or comment.creator_id != requester.id):
             raise MarkingServiceError('no permission')

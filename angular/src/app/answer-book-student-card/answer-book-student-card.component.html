@@ -1,7 +1,7 @@
 <app-user-mini-card [enablePopup]="enablePopup" [user]="book.student" [enableAdmin]="enableAdmin"
                     [preferNickname]="false" *ngIf="book.student_id; else noStudent"></app-user-mini-card>
 <ng-template #noStudent>
-  <div class="ui action input small" [class.disabled]="updatingStudent" *ngIf="!task.is_locked; else noUpdate">
+  <div class="ui action input small" [class.disabled]="updatingStudent" *ngIf="!task.answer_locked; else noUpdate">
     <input type="text" #inputStudentName (keyup.enter)="updateStudent(inputStudentName.value)" placeholder="Student ID">
     <button class="ui icon button" (click)="updateStudent(inputStudentName.value)"
             [ngClass]="{'loading disabled': updatingStudent}">

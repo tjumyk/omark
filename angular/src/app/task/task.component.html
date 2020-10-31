@@ -2,7 +2,7 @@
 
 <ng-container *ngIf="task">
   <a class="ui header" routerLink=".">
-    <i class="icon archive" [class.red]="task.is_locked"></i> {{task.name}}
+    <i class="icon archive"></i> {{task.name}}
   </a>
   <router-outlet></router-outlet>
 </ng-container>

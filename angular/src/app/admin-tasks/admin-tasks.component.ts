@@ -55,23 +55,4 @@ export class AdminTasksComponent implements OnInit {
     )
   }
 
-  toggleTaskLock(task: Task, btn: HTMLElement) {
-    btn.classList.add('loading', 'disabled');
-    if (task.is_locked) {
-      this.adminService.unlockTask(task.id).pipe(
-        finalize(() => btn.classList.remove('loading', 'disabled'))
-      ).subscribe(
-        () => task.is_locked = false,
-        error => this.error = error.error
-      )
-    } else {
-      this.adminService.lockTask(task.id).pipe(
-        finalize(() => btn.classList.remove('loading', 'disabled'))
-      ).subscribe(
-        () => task.is_locked = true,
-        error => this.error = error.error
-      )
-    }
-  }
-
 }

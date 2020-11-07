@@ -13,7 +13,11 @@
         <div class="ui loader text inline active centered" *ngIf="loadingTasks">Loading Tasks...</div>
 
         <div class="ui menu vertical fluid" *ngIf="tasks && tasks.length">
-          <a *ngFor="let task of tasks" routerLink="/tasks/{{task.id}}" class="item"><i class="icon angle right"></i>{{task.name}}</a>
+          <a *ngFor="let task of tasks" routerLink="/tasks/{{task.id}}" class="item">
+            <i class="icon angle right"></i>
+            <span class="ui label green" *ngIf="!task.config_locked||!task.answer_locked||!task.marking_locked">Open</span>
+            {{task.name}}
+          </a>
         </div>
       </div>
 

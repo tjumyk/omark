@@ -7,6 +7,7 @@ from collections import defaultdict
 
 from flask import Blueprint, jsonify, request, current_app as app
 
+from async_job_worker import run_book_mirror
 from auth_connect.oauth import requires_admin
 from models import db
 from services.account import AccountService, AccountServiceError
@@ -14,8 +15,8 @@ from services.answer import AnswerService, AnswerServiceError
 from services.task import TaskService, TaskServiceError
 from utils.crypt import md5sum
 from utils.give import GiveImporter, GiveImporterError
+from utils.mirror import MirrorTool
 from utils.pdf import get_pdf_pages
-from async_job_worker import run_book_mirror
 
 admin_api = Blueprint('admin_api', __name__)
 
@@ -264,12 +265,17 @@ def delete_book(bid: int):
         file_paths = AnswerService.delete_book(book)
 
         data_folder = app.config['DATA_FOLDER']
-        book_folder = os.path.join(data_folder, 'answer_books', str(book.id))
+        book_path = os.path.join('answer_books', str(book.id))
+        book_folder = os.path.join(data_folder, book_path)
         if os.path.exists(book_folder):
             for path in file_paths:
                 full_path = os.path.join(book_folder, path)
                 if os.path.exists(full_path):
                     os.remove(full_path)
+                if MirrorTool.enabled:
+                    remote_path = os.path.join(book_path, path)
+                    if MirrorTool.exists(remote_path):
+                        MirrorTool.delete(remote_path)
             if not os.listdir(book_folder):
                 os.rmdir(book_folder)
 
@@ -289,12 +295,17 @@ def delete_page(pid: int):
 
         file_path = AnswerService.delete_page(page)
 
-        data_folder = app.config['DATA_FOLDER']
-        book_folder = os.path.join(data_folder, 'answer_books', str(page.book_id))
         if file_path:
+            data_folder = app.config['DATA_FOLDER']
+            book_path = os.path.join('answer_books', str(page.book_id))
+            book_folder = os.path.join(data_folder, book_path)
             full_path = os.path.join(book_folder, file_path)
             if os.path.exists(full_path):
                 os.remove(full_path)
+            if MirrorTool.enabled:
+                remote_path = os.path.join(book_path, file_path)
+                if MirrorTool.exists(remote_path):
+                    MirrorTool.delete(remote_path)
 
         db.session.commit()
         return "", 204

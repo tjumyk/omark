@@ -4,6 +4,7 @@
 __pycache__/
 
 static/
+static_cn/
 
 config.json
 oauth.config.json

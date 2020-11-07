@@ -13,6 +13,7 @@ from auth_connect import oauth
 from models import db
 from services.account import AccountService, AccountServiceError
 from utils.ip import IPTool
+from utils.mirror import MirrorTool
 
 
 class MyFlask(Flask):
@@ -74,6 +75,7 @@ app.config.from_json('config.json')
 
 db.init_app(app)
 IPTool.init_app(app)
+MirrorTool.init(app.config)
 
 
 # import logging

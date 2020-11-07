@@ -6,3 +6,5 @@ opencv-python
 numpy
 python-dateutil
 geoip2
+oss2
+celery[redis]==4.4.7

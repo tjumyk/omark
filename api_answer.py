@@ -5,8 +5,9 @@ import tempfile
 import uuid
 import zipfile
 
-from flask import Blueprint, jsonify, request, current_app as app, send_from_directory
+from flask import Blueprint, jsonify, request, current_app as app, send_from_directory, redirect
 
+from async_job_worker import run_book_mirror
 from auth_connect.oauth import requires_login
 from models import db
 from services.account import AccountService, AccountServiceError
@@ -14,6 +15,8 @@ from services.answer import AnswerService, AnswerServiceError
 from services.marking import MarkingService, MarkingServiceError
 from services.task import TaskService, TaskServiceError
 from utils.image import process_image
+from utils.ip import IPTool
+from utils.mirror import MirrorTool
 from utils.pdf import get_pdf_pages
 
 answer_api = Blueprint('answer_api', __name__)
@@ -125,6 +128,7 @@ def do_book_pages(bid: int):
                     num_pages = get_pdf_pages(tmp_path)
                     pages.extend(AnswerService.add_multi_pages(book, path, num_pages, creator=user))
                     shutil.copyfile(tmp_path, full_path)
+                    run_book_mirror.apply_async((book.id, path))
             else:
                 if options:
                     with tempfile.TemporaryDirectory() as tmp_dir:
@@ -142,10 +146,12 @@ def do_book_pages(bid: int):
                                 alt_path = '%s_%d%s' % (random_id, i, ext)
                             page = AnswerService.add_page(book, alt_path, creator=user)
                             shutil.copy(output_img_path, os.path.join(data_folder, book_folder, alt_path))
+                            run_book_mirror.apply_async((book.id, alt_path))
                             pages.append(page)
                 else:
                     page = AnswerService.add_page(book, path, index=params.get('index'), creator=user)
                     file.save(full_path)
+                    run_book_mirror.apply_async((book.id, path))
                     pages.append(page)
         db.session.commit()
         return jsonify([page.to_dict(with_annotations=True, with_creator=True) for page in pages]), 201
@@ -162,7 +168,17 @@ def do_book_file(bid: int, file_path: str):
             return jsonify(msg='book not found'), 404
 
         data_folder = app.config['DATA_FOLDER']
-        book_folder = os.path.join(data_folder, 'answer_books', str(book.id))
+        book_path = os.path.join('answer_books', str(book.id))
+        book_folder = os.path.join(data_folder, book_path)
+
+        if MirrorTool.enabled:
+            region = IPTool.get_ip_country(IPTool.get_client_ip(request))
+            if region:
+                region = region.lower()
+            if MirrorTool.is_region_supported(region):
+                remote_path = os.path.join(book_path, file_path)
+                if MirrorTool.exists(remote_path):
+                    return redirect(MirrorTool.get_url(remote_path))
         return send_from_directory(book_folder, file_path)
     except AnswerServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400

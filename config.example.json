@@ -17,5 +17,16 @@
   "GEOIP": {
     "country": null
   },
-  "DETECT_REQUEST_REGIONS": []
+  "DETECT_REQUEST_REGIONS": [],
+  "FILE_MIRROR": null,
+  "ASYNC_JOB":{
+    "broker": "amqp://",
+    "broker_use_ssl": {
+      "keyfile": "/var/ssl/private/worker-key.pem",
+      "certfile": "/var/ssl/worker-cert.pem",
+      "ca_certs": "/var/ssl/myca.pem",
+      "cert_reqs": "CERT_REQUIRED"
+    },
+    "backend": "redis://"
+  }
 }

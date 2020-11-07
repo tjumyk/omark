@@ -15,6 +15,7 @@ from services.task import TaskService, TaskServiceError
 from utils.crypt import md5sum
 from utils.give import GiveImporter, GiveImporterError
 from utils.pdf import get_pdf_pages
+from async_job_worker import run_book_mirror
 
 admin_api = Blueprint('admin_api', __name__)
 
@@ -243,6 +244,7 @@ def import_give(tid: int):
                 if not os.path.exists(to_dir_path):
                     os.makedirs(to_dir_path)
                 shutil.copy(tmp_path, to_path)
+                run_book_mirror.apply_async((book.id, path))
 
         db.session.commit()
         return jsonify(num_new_books=num_new_books, num_skipped_books=num_skipped_books,

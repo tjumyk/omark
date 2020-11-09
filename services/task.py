@@ -5,7 +5,7 @@ from sqlalchemy import func
 from sqlalchemy.orm import joinedload
 
 from error import BasicError
-from models import Task, db, Question, UserAlias, MarkerQuestionAssignment, AnswerBook, Marking, Comment
+from models import Task, db, Question, UserAlias, MarkerQuestionAssignment, AnswerBook, Marking, Comment, Material
 
 
 class TaskServiceError(BasicError):
@@ -184,3 +184,40 @@ class TaskService:
         if ass is None:
             raise TaskServiceError('assignment not found')
         db.session.delete(ass)
+
+    @classmethod
+    def get_material(cls, _id: int) -> Optional[Material]:
+        if _id is None:
+            raise TaskServiceError('id is required')
+        if not isinstance(_id, int):
+            raise TaskServiceError('id must be an integer')
+
+        return Material.query.get(_id)
+
+    @classmethod
+    def add_material(cls, task: Task, name: str, path: str):
+        if task is None:
+            raise TaskServiceError('task is required')
+        if not name:
+            raise TaskServiceError('name is required')
+        if not path:
+            raise TaskServiceError('path is required')
+
+        if task.config_locked:
+            raise TaskServiceError('task config locked')
+
+        if db.session.query(func.count()).filter(Material.task_id == task.id, Material.name == name).scalar():
+            raise TaskServiceError('duplicate name')
+
+        material = Material(task_id=task.id, name=name, path=path)
+        db.session.add(material)
+        return material
+
+    @classmethod
+    def remove_material(cls, material: Material):
+        if material is None:
+            raise TaskServiceError('material is required')
+
+        if material.task.config_locked:
+            raise TaskServiceError('task config locked')
+        db.session.delete(material)

@@ -29,7 +29,7 @@ def get_task(tid: int):
         if task is None:
             return jsonify(msg='task not found'), 404
 
-        return jsonify(task.to_dict(with_questions=True, with_assignments=True))
+        return jsonify(task.to_dict(with_questions=True, with_assignments=True, with_materials=True))
     except TaskServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 

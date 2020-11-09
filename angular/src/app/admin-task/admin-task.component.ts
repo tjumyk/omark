@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {BasicError, MarkerQuestionAssignment, Question, Task} from "../models";
+import {BasicError, MarkerQuestionAssignment, Material, Question, Task} from "../models";
 import {TaskService} from "../task.service";
 import {ActivatedRoute} from "@angular/router";
 import {finalize} from "rxjs/operators";
@@ -25,6 +25,10 @@ export class AdminTaskComponent implements OnInit {
 
   newAssignmentForm = new NewMarkerQuestionAssignmentForm();
   addingAssignment: boolean;
+
+  addingMaterial: boolean;
+  newMaterialFile: string;
+  addMaterialProgress: number;
 
   importGiveArchive: string;
   importGiveFileNames: string;
@@ -84,6 +88,43 @@ export class AdminTaskComponent implements OnInit {
         }
       },
       error => this.error = error.error
+    )
+  }
+
+  addMaterial(f: NgForm, files: FileList){
+    if (f.invalid || files.length < 1)
+      return;
+
+    this.addingMaterial = true;
+    this.adminService.addMaterial(this.taskId, files.item(0)).pipe(
+      finalize(()=>this.addingMaterial=false)
+    ).subscribe(
+      event => {
+        switch (event.type) {
+          case HttpEventType.UploadProgress:
+            this.addMaterialProgress = Math.round(100 * event.loaded / event.total);
+            break;
+          case HttpEventType.Response:
+            const resp = event.body as Material;
+            this.task.materials.push(resp);
+        }
+      },
+      error => this.error = error.error
+    )
+  }
+
+  deleteMaterial(mat: Material, index: number, btn: HTMLButtonElement){
+    if(!confirm(`Really want to delete material ${mat.name}?`))
+      return;
+
+    btn.classList.add('loading', 'disabled');
+    this.adminService.deleteMaterial(mat.id).pipe(
+      finalize(()=>btn.classList.remove('loading', 'disabled'))
+    ).subscribe(
+      ()=>{
+        this.task.materials.splice(index, 1)
+      },
+      error=>this.error = error.error
     )
   }
 

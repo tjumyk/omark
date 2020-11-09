@@ -30,6 +30,23 @@
   </div>
 
   <table class="ui table unstackable">
+    <thead><tr><th>Material ID</th><th>Material Name</th><th>Created At</th><th>Actions</th></tr></thead>
+    <tbody>
+    <tr *ngFor="let m of task.materials; index as i">
+      <td>{{m.id}}</td>
+      <td>{{m.name}}</td>
+      <td>{{m.created_at|date:'short'}}</td>
+      <td>
+        <div class="ui mini buttons">
+          <a class="ui icon button" href="api/materials/{{m.id}}/{{m.name}}" target="_blank"><i class="icon eye open"></i></a>
+          <button *ngIf="!task.config_locked" class="ui icon button red" (click)="deleteMaterial(m, i, btnDeleteMaterial)" #btnDeleteMaterial><i class="icon trash"></i></button>
+        </div>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+  <table class="ui table unstackable">
     <thead><tr><th>Question ID</th><th>Question Number</th><th>Marks</th><th>Markers</th><th>Actions</th></tr></thead>
     <tbody>
     <tr *ngFor="let q of task.questions; index as i">
@@ -51,7 +68,7 @@
     </tbody>
   </table>
 
-  <div class="ui grid stackable centered three column" *ngIf="!task.config_locked || !task.answer_locked">
+  <div class="ui grid stackable centered four column" *ngIf="!task.config_locked || !task.answer_locked">
     <div class="column" *ngIf="!task.config_locked">
       <div class="ui segment">
         <form class="ui form" #f="ngForm" (ngSubmit)="addQuestion(f)" [ngClass]="{'loading': addingQuestion}">
@@ -94,6 +111,24 @@
             </div>
           </div>
           <button type="submit" class="ui button primary fluid"><i class="icon plus"></i> Add Marker for Question</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="column" *ngIf="!task.config_locked">
+      <div class="ui segment">
+        <div class="ui top attached progress" *ngIf="addingMaterial">
+          <div class="bar" [ngStyle]="{'width.%': addMaterialProgress}"></div>
+        </div>
+        <form class="ui form" #f4="ngForm" (ngSubmit)="addMaterial(f4, inputMaterialFile.files)" [ngClass]="{'loading': addingMaterial}">
+          <div class="field required" [ngClass]="{'error': (materialFileModel.touched || materialFileModel.dirty || f4.submitted) && materialFileModel.invalid}">
+            <label>Material File</label>
+            <input type="file" required name="file" [(ngModel)]="newMaterialFile" #materialFileModel="ngModel" #inputMaterialFile>
+            <div class="errors">
+              <label *ngIf="materialFileModel.errors?.required"><i class="icon times"></i> Material file is required</label>
+            </div>
+          </div>
+          <button type="submit" class="ui button primary fluid"><i class="icon upload"></i> Add Material</button>
         </form>
       </div>
     </div>

@@ -7,6 +7,7 @@ from flask import Flask, request, jsonify, send_from_directory
 from api_account import account_api
 from api_admin import admin_api
 from api_answer import answer_api
+from api_material import material_api
 from api_task import task_api
 from api_marking import marking_api
 from auth_connect import oauth
@@ -98,6 +99,7 @@ app.register_blueprint(admin_api, url_prefix='/api/admin')
 app.register_blueprint(task_api, url_prefix='/api/tasks')
 app.register_blueprint(answer_api, url_prefix='/api/answers')
 app.register_blueprint(marking_api, url_prefix='/api/markings')
+app.register_blueprint(material_api, url_prefix='/api/materials')
 
 
 @app.route('/')

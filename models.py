@@ -74,14 +74,35 @@ class Task(db.Model):
     def __repr__(self):
         return '<Task %r>' % self.name
 
-    def to_dict(self, with_questions: bool = False, with_assignments: bool = False) -> dict:
+    def to_dict(self, with_questions: bool = False, with_assignments: bool = False, with_materials: bool=False) -> dict:
         d = dict(id=self.id, name=self.name,
                  config_locked=self.config_locked, answer_locked=self.answer_locked, marking_locked=self.marking_locked,
                  created_at=self.created_at, modified_at=self.modified_at)
         if with_questions:
             d['questions'] = [q.to_dict(with_marker_assignments=with_assignments)
                               for q in sorted(self.questions, key=lambda q: q.index)]
+        if with_materials:
+            d['materials'] = [m.to_dict() for m in self.materials]
         return d
+
+
+class Material(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    task_id = db.Column(db.Integer, db.ForeignKey('task.id'), nullable=False)
+    name = db.Column(db.String(128), nullable=False)
+    path = db.Column(db.String(256), nullable=False)
+
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    modified_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    task = db.relationship('Task', backref=db.backref('materials'))
+
+    def __repr__(self):
+        return '<Material %r>' % self.id
+
+    def to_dict(self):
+        return dict(id=self.id, task_id=self.task_id, name=self.name,
+                    created_at=self.created_at, modified_at=self.modified_at)
 
 
 class Question(db.Model):
@@ -171,7 +192,7 @@ class AnswerBook(db.Model):
         if with_markings:
             d['markings'] = [m.to_dict(with_creator=with_creator, with_modifier=with_modifier) for m in self.markings]
         if with_comments:
-            d['comments'] = [c.to_dict(with_creator=with_creator) for c in sorted(self.comments, key=lambda c:c.id)]
+            d['comments'] = [c.to_dict(with_creator=with_creator) for c in sorted(self.comments, key=lambda c: c.id)]
         if with_creator:
             d['creator'] = self.creator.to_dict() if self.creator else None
         if with_modifier:

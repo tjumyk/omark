@@ -77,4 +77,16 @@ export class AdminService {
   deletePage(pageId: number) :Observable<any>{
     return this.http.delete(`${this.api}/pages/${pageId}`)
   }
+
+  addMaterial(taskId: number, file: File): Observable<HttpEvent<any>> {
+    let form = new FormData();
+    form.append('file', file);
+    const req = new HttpRequest('POST', `${this.api}/tasks/${taskId}/materials`, form,
+      {reportProgress: true});
+    return this.http.request(req);
+  }
+
+  deleteMaterial(materialId: number): Observable<any> {
+    return this.http.delete(`${this.api}/materials/${materialId}`)
+  }
 }

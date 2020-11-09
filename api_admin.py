@@ -4,6 +4,7 @@ import subprocess
 import sys
 import tempfile
 from collections import defaultdict
+from uuid import uuid4
 
 from flask import Blueprint, jsonify, request, current_app as app
 
@@ -127,7 +128,7 @@ def import_give(tid: int):
         if task is None:
             return jsonify(msg='task not found'), 404
 
-        if task.answer_locked:
+        if task.answer_locked:  # early stop
             return jsonify(msg='task answer locked'), 400
 
         archive = request.files.get('archive')
@@ -310,4 +311,56 @@ def delete_page(pid: int):
         db.session.commit()
         return "", 204
     except AnswerServiceError as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@admin_api.route('/tasks/<int:tid>/materials', methods=['POST'])
+@requires_admin
+def do_task_materials(tid: int):
+    try:
+        task = TaskService.get(tid)
+        if task is None:
+            return jsonify(msg='task not found'), 404
+
+        if task.config_locked:  # early stop
+            return jsonify(msg='task config locked'), 400
+
+        file = request.files.get('file')
+        if file is None:
+            return jsonify(msg='file is required'), 400
+
+        name = file.filename
+        _, ext = os.path.splitext(name)
+        path = os.path.join('materials', str(uuid4()) + ext)
+        material = TaskService.add_material(task, name, path)
+
+        # do actual file copy
+        data_folder = app.config['DATA_FOLDER']
+        full_path = os.path.join(data_folder, path)
+        folder_path = os.path.dirname(full_path)
+        if not os.path.exists(folder_path):
+            os.makedirs(folder_path)
+        file.save(full_path)
+
+        db.session.commit()
+        return jsonify(material.to_dict()), 201
+    except TaskServiceError as e:
+        return jsonify(msg=e.msg, detail=e.detail), 400
+
+
+@admin_api.route('/materials/<int:mid>', methods=['DELETE'])
+@requires_admin
+def do_material(mid: int):
+    try:
+        material = TaskService.get_material(mid)
+        if material is None:
+            return jsonify(msg='material not found'), 404
+
+        TaskService.remove_material(material)
+        data_folder = app.config['DATA_FOLDER']
+        os.remove(os.path.join(data_folder, material.path))
+
+        db.session.commit()
+        return '', 204
+    except TaskServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400

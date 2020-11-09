@@ -31,6 +31,17 @@ export class Task {
   modified_at: string;
 
   questions?: Question[];
+  materials?: Material[];
+}
+
+export class Material{
+  id: number;
+  task_id: number;
+  name: string;
+  created_at: string;
+  modified_at: string;
+
+  task?: Task;
 }
 
 export class Question {

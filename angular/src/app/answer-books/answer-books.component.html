@@ -1,3 +1,10 @@
+<div *ngIf="task && task.materials.length" class="materials">
+  <a href="api/materials/{{m.id}}/{{m.name}}" *ngFor="let m of task.materials" target="_blank" class="ui button labeled icon">
+    {{m.name}}
+    <i class="icon file"></i>
+  </a>
+</div>
+
 <app-error [error]="error"></app-error>
 
 <div class="ui segment very padded basic" *ngIf="loadingBooks">

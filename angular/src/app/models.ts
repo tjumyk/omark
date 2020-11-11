@@ -49,6 +49,7 @@ export class Question {
   task_id: number;
 
   index: number;
+  label?: string;
   marks: number;
   description?: string;
 

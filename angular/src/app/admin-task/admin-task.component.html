@@ -47,11 +47,12 @@
   </table>
 
   <table class="ui table unstackable">
-    <thead><tr><th>Question ID</th><th>Question Number</th><th>Marks</th><th>Markers</th><th>Actions</th></tr></thead>
+    <thead><tr><th>Question ID</th><th>Question Number</th><th>Label</th><th>Marks</th><th>Markers</th><th>Actions</th></tr></thead>
     <tbody>
     <tr *ngFor="let q of task.questions; index as i">
       <td>{{q.id}}</td>
       <td>{{q.index}}</td>
+      <td>{{q.label}}</td>
       <td>{{q.marks}}</td>
       <td>
         <div *ngFor="let ass of q.marker_assignments; index as j" class="ui label">
@@ -96,6 +97,10 @@
             <div class="errors">
               <label *ngIf="indexModel.errors?.required"><i class="icon times"></i> Question number is required</label>
             </div>
+          </div>
+          <div class="field" [ngClass]="{'error': (labelModel.touched || labelModel.dirty || f.submitted) && labelModel.invalid}">
+            <label>Label (Optional)</label>
+            <input type="text" name="label" maxlength="32" [(ngModel)]="newQuestionForm.label" #labelModel="ngModel">
           </div>
           <div class="field required" [ngClass]="{'error': (marksModel.touched || marksModel.dirty || f.submitted) && marksModel.invalid}">
             <label>Marks</label>

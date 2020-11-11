@@ -61,7 +61,8 @@ def do_task_questions(tid: int):
             return jsonify(msg='task not found'), 404
 
         params = request.json
-        q = TaskService.add_question(task, params.get('index'), params.get('marks'), params.get('description'))
+        q = TaskService.add_question(task, params.get('index'), params.get('label'), params.get('marks'),
+                                     params.get('description'))
         db.session.commit()
         return jsonify(q.to_dict(with_marker_assignments=True)), 201
     except TaskServiceError as e:

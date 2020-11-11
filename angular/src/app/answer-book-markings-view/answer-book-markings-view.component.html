@@ -2,7 +2,10 @@
   <thead><tr><th>Q</th><th>Marks</th><th>Marker</th></tr></thead>
   <tbody>
   <tr *ngFor="let item of qMap|keyvalue: compareQMapItems">
-    <td>Q{{item.value.question.index}}</td>
+    <td>
+      <ng-container *ngIf="item.value.question.label; else qNum">{{item.value.question.label}}</ng-container>
+      <ng-template #qNum>Q{{item.value.question.index}}</ng-template>
+    </td>
     <ng-container *ngIf="item.value.editing; else notEditing">
       <td colspan="2">
         <div class="ui action input fluid" [class.disabled]="item.value.submitting">

@@ -96,13 +96,17 @@ class TaskService:
         return Question.query.get(_id)
 
     @staticmethod
-    def add_question(task: Task, index: int, marks: float, description: Optional[str]) -> Question:
+    def add_question(task: Task, index: int, label: Optional[str], marks: float, description: Optional[str]) \
+            -> Question:
         if task is None:
             raise TaskServiceError('task is required')
         if index is None:
             raise TaskServiceError('index is required')
         if not isinstance(index, int):
             raise TaskServiceError('index must be an integer')
+        if label is not None:
+            if len(label) > 32:
+                raise TaskServiceError('label is too long')
         if marks is None:
             raise TaskServiceError('marks is required')
         if not isinstance(marks, (int, float)):
@@ -117,7 +121,7 @@ class TaskService:
                 .scalar():
             raise TaskServiceError('duplicate index')
 
-        q = Question(task=task, index=index, marks=marks, description=description)
+        q = Question(task=task, index=index, label=label, marks=marks, description=description)
         db.session.add(q)
         return q
 

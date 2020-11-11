@@ -101,7 +101,8 @@ def export_markings(tid: int):
         columns = ['BookID', 'UserID', 'UserName']
         questions = task.questions
         for q in questions:
-            columns.append('Q%d' % q.index)
+            q_name = q.label or 'Q%d' % q.index
+            columns.append(q_name)
         columns.append('Total')
         columns.append('Comments')
         tsv.append('\t'.join(columns))

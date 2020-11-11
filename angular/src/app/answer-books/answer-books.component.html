@@ -37,7 +37,10 @@
       <th (click)="sortField('id', thID)" #thID>ID</th>
       <th (click)="sortField('student.name', thStudent)" #thStudent>Student</th>
       <th (click)="sortField('_submitted_at_time', thSubmittedAt)" #thSubmittedAt *ngIf="hasSubmittedAt">Submitted At</th>
-      <th (click)="sortField('_marks_'+q.id, thQuestion)" #thQuestion *ngFor="let q of task.questions">Q{{q.index}}</th>
+      <th (click)="sortField('_marks_'+q.id, thQuestion)" #thQuestion *ngFor="let q of task.questions">
+        <ng-container *ngIf="q.label; else qNumber">{{q.label}}</ng-container>
+        <ng-template #qNumber>Q{{q.index}}</ng-template>
+      </th>
       <th (click)="sortField('_total_marks', thTotal)" #thTotal>Total</th>
       <th (click)="sortField('comments.length', thComments)" #thComments>Comments</th>
       <th>Actions</th>

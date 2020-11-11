@@ -9,6 +9,7 @@ export class NewTaskForm {
 
 export class NewQuestionForm{
   index: number;
+  label?: string;
   marks: number;
   description?: string;
 }

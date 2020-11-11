@@ -110,6 +110,7 @@ class Question(db.Model):
     task_id = db.Column(db.Integer, db.ForeignKey('task.id'), nullable=False)
 
     index = db.Column(db.Integer, nullable=False)
+    label = db.Column(db.String(32))
     marks = db.Column(db.Float, nullable=False)
     description = db.Column(db.Text)
 
@@ -122,8 +123,8 @@ class Question(db.Model):
         return '<Question %r>' % self.id
 
     def to_dict(self, with_task: bool = False, with_marker_assignments: bool = False) -> dict:
-        d = dict(id=self.id, task_id=self.task_id, index=self.index, marks=self.marks, description=self.description,
-                 created_at=self.created_at, modified_at=self.modified_at)
+        d = dict(id=self.id, task_id=self.task_id, index=self.index, label=self.label, marks=self.marks,
+                 description=self.description, created_at=self.created_at, modified_at=self.modified_at)
         if with_task:
             d['task'] = self.task.to_dict()
         if with_marker_assignments:

@@ -127,7 +127,7 @@ export class AnswerPageAnnotationLayerComponent implements OnInit, AfterViewInit
     this.fabricCanvas.freeDrawingBrush.color = '#FF0000';
     this.fabricCanvas.freeDrawingBrush.width = this.penSize * width;
     this.fabricCanvas.selection = false;
-    this.fabricCanvas.hoverCursor = 'pointer';
+    this.fabricCanvas.hoverCursor = 'default';
 
     this.windowResizeListener = () => {
       const oldWidth = this.fabricCanvas.getWidth();
@@ -284,7 +284,6 @@ export class AnswerPageAnnotationLayerComponent implements OnInit, AfterViewInit
 
           fabric.Path.fromObject(data, (path)=>{
             this.lockObject(path);
-            path.selectable = ann.creator_id == user.id;
             path._annotation_id = ann.id;
             this.fabricCanvas.add(path)
           })
@@ -301,6 +300,7 @@ export class AnswerPageAnnotationLayerComponent implements OnInit, AfterViewInit
     obj.lockScalingX = true;
     obj.lockScalingY = true;
     obj.hasControls = false;
+    obj.selectable = false;
   }
 
   private updateTool(){

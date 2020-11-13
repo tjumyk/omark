@@ -176,39 +176,55 @@ export class AnswerPageAnnotationLayerComponent implements OnInit, AfterViewInit
         setTimeout(() => this.uploadAnnotations(), this.uploadAnnotationsDelay);
     });
 
-    this.fabricCanvas.on('mouse:down', (event)=>{
-      const target = event.target;
-      if(target && this._tool == 'eraser'){
-        const aid = target['_annotation_id'];
-        if(aid) {
-          if (!target['_deleting']) {
-            target['_deleting'] = true;
-            this.markingService.deleteAnnotation(aid).pipe(
-              finalize(() => target['_deleting'] = false)
-            ).subscribe(
-              () => {
-                this.fabricCanvas.remove(target);
-
-                let i = 0, annIndex = -1;
-                for (let ann of this.page.annotations) {
-                  if (ann.id == aid) {
-                    annIndex = i;
-                    break
-                  }
-                  ++i;
-                }
-                if (annIndex >= 0) {
-                  this.page.annotations.splice(annIndex, 1)
-                }
-              },
-              error => this.error.emit(error.error)
-            )
-          }
-        } else {
-          alert('Annotation has not yet been synced.\nPlease wait for a few seconds.')
-        }
-      }
+    // keep track of mouse button status in an old-fashion way because the 'buttons/which' apis are not reliable now.
+    let isMouseDown = false;
+    this.fabricCanvas.on('mouse:down', function () {
+      isMouseDown = true
     });
+    this.fabricCanvas.on('mouse:up', function () {
+      isMouseDown = false
+    });
+
+    const eraserHandler = (event) => {
+      if (this._tool != 'eraser')
+        return;
+      const target = event.target;
+      if(!target)
+        return;
+      if (event.e.type === 'mousemove' && !isMouseDown)  // button also need to be pressed for mousemove
+        return;
+
+      const aid = target['_annotation_id'];
+      if (aid) {
+        if (!target['_deleting']) {
+          target['_deleting'] = true;
+          this.markingService.deleteAnnotation(aid).pipe(
+            finalize(() => target['_deleting'] = false)
+          ).subscribe(
+            () => {
+              this.fabricCanvas.remove(target);
+
+              let i = 0, annIndex = -1;
+              for (let ann of this.page.annotations) {
+                if (ann.id == aid) {
+                  annIndex = i;
+                  break
+                }
+                ++i;
+              }
+              if (annIndex >= 0) {
+                this.page.annotations.splice(annIndex, 1)
+              }
+            },
+            error => this.error.emit(error.error)
+          )
+        }
+      } else {
+        alert('Annotation has not yet been synced.\nPlease wait for a few seconds.')
+      }
+    };
+    this.fabricCanvas.on('mouse:over', eraserHandler);
+    this.fabricCanvas.on('mouse:down', eraserHandler);
   }
 
   private uploadAnnotations() {

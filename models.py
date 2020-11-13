@@ -239,9 +239,11 @@ class AnswerPage(db.Model):
 
 
 class Marking(db.Model):
+    # TODO consider using (book_id, question_id) as primary key in new db setup?
     id = db.Column(db.Integer, primary_key=True)
     book_id = db.Column(db.Integer, db.ForeignKey('answer_book.id'), nullable=False)
     question_id = db.Column(db.Integer, db.ForeignKey('question.id'), nullable=False)
+    __table__args = (db.UniqueConstraint(book_id, question_id),)
 
     marks = db.Column(db.Float, nullable=False)
     remarks = db.Column(db.Text)

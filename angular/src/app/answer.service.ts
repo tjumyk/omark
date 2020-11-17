@@ -57,10 +57,12 @@ export class AnswerService {
     return this.http.put<AnswerBook>(`${this.api}/books/${id}`, form)
   }
 
-  goToBook(fromId: number, isNext: boolean, getPages: boolean = false): Observable<AnswerBook> {
+  goToBook(fromId: number, isNext: boolean, getPages: boolean = false, skipMarked: boolean = false): Observable<AnswerBook> {
     let params = new HttpParams();
     if (getPages)
       params = params.append('pages', 'true');
+    if(skipMarked)
+      params = params.append('skip-marked', 'true');
 
     if (isNext)
       return this.http.get<AnswerBook>(`${this.api}/books/${fromId}/next`, {params});

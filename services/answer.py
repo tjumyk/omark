@@ -4,7 +4,8 @@ from typing import Optional, Set, List
 from sqlalchemy import func
 
 from error import BasicError
-from models import AnswerBook, Task, UserAlias, db, AnswerPage, Annotation, Marking, Comment
+from models import AnswerBook, Task, UserAlias, db, AnswerPage, Annotation, Marking, Comment, MarkerQuestionAssignment, \
+    Question
 
 
 class AnswerServiceError(BasicError):
@@ -33,7 +34,8 @@ class AnswerService:
                     AnswerBook.student_id == student.id).first()
 
     @staticmethod
-    def go_to_book(from_book: AnswerBook, is_next: bool = True) -> Optional[AnswerBook]:
+    def go_to_book(from_book: AnswerBook, is_next: bool = True, skip_marked_by: UserAlias = None) \
+            -> Optional[AnswerBook]:
         if from_book is None:
             raise AnswerServiceError('from book is required')
 
@@ -44,6 +46,20 @@ class AnswerService:
         else:
             filters.append(AnswerBook.id < from_book.id)
             order_by = AnswerBook.id.desc()
+
+        if skip_marked_by is not None:
+            qids = [r[0] for r in db.session.query(MarkerQuestionAssignment.question_id)
+                    .filter(MarkerQuestionAssignment.question_id == Question.id,
+                            Question.task_id == from_book.task_id,
+                            MarkerQuestionAssignment.marker_id == skip_marked_by.id)]
+
+            sub_query = db.session.query(Marking.book_id) \
+                .filter(Marking.book_id == AnswerBook.id,
+                        AnswerBook.task_id == from_book.task_id,
+                        Marking.question_id.in_(qids)) \
+                .group_by(Marking.book_id).having(func.count() == len(qids)).subquery()
+            filters.append(AnswerBook.id.notin_(sub_query))
+
         return db.session.query(AnswerBook).filter(*filters).order_by(order_by).first()
 
     @staticmethod

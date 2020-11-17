@@ -64,7 +64,15 @@ def go_to_book(bid: int):
         if book is None:
             return jsonify(msg='book not found'), 404
 
-        book2 = AnswerService.go_to_book(book, request.path.endswith('/next'))
+        if request.args.get('skip-marked') == 'true':
+            user = AccountService.get_current_user()
+            if user is None:
+                return jsonify(msg='user info required'), 500
+            skip_marked_by = user
+        else:
+            skip_marked_by = None
+
+        book2 = AnswerService.go_to_book(book, request.path.endswith('/next'), skip_marked_by)
         if book2 is None:
             return "", 204
 

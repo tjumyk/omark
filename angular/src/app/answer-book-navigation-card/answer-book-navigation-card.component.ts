@@ -30,18 +30,21 @@ export class AnswerBookNavigationCardComponent implements OnInit {
   ngOnInit() {
   }
 
-  goToBook(btn: HTMLButtonElement, isNext: boolean) {
+  goToBook(btn: HTMLButtonElement, isNext: boolean, skipMarked: boolean = false) {
     btn.classList.add('loading', 'disabled');
-    this.answerService.goToBook(this.currentBook.id, isNext).pipe(
+    this.answerService.goToBook(this.currentBook.id, isNext, false, skipMarked).pipe(
       finalize(()=>{btn.classList.remove('loading', 'disabled')})
     ).subscribe(
       _book => {
         if (_book) {
           this.router.navigate([`/tasks/${this.task.id}/books/${_book.id}`]);
         } else {
-          if (isNext)
-            alert('No more next books');
-          else
+          if (isNext) {
+            if(skipMarked)
+              alert('No more next unmarked books');
+            else
+              alert('No more next books');
+          }else
             alert('No more previous books');
         }
       },

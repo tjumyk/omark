@@ -1,9 +1,10 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {AnswerBook, BasicError, Task} from "../models";
+import {AnswerBook, BasicError, Task, User} from "../models";
 import {finalize} from "rxjs/operators";
 import {AnswerService} from "../answer.service";
 import {Router} from "@angular/router";
 import {NewAnswerBookForm, TaskService} from "../task.service";
+import {AccountService} from "../account.service";
 
 @Component({
   selector: 'app-answer-book-navigation-card',
@@ -20,14 +21,38 @@ export class AnswerBookNavigationCardComponent implements OnInit {
   @Input()
   enableNewBook: boolean;
 
+  user: User;
+  hasAssignment: boolean;
+
   @Output()
   error = new EventEmitter<BasicError>();
 
-  constructor(private taskService:TaskService,
+  constructor(private accountService: AccountService,
+              private taskService:TaskService,
               private answerService: AnswerService,
               private router: Router) { }
 
   ngOnInit() {
+    this.accountService.getCurrentUser().subscribe(
+      user=>{
+        this.user = user;
+
+        if(this.task){
+          this.hasAssignment = false;
+          for(let question of this.task.questions){
+            for(let ass of question.marker_assignments){
+              if(ass.marker_id == user.id){
+                this.hasAssignment = true;
+                break;
+              }
+            }
+            if(this.hasAssignment)
+              break;
+          }
+        }
+      },
+      error=>this.error =error.error
+    )
   }
 
   goToBook(btn: HTMLButtonElement, isNext: boolean, skipMarked: boolean = false) {

@@ -6,6 +6,7 @@ import {MarkingService, UpdateCommentForm} from "../marking.service";
 import * as moment from "moment";
 import {NgForm} from "@angular/forms";
 import {finalize} from "rxjs/operators";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-answer-book-comments-view',
@@ -33,7 +34,8 @@ export class AnswerBookCommentsViewComponent implements OnInit, OnDestroy {
 
   constructor(private accountService: AccountService,
               private answerService: AnswerService,
-              private markingService: MarkingService) { }
+              private markingService: MarkingService,
+              private router: Router) { }
 
   ngOnInit() {
     this.accountService.getCurrentUser().subscribe(
@@ -41,7 +43,10 @@ export class AnswerBookCommentsViewComponent implements OnInit, OnDestroy {
         this.user = user;
         this.isAdmin = AccountService.isAdmin(user);
 
-        this.setupTimeTracker()
+        this.setupTimeTracker();
+        for (let comment of this.book.comments) {
+          this.setupCommentContent(comment)
+        }
       },
       error => this.error.emit(error.error)
     )
@@ -77,6 +82,7 @@ export class AnswerBookCommentsViewComponent implements OnInit, OnDestroy {
       comment => {
         this.book.comments.push(comment);
         this.updateTimeFields(comment);
+        this.setupCommentContent(comment);
         f.resetForm();
       },
       error=>this.error.emit(error.error)
@@ -111,6 +117,7 @@ export class AnswerBookCommentsViewComponent implements OnInit, OnDestroy {
         comment.modified_at = _comment.modified_at;
 
         this.updateTimeFields(comment);
+        this.setupCommentContent(comment);
       },
       error=>this.error.emit(error.error)
     )
@@ -134,4 +141,18 @@ export class AnswerBookCommentsViewComponent implements OnInit, OnDestroy {
     )
   }
 
+  setupCommentContent(comment: Comment){
+    let html = comment.content;
+    html = html.replace(/https?:\/\/[^\s]+/gi, `<a target="_blank" href="$&">$&</a>`);
+    html = html.replace(/#(\d+)/g, `<a href="tasks/${this.task.id}/books/$1" class="router">$&</a>`);
+    comment['_content_html'] = html;
+  }
+
+  handleRouterLinks(event: MouseEvent) {
+    const target = event.target as Element;
+    if(target.tagName == 'A' && target.classList.contains('router')){ // is a router link
+      this.router.navigateByUrl(target.getAttribute('href'));
+      return false;
+    }
+  }
 }

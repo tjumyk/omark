@@ -19,7 +19,7 @@
       <div class="metadata">
         <span class="date" *ngIf="comment._modified_at_from_now">{{comment._modified_at_from_now}}</span>
       </div>
-      <div class="text">{{comment.content}}</div>
+      <div class="text" [innerHTML]="comment._content_html" (click)="handleRouterLinks($event)"></div>
       <div class="actions" *ngIf="!task.marking_locked && user.id === comment.creator_id">
         <a class="edit" (click)="editComment(comment)">Edit</a>
         <a class="delete" (click)="removeComment(comment, btnRemoveComment, i)" #btnRemoveComment></a>

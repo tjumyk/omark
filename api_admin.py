@@ -15,9 +15,11 @@ from services.account import AccountService, AccountServiceError
 from services.answer import AnswerService, AnswerServiceError
 from services.task import TaskService, TaskServiceError
 from utils.crypt import md5sum
-from utils.give import GiveImporter, GiveImporterError
+from utils.give import GiveImporter
+from utils.importer import ImporterError
 from utils.mirror import MirrorTool
 from utils.pdf import get_pdf_pages
+from utils.submit import SubmitImporter
 
 admin_api = Blueprint('admin_api', __name__)
 
@@ -122,8 +124,9 @@ def do_question_assignment(qid: int, uid: int):
 
 
 @admin_api.route('/tasks/<int:tid>/import-give', methods=['POST'])
+@admin_api.route('/tasks/<int:tid>/import-submit', methods=['POST'])
 @requires_admin
-def import_give(tid: int):
+def import_books(tid: int):
     try:
         task = TaskService.get(tid)
         if task is None:
@@ -134,6 +137,11 @@ def import_give(tid: int):
 
         archive = request.files.get('archive')
         file_names_str = request.form.get('file_names')
+
+        if request.path.endswith('/import-give'):
+            importer = GiveImporter
+        else:  # /import-submit
+            importer = SubmitImporter
 
         if not archive:
             return jsonify(msg='archive file is required'), 400
@@ -160,7 +168,7 @@ def import_give(tid: int):
             os.mkdir(extract_dir)
 
             copy_info = []
-            for student_id, submissions_info in GiveImporter(file_names).import_archive(archive_path, extract_dir):
+            for student_id, submissions_info in importer(file_names).import_archive(archive_path, extract_dir):
                 student = AccountService.sync_user_by_name(student_id)
                 if not submissions_info:  # no submission
                     continue  # ignore
@@ -252,7 +260,7 @@ def import_give(tid: int):
         db.session.commit()
         return jsonify(num_new_books=num_new_books, num_skipped_books=num_skipped_books,
                        num_updated_books=num_updated_books)
-    except (TaskServiceError, GiveImporterError, AccountServiceError, AnswerServiceError) as e:
+    except (TaskServiceError, ImporterError, AccountServiceError, AnswerServiceError) as e:
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 

@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {Observable} from "rxjs";
-import {Task, MarkerQuestionAssignment, Question} from "./models";
+import {MarkerQuestionAssignment, Question, Task} from "./models";
 import {HttpClient, HttpEvent, HttpRequest} from "@angular/common/http";
 
 export class NewTaskForm {
@@ -14,16 +14,26 @@ export class NewQuestionForm{
   description?: string;
 }
 
-export class NewMarkerQuestionAssignmentForm{
+export class NewMarkerQuestionAssignmentForm {
   qid: number;
   marker_name: string;
 }
 
-export class ImportGiveResponse{
+export class ImportBooksResponse {
   num_new_books: number;
   num_skipped_books: number;
   num_updated_books: number;
 }
+
+export class ImportSource {
+  id: string;
+  name: string;
+}
+
+export const IMPORT_SOURCES: ImportSource[] = [
+  {id: 'give', name: 'CSE Give'},
+  {id: 'submit', name: 'UNSWKG Submit'}
+]
 
 @Injectable({
   providedIn: 'root'
@@ -62,11 +72,11 @@ export class AdminService {
     return this.http.delete(`${this.api}/questions/${qId}/assignments/${uId}`)
   }
 
-  importGiveSubmissions(taskId: number, archive: File, fileNames: string): Observable<HttpEvent<any>>{
+  importBooks(taskId: number, source: ImportSource, archive: File, fileNames: string): Observable<HttpEvent<any>> {
     const form = new FormData();
     form.append('archive', archive);
     form.append('file_names', fileNames);
-    const req = new HttpRequest('POST', `${this.api}/tasks/${taskId}/import-give`,
+    const req = new HttpRequest('POST', `${this.api}/tasks/${taskId}/import-${source.id}`,
       form, {reportProgress: true});
     return this.http.request(req);
   }

@@ -9,12 +9,13 @@ from typing import Iterable, List
 from dateutil import tz
 
 from error import BasicError
+from utils.importer import Importer, ImporterError
 
 _tz_local = tz.tzlocal()
 _tz_utc = tz.tzutc()
 
 
-class GiveImporterError(BasicError):
+class GiveImporterError(ImporterError):
     pass
 
 
@@ -47,7 +48,7 @@ class GiveLog:
             return GiveLog(entries)
 
 
-class GiveImporter:
+class GiveImporter(Importer):
     _default_submission_name = 'submission.tar'
     _pre_submission_name = 'pre-submission.tar'
     _log_name = 'log'

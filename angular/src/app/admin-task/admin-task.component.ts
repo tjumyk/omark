@@ -4,7 +4,14 @@ import {TaskService} from "../task.service";
 import {ActivatedRoute} from "@angular/router";
 import {finalize} from "rxjs/operators";
 import {NgForm} from "@angular/forms";
-import {AdminService, ImportGiveResponse, NewMarkerQuestionAssignmentForm, NewQuestionForm} from "../admin.service";
+import {
+  AdminService,
+  ImportBooksResponse,
+  ImportSource,
+  NewMarkerQuestionAssignmentForm,
+  NewQuestionForm,
+  IMPORT_SOURCES
+} from "../admin.service";
 import {HttpEventType} from "@angular/common/http";
 import {TitleService} from "../title.service";
 
@@ -30,10 +37,13 @@ export class AdminTaskComponent implements OnInit {
   newMaterialFile: string;
   addMaterialProgress: number;
 
-  importGiveArchive: string;
-  importGiveFileNames: string;
-  importingGive: boolean;
-  importGiveProgress: number;
+
+  IMPORT_SOURCES=IMPORT_SOURCES;
+  importSource: ImportSource;
+  importArchive: string;
+  importFileNames: string;
+  importing: boolean;
+  importProgress: number;
 
   constructor(private taskService: TaskService,
               private adminService: AdminService,
@@ -128,23 +138,23 @@ export class AdminTaskComponent implements OnInit {
     )
   }
 
-  importGive(f: NgForm, fileList: FileList) {
+  importBooks(f: NgForm, fileList: FileList) {
     if (f.invalid || fileList.length < 1)
       return;
 
     const archive = fileList.item(0);
 
-    this.importingGive = true;
-    this.adminService.importGiveSubmissions(this.taskId, archive, this.importGiveFileNames).pipe(
-      finalize(() => this.importingGive = false)
+    this.importing = true;
+    this.adminService.importBooks(this.taskId, this.importSource, archive, this.importFileNames).pipe(
+      finalize(() => this.importing = false)
     ).subscribe(
       event => {
         switch (event.type) {
           case HttpEventType.UploadProgress:
-            this.importGiveProgress = Math.round(100 * event.loaded / event.total);
+            this.importProgress = Math.round(100 * event.loaded / event.total);
             break;
           case HttpEventType.Response:
-            const resp = event.body as ImportGiveResponse;
+            const resp = event.body as ImportBooksResponse;
             alert(`Imported books: ${resp.num_new_books} new, ${resp.num_updated_books} updated, ${resp.num_skipped_books} skipped`)
         }
       },

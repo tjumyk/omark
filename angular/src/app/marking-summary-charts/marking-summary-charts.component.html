@@ -1,0 +1,11 @@
+<div class="ui grid stackable five columns">
+  <div class="column" *ngFor="let d of data">
+    <div class="ui segment">
+      <div class="ui top attached label" [class.black]="d.isTotal">
+        <ng-container *ngIf="d.question; else noQuestion">{{d.question.label || 'Q' + d.question.index}}</ng-container>
+        <ng-template #noQuestion>{{d.isTotal ? 'Total': '?'}}</ng-template>
+      </div>
+      <app-chart [data]="d.chartData"></app-chart>
+    </div>
+  </div>
+</div>

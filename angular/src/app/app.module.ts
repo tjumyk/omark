@@ -35,6 +35,8 @@ import { AnswerBookNavigationCardComponent } from './answer-book-navigation-card
 import { AnswerBookStudentCardComponent } from './answer-book-student-card/answer-book-student-card.component';
 import {AnswerBookPrintComponent} from "./answer-book-print/answer-book-print.component";
 import { AnswerBookCommentsViewComponent } from './answer-book-comments-view/answer-book-comments-view.component';
+import {ChartComponent} from "./chart/chart.component";
+import { MarkingSummaryChartsComponent } from './marking-summary-charts/marking-summary-charts.component';
 
 @NgModule({
   declarations: [
@@ -69,6 +71,8 @@ import { AnswerBookCommentsViewComponent } from './answer-book-comments-view/ans
     AnswerBookStudentCardComponent,
     AnswerBookPrintComponent,
     AnswerBookCommentsViewComponent,
+    ChartComponent,
+    MarkingSummaryChartsComponent
   ],
   imports: [
     BrowserModule,

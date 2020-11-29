@@ -12,6 +12,8 @@
 </div>
 
 <ng-container *ngIf="books">
+  <app-marking-summary-charts [task]="task" [books]="books"></app-marking-summary-charts>
+
   <div class="ui top attached clearing segment">
     <div class="ui right floated menu secondary fitted">
       <div class="item">

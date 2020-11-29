@@ -1,5 +1,9 @@
 <app-error [error]="error"></app-error>
 
+<div class="ui segment very padded basic" *ngIf="loadingBook">
+  <div class="ui active loader inline text centered">Loading book...</div>
+</div>
+
 <ng-container *ngIf="book">
   <ng-container *ngIf="!printMode && !annotatorShown">
     <div class="ui segment">

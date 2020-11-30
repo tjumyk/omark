@@ -1,6 +1,6 @@
 <div class="ui buttons vertical fluid icon labeled basic" [class.inverted]="darkMode">
   <button class="ui button" (click)="goToBook(btnPrevBook, false)" #btnPrevBook><i class="icon angle left"></i> Previous Book</button>
   <button class="ui button" (click)="goToBook(btnNextBook, true)" #btnNextBook><i class="icon angle right"></i> Next Book</button>
-  <button class="ui button" *ngIf="hasAssignment" (click)="goToBook(btnNextUnmarkedBook, true, true)" #btnNextUnmarkedBook><i class="icon angle double right"></i> Next Unmarked Book</button>
+  <button class="ui button" *ngIf="!task.marking_locked&&hasAssignment" (click)="goToBook(btnNextUnmarkedBook, true, true)" #btnNextUnmarkedBook><i class="icon angle double right"></i> Next Unmarked Book</button>
   <button *ngIf="enableNewBook" class="ui button" (click)="addBook(btnAddBook)" #btnAddBook><i class="icon plus"></i> New Book</button>
 </div>

@@ -29,147 +29,164 @@
     <ng-template #unlocked><i class="ui icon lock open green"></i></ng-template>
   </div>
 
-  <table class="ui table unstackable">
-    <thead><tr><th>Material ID</th><th>Material Name</th><th>Created At</th><th>Actions</th></tr></thead>
-    <tbody>
-    <tr *ngFor="let m of task.materials; index as i">
-      <td>{{m.id}}</td>
-      <td>{{m.name}}</td>
-      <td>{{m.created_at|date:'short'}}</td>
-      <td>
-        <div class="ui mini buttons">
-          <a class="ui icon button" href="api/materials/{{m.id}}/{{m.name}}" target="_blank"><i class="icon eye open"></i></a>
-          <button *ngIf="!task.config_locked" class="ui icon button red" (click)="deleteMaterial(m, i, btnDeleteMaterial)" #btnDeleteMaterial><i class="icon trash"></i></button>
-        </div>
-      </td>
-    </tr>
-    </tbody>
-  </table>
-
-  <table class="ui table unstackable">
-    <thead><tr><th>Question ID</th><th>Question Number</th><th>Label</th><th>Marks</th><th>Markers</th><th>Actions</th></tr></thead>
-    <tbody>
-    <tr *ngFor="let q of task.questions; index as i">
-      <td>{{q.id}}</td>
-      <td>{{q.index}}</td>
-      <td>{{q.label}}</td>
-      <td>{{q.marks}}</td>
-      <td>
-        <div *ngFor="let ass of q.marker_assignments; index as j" class="ui label">
-          <app-user-mini-card  [enableAdmin]="true" [enableAvatar]="true" [enablePopup]="true" [user]="ass.marker"></app-user-mini-card>
-          <i *ngIf="!task.config_locked" class="icon times circle red link btn-delete-assign" (click)="deleteAssignment(ass, q, j, btnDeleteAssignment)" #btnDeleteAssignment title="Delete"></i>
-        </div>
-      </td>
-      <td>
-        <div class="ui mini buttons" *ngIf="!task.config_locked">
-          <button class="ui button icon red" (click)="deleteQuestion(q, i, btnDeleteQuestion)" #btnDeleteQuestion><i class="icon trash"></i></button>
-        </div>
-      </td>
-    </tr>
-    </tbody>
-  </table>
-
-  <div class="ui grid stackable centered four column" *ngIf="!task.config_locked || !task.answer_locked">
-    <div class="column" *ngIf="!task.config_locked">
-      <div class="ui segment">
-        <div class="ui top attached progress" *ngIf="addingMaterial">
-          <div class="bar" [ngStyle]="{'width.%': addMaterialProgress}"></div>
-        </div>
-        <form class="ui form" #f4="ngForm" (ngSubmit)="addMaterial(f4, inputMaterialFile.files)" [ngClass]="{'loading': addingMaterial}">
-          <div class="field required" [ngClass]="{'error': (materialFileModel.touched || materialFileModel.dirty || f4.submitted) && materialFileModel.invalid}">
-            <label>Material File</label>
-            <input type="file" required name="file" [(ngModel)]="newMaterialFile" #materialFileModel="ngModel" #inputMaterialFile>
-            <div class="errors">
-              <label *ngIf="materialFileModel.errors?.required"><i class="icon times"></i> Material file is required</label>
-            </div>
-          </div>
-          <button type="submit" class="ui button primary fluid"><i class="icon upload"></i> Add Material</button>
-        </form>
+  <div class="ui grid stackable config">
+    <div class="column four wide">
+      <div class="ui vertical menu fluid">
+        <a class="item" [class.active]="activeTab=='questions'" (click)="activeTab='questions'">Questions <i class="icon question"></i></a>
+        <a class="item" [class.active]="activeTab=='materials'" (click)="activeTab='materials'">Materials <i class="icon copy"></i></a>
+        <a class="item" [class.active]="activeTab=='import_export'" (click)="activeTab='import_export'">Import/Export <i class="icon exchange"></i></a>
       </div>
     </div>
 
-    <div class="column" *ngIf="!task.config_locked">
-      <div class="ui segment">
-        <form class="ui form" #f="ngForm" (ngSubmit)="addQuestion(f)" [ngClass]="{'loading': addingQuestion}">
-          <div class="field required" [ngClass]="{'error': (indexModel.touched || indexModel.dirty || f.submitted) && indexModel.invalid}">
-            <label>Question Number</label>
-            <input type="number" name="index" required min="1" step="1" [(ngModel)]="newQuestionForm.index" #indexModel="ngModel">
-            <div class="errors">
-              <label *ngIf="indexModel.errors?.required"><i class="icon times"></i> Question number is required</label>
-            </div>
-          </div>
-          <div class="field" [ngClass]="{'error': (labelModel.touched || labelModel.dirty || f.submitted) && labelModel.invalid}">
-            <label>Label (Optional)</label>
-            <input type="text" name="label" maxlength="32" [(ngModel)]="newQuestionForm.label" #labelModel="ngModel">
-          </div>
-          <div class="field required" [ngClass]="{'error': (marksModel.touched || marksModel.dirty || f.submitted) && marksModel.invalid}">
-            <label>Marks</label>
-            <input type="number" name="marks" required min="0" step="0.1" [(ngModel)]="newQuestionForm.marks" #marksModel="ngModel">
-            <div class="errors">
-              <label *ngIf="marksModel.errors?.required"><i class="icon times"></i> Marks is required</label>
-            </div>
-          </div>
-          <button type="submit" class="ui button primary fluid"><i class="icon plus"></i> Add Question</button>
-        </form>
-      </div>
-    </div>
+    <div class="column twelve wide">
+      <!-- Start of Questions Tab -->
+      <div class="ui tab" [class.active]="activeTab=='questions'">
+        <table class="ui table unstackable">
+          <thead><tr><th>Question ID</th><th>Question Number</th><th>Label</th><th>Marks</th><th>Markers</th><th>Actions</th></tr></thead>
+          <tbody>
+          <tr *ngFor="let q of task.questions; index as i">
+            <td>{{q.id}}</td>
+            <td>{{q.index}}</td>
+            <td>{{q.label}}</td>
+            <td>{{q.marks}}</td>
+            <td>
+              <div *ngFor="let ass of q.marker_assignments; index as j" class="ui label">
+                <app-user-mini-card  [enableAdmin]="true" [enableAvatar]="true" [enablePopup]="true" [user]="ass.marker"></app-user-mini-card>
+                <i *ngIf="!task.config_locked" class="icon times circle red link btn-delete-assign" (click)="deleteAssignment(ass, q, j, btnDeleteAssignment)" #btnDeleteAssignment title="Delete"></i>
+              </div>
+            </td>
+            <td>
+              <div class="ui mini buttons" *ngIf="!task.config_locked">
+                <button class="ui button icon red" (click)="deleteQuestion(q, i, btnDeleteQuestion)" #btnDeleteQuestion><i class="icon trash"></i></button>
+              </div>
+            </td>
+          </tr>
+          </tbody>
+        </table>
 
-    <div class="column" *ngIf="!task.config_locked">
-      <div class="ui segment">
-        <form class="ui form" #f2="ngForm" (ngSubmit)="addAssignment(f2)" [ngClass]="{'loading': addingAssignment}">
-          <div class="field required" [ngClass]="{'error': (qidModel.touched || qidModel.dirty || f2.submitted) && qidModel.invalid}">
-            <label>Question</label>
-            <select name="qid" [(ngModel)]="newAssignmentForm.qid" #qidModel="ngModel" required>
-              <option [ngValue]="q.id" *ngFor="let q of task.questions">Q{{q.index}} (id: {{q.id}})</option>
-            </select>
-            <div class="errors">
-              <label *ngIf="qidModel.errors?.required"><i class="icon times"></i> Question is required</label>
+        <div class="ui grid stackable two column" *ngIf="!task.config_locked">
+          <div class="column">
+            <div class="ui segment config">
+              <form class="ui form" #f="ngForm" (ngSubmit)="addQuestion(f)" [ngClass]="{'loading': addingQuestion}">
+                <div class="field required" [ngClass]="{'error': (indexModel.touched || indexModel.dirty || f.submitted) && indexModel.invalid}">
+                  <label>Question Number</label>
+                  <input type="number" name="index" required min="1" step="1" [(ngModel)]="newQuestionForm.index" #indexModel="ngModel" placeholder="Question number, e.g. 1">
+                  <div class="errors">
+                    <label *ngIf="indexModel.errors?.required"><i class="icon times"></i> Question number is required</label>
+                  </div>
+                </div>
+                <div class="field required" [ngClass]="{'error': (marksModel.touched || marksModel.dirty || f.submitted) && marksModel.invalid}">
+                  <label>Marks</label>
+                  <input type="number" name="marks" required min="0" step="0.1" [(ngModel)]="newQuestionForm.marks" #marksModel="ngModel" placeholder="Full marks of this question, e.g. 20">
+                  <div class="errors">
+                    <label *ngIf="marksModel.errors?.required"><i class="icon times"></i> Marks is required</label>
+                  </div>
+                </div>
+                <div class="field" [ngClass]="{'error': (labelModel.touched || labelModel.dirty || f.submitted) && labelModel.invalid}">
+                  <label>Label (Optional)</label>
+                  <input type="text" name="label" maxlength="32" [(ngModel)]="newQuestionForm.label" #labelModel="ngModel" placeholder="Use a label as the title of this question, e.g. Report">
+                </div>
+                <button type="submit" class="ui button primary fluid"><i class="icon plus"></i> Add Question</button>
+              </form>
             </div>
           </div>
-          <div class="field required" [ngClass]="{'error': (markerNameModel.touched || markerNameModel.dirty || f2.submitted) && markerNameModel.invalid}">
-            <label>Marker Name</label>
-            <input type="text" name="marker_name" required [(ngModel)]="newAssignmentForm.marker_name" #markerNameModel="ngModel">
-            <div class="errors">
-              <label *ngIf="markerNameModel.errors?.required"><i class="icon times"></i> Marker name is required</label>
-            </div>
-          </div>
-          <button type="submit" class="ui button primary fluid"><i class="icon plus"></i> Add Marker for Question</button>
-        </form>
-      </div>
-    </div>
 
-    <div class="column" *ngIf="!task.answer_locked">
-      <div class="ui segment">
-        <div class="ui top attached progress" *ngIf="importing">
-          <div class="bar" [ngStyle]="{'width.%': importProgress}"></div>
+          <div class="column">
+            <div class="ui segment config">
+              <form class="ui form" #f2="ngForm" (ngSubmit)="addAssignment(f2)" [ngClass]="{'loading': addingAssignment}">
+                <div class="field required" [ngClass]="{'error': (qidModel.touched || qidModel.dirty || f2.submitted) && qidModel.invalid}">
+                  <label>Question</label>
+                  <select name="qid" [(ngModel)]="newAssignmentForm.qid" #qidModel="ngModel" required>
+                    <option [ngValue]="q.id" *ngFor="let q of task.questions">Q{{q.index}} (id: {{q.id}})</option>
+                  </select>
+                  <div class="errors">
+                    <label *ngIf="qidModel.errors?.required"><i class="icon times"></i> Question is required</label>
+                  </div>
+                </div>
+                <div class="field required" [ngClass]="{'error': (markerNameModel.touched || markerNameModel.dirty || f2.submitted) && markerNameModel.invalid}">
+                  <label>Marker Name</label>
+                  <input type="text" name="marker_name" required [(ngModel)]="newAssignmentForm.marker_name" #markerNameModel="ngModel" placeholder="Username of the marker">
+                  <div class="errors">
+                    <label *ngIf="markerNameModel.errors?.required"><i class="icon times"></i> Marker name is required</label>
+                  </div>
+                </div>
+                <button type="submit" class="ui button primary fluid"><i class="icon plus"></i> Add Marker for Question</button>
+              </form>
+            </div>
+          </div>
         </div>
-        <form class="ui form" #f3="ngForm" (ngSubmit)="importBooks(f3, inputArchiveFile.files)" [ngClass]="{'loading': importing}">
-          <div class="field required" [ngClass]="{'error': (systemModel.touched || systemModel.dirty || f3.submitted) && systemModel.invalid}">
-            <label>Source</label>
-            <select name="source" [(ngModel)]="importSource" #systemModel="ngModel" required>
-              <option [ngValue]="opt" *ngFor="let opt of IMPORT_SOURCES">{{opt.name}}</option>
-            </select>
-            <div class="errors">
-              <label *ngIf="systemModel.errors?.required"><i class="icon times"></i> System is required</label>
-            </div>
+      </div> <!-- End of Questions Tab -->
+
+      <!-- Start of Materials Tab -->
+      <div class="ui tab" [class.active]="activeTab=='materials'">
+        <table class="ui table unstackable">
+          <thead><tr><th>Material ID</th><th>Material Name</th><th>Created At</th><th>Actions</th></tr></thead>
+          <tbody>
+          <tr *ngFor="let m of task.materials; index as i">
+            <td>{{m.id}}</td>
+            <td>{{m.name}}</td>
+            <td>{{m.created_at|date:'short'}}</td>
+            <td>
+              <div class="ui mini buttons">
+                <a class="ui icon button" href="api/materials/{{m.id}}/{{m.name}}" target="_blank"><i class="icon eye open"></i></a>
+                <button *ngIf="!task.config_locked" class="ui icon button red" (click)="deleteMaterial(m, i, btnDeleteMaterial)" #btnDeleteMaterial><i class="icon trash"></i></button>
+              </div>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+
+        <div class="ui segment config" *ngIf="!task.config_locked">
+          <div class="ui top attached progress" *ngIf="addingMaterial">
+            <div class="bar" [ngStyle]="{'width.%': addMaterialProgress}"></div>
           </div>
-          <div class="field required" [ngClass]="{'error': (archiveModel.touched || archiveModel.dirty || f3.submitted) && archiveModel.invalid}">
-            <label>Archive File</label>
-            <input type="file" required name="archive" accept=".zip,.tar,.tar.gz" [(ngModel)]="importArchive" #archiveModel="ngModel" #inputArchiveFile>
-            <div class="errors">
-              <label *ngIf="archiveModel.errors?.required"><i class="icon times"></i> Archive file is required</label>
+          <form class="ui form" #f4="ngForm" (ngSubmit)="addMaterial(f4, inputMaterialFile.files)" [ngClass]="{'loading': addingMaterial}">
+            <div class="field required" [ngClass]="{'error': (materialFileModel.touched || materialFileModel.dirty || f4.submitted) && materialFileModel.invalid}">
+              <label>Material File</label>
+              <input type="file" required name="file" [(ngModel)]="newMaterialFile" #materialFileModel="ngModel" #inputMaterialFile>
+              <div class="errors">
+                <label *ngIf="materialFileModel.errors?.required"><i class="icon times"></i> Material file is required</label>
+              </div>
             </div>
+            <button type="submit" class="ui button primary fluid"><i class="icon upload"></i> Add Material</button>
+          </form>
+        </div>
+      </div> <!-- End of Materials Tab -->
+
+      <!-- Start of Import/Export Tab -->
+      <div class="ui tab" [class.active]="activeTab=='import_export'">
+        <div class="ui segment config" *ngIf="!task.answer_locked">
+          <div class="ui top attached progress" *ngIf="importing">
+            <div class="bar" [ngStyle]="{'width.%': importProgress}"></div>
           </div>
-          <div class="field required" [ngClass]="{'error': (fileNamesModel.touched || fileNamesModel.dirty || f3.submitted) && fileNamesModel.invalid}">
-            <label>File Names</label>
-            <input type="text" name="file_names" required [(ngModel)]="importFileNames" #fileNamesModel="ngModel" placeholder="comma-separated file names">
-            <div class="errors">
-              <label *ngIf="fileNamesModel.errors?.required"><i class="icon times"></i> File names are required</label>
+          <form class="ui form" #f3="ngForm" (ngSubmit)="importBooks(f3, inputArchiveFile.files)" [ngClass]="{'loading': importing}">
+            <div class="field required" [ngClass]="{'error': (systemModel.touched || systemModel.dirty || f3.submitted) && systemModel.invalid}">
+              <label>Source</label>
+              <select name="source" [(ngModel)]="importSource" #systemModel="ngModel" required>
+                <option [ngValue]="opt" *ngFor="let opt of IMPORT_SOURCES">{{opt.name}}</option>
+              </select>
+              <div class="errors">
+                <label *ngIf="systemModel.errors?.required"><i class="icon times"></i> System is required</label>
+              </div>
             </div>
-          </div>
-          <button type="submit" class="ui button primary fluid"><i class="icon upload"></i> Import Books</button>
-        </form>
-      </div>
+            <div class="field required" [ngClass]="{'error': (archiveModel.touched || archiveModel.dirty || f3.submitted) && archiveModel.invalid}">
+              <label>Archive File</label>
+              <input type="file" required name="archive" accept=".zip,.tar,.tar.gz" [(ngModel)]="importArchive" #archiveModel="ngModel" #inputArchiveFile>
+              <div class="errors">
+                <label *ngIf="archiveModel.errors?.required"><i class="icon times"></i> Archive file is required</label>
+              </div>
+            </div>
+            <div class="field required" [ngClass]="{'error': (fileNamesModel.touched || fileNamesModel.dirty || f3.submitted) && fileNamesModel.invalid}">
+              <label>File Names</label>
+              <textarea rows="3" name="file_names" required [(ngModel)]="importFileNames" #fileNamesModel="ngModel" placeholder="Name of files to extract from each submission (multiple names are separated by comma), e.g. report.pdf,bonus_report.pdf"></textarea>
+              <div class="errors">
+                <label *ngIf="fileNamesModel.errors?.required"><i class="icon times"></i> File names are required</label>
+              </div>
+            </div>
+            <button type="submit" class="ui button primary fluid"><i class="icon upload"></i> Import Books</button>
+          </form>
+        </div>
+      </div> <!-- End of Materials Tab -->
     </div>
   </div>
 

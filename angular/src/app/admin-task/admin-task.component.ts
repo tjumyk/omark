@@ -45,6 +45,8 @@ export class AdminTaskComponent implements OnInit {
   importing: boolean;
   importProgress: number;
 
+  activeTab: string = 'questions';
+
   constructor(private taskService: TaskService,
               private adminService: AdminService,
               private titleService: TitleService,

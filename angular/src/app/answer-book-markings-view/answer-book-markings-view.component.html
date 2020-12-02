@@ -34,7 +34,7 @@
     </ng-container>
     <ng-template #notEditing>
       <ng-container *ngIf="item.value.marking; else notMarked">
-        <td>
+        <td title="{{item.value.marking.modified_at|date:'short'}}">
           {{item.value.marking.marks}}
           <i class="icon edit link" (click)="startUpdateMarking(item.value.question)" *ngIf="!task.marking_locked && item.value.assigned"></i>
         </td>

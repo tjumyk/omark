@@ -1,6 +1,7 @@
 import json
 import os
 import shutil
+import subprocess
 import tempfile
 import uuid
 import zipfile
@@ -133,7 +134,10 @@ def do_book_pages(bid: int):
                 with tempfile.TemporaryDirectory() as tmp_dir:
                     tmp_path = os.path.join(tmp_dir, 'file.pdf')
                     file.save(tmp_path)
-                    num_pages = get_pdf_pages(tmp_path)
+                    try:
+                        num_pages = get_pdf_pages(tmp_path)
+                    except subprocess.CalledProcessError:
+                        return jsonify(msg='failed to get pdf info'), 500
                     pages.extend(AnswerService.add_multi_pages(book, path, num_pages, creator=user))
                     shutil.copyfile(tmp_path, full_path)
                     run_book_mirror.apply_async((book.id, path))

@@ -68,7 +68,7 @@ class GiveImporter(Importer):
 
         if len(folder_files) == 1 and folder_files[0] == self._pre_submission_name and self.pre_submission_fallback:
             _time = datetime.utcfromtimestamp(os.stat(os.path.join(folder_path, self._pre_submission_name)).st_mtime)
-            print('[Waring] Fallback to use pre-submission in %s' % folder_path, file=sys.stderr)
+            print('[Warning] Fallback to use pre-submission in %s' % folder_path, file=sys.stderr)
             return [(self._pre_submission_name, _time)]
 
         if self._log_name not in folder_files:
@@ -118,7 +118,7 @@ class GiveImporter(Importer):
                             f_tar.extract(member, extract_dir, set_attrs=False)
                             extracted[member_name] = os.path.join(extract_dir, member_name)
             except IOError as e:
-                print('[Waring] Failed to extract files in tar "%s" for %s: %s' % (file_name, student_id, str(e)),
+                print('[Warning] Failed to extract files in tar "%s" for %s: %s' % (file_name, student_id, str(e)),
                       file=sys.stderr)
             all_extracted.append((time, extracted))
         return all_extracted

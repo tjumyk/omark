@@ -113,6 +113,12 @@ export class AnswerBooksComponent implements OnInit {
         if (item.student.nickname && item.student.nickname.toLowerCase().indexOf(keyLower) >= 0)
           return true;
       }
+      if (item.comments) {
+        for (let comment of item.comments) {
+          if (comment.content.toLowerCase().indexOf(keyLower) >= 0)
+            return true;
+        }
+      }
       return false;
     });
 

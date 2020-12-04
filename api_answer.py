@@ -1,7 +1,6 @@
 import json
 import os
 import shutil
-import subprocess
 import tempfile
 import uuid
 import zipfile
@@ -18,7 +17,7 @@ from services.task import TaskService, TaskServiceError
 from utils.image import process_image
 from utils.ip import IPTool
 from utils.mirror import MirrorTool
-from utils.pdf import get_pdf_pages
+from utils.pdf import get_pdf_pages, PDFError
 
 answer_api = Blueprint('answer_api', __name__)
 
@@ -136,8 +135,8 @@ def do_book_pages(bid: int):
                     file.save(tmp_path)
                     try:
                         num_pages = get_pdf_pages(tmp_path)
-                    except subprocess.CalledProcessError:
-                        return jsonify(msg='failed to get pdf info'), 500
+                    except PDFError as e:
+                        return jsonify(msg=e.msg, detail=e.detail), 500
                     pages.extend(AnswerService.add_multi_pages(book, path, num_pages, creator=user))
                     shutil.copyfile(tmp_path, full_path)
                     run_book_mirror.apply_async((book.id, path))

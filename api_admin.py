@@ -1,6 +1,5 @@
 import os
 import shutil
-import subprocess
 import sys
 import tempfile
 from collections import defaultdict
@@ -18,7 +17,7 @@ from utils.crypt import md5sum
 from utils.give import GiveImporter
 from utils.importer import ImporterError
 from utils.mirror import MirrorTool
-from utils.pdf import get_pdf_pages
+from utils.pdf import get_pdf_pages, PDFError
 from utils.submit import SubmitImporter
 
 admin_api = Blueprint('admin_api', __name__)
@@ -215,8 +214,9 @@ def import_books(tid: int):
                             if ext == '.pdf':  # split pdf pages
                                 try:
                                     num_pages = get_pdf_pages(tmp_path)
-                                except subprocess.CalledProcessError:
-                                    print('[Warning] Failed to get pdf info of: %s' % tmp_path, file=sys.stderr)
+                                except PDFError as e:
+                                    print('[Warning] Failed to get pdf info of: %s (%s)' % (tmp_path, e.msg),
+                                          file=sys.stderr)
                                     continue
                                 AnswerService.add_multi_pages(book, path, num_pages)
                             else:
@@ -239,8 +239,9 @@ def import_books(tid: int):
                         if ext == '.pdf':  # split pdf pages
                             try:
                                 num_pages = get_pdf_pages(tmp_path)
-                            except subprocess.CalledProcessError:
-                                print('[Warning] Failed to get pdf info of: %s' % tmp_path, file=sys.stderr)
+                            except PDFError as e:
+                                print('[Warning] Failed to get pdf info of: %s (%s)' % (tmp_path, e.msg),
+                                      file=sys.stderr)
                                 continue
                             AnswerService.add_multi_pages(book, path, num_pages)
                         else:

@@ -183,6 +183,13 @@
                 <label *ngIf="fileNamesModel.errors?.required"><i class="icon times"></i> File names are required</label>
               </div>
             </div>
+            <div class="field">
+              <div class="ui toggle checkbox">
+                <input type="checkbox" name="force_update" [(ngModel)]="importForceUpdate" class="hidden" #inputImportForceUpdate>
+                <label (click)="inputImportForceUpdate.click()">Force Update</label>
+              </div>
+              <div class="ui info message" *ngIf="importForceUpdate">Update a book even when its submission time matches the imported submission.</div>
+            </div>
             <button type="submit" class="ui button primary fluid"><i class="icon upload"></i> Import Books</button>
           </form>
         </div>

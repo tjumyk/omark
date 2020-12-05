@@ -136,6 +136,7 @@ def import_books(tid: int):
 
         archive = request.files.get('archive')
         file_names_str = request.form.get('file_names')
+        force_update = request.form.get('force_update') == 'true'
 
         if request.path.endswith('/import-give'):
             importer = GiveImporter
@@ -191,8 +192,8 @@ def import_books(tid: int):
                 # find if a book exists
                 book = AnswerService.get_book_by_task_student(task, student)
                 if book is not None:  # already imported
-                    if book.submitted_at is not None and book.submitted_at == submission_time:  # same version
-                        num_skipped_books += 1
+                    if not force_update and book.submitted_at is not None and book.submitted_at == submission_time:
+                        num_skipped_books += 1  # skip if same submission time
                         continue
                     else:  # update to latest version
                         book_folder = os.path.join(data_folder, 'answer_books', str(book.id))

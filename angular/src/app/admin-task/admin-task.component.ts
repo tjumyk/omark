@@ -42,6 +42,7 @@ export class AdminTaskComponent implements OnInit {
   importSource: ImportSource;
   importArchive: string;
   importFileNames: string;
+  importForceUpdate: boolean;
   importing: boolean;
   importProgress: number;
 
@@ -147,7 +148,7 @@ export class AdminTaskComponent implements OnInit {
     const archive = fileList.item(0);
 
     this.importing = true;
-    this.adminService.importBooks(this.taskId, this.importSource, archive, this.importFileNames).pipe(
+    this.adminService.importBooks(this.taskId, this.importSource, archive, this.importFileNames, this.importForceUpdate).pipe(
       finalize(() => this.importing = false)
     ).subscribe(
       event => {

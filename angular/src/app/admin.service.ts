@@ -64,18 +64,21 @@ export class AdminService {
     return this.http.delete(`${this.api}/questions/${qId}`)
   }
 
-  addAssignment(taskId: number, form: NewMarkerQuestionAssignmentForm):Observable<MarkerQuestionAssignment> {
+  addAssignment(taskId: number, form: NewMarkerQuestionAssignmentForm): Observable<MarkerQuestionAssignment> {
     return this.http.post<MarkerQuestionAssignment>(`${this.api}/tasks/${taskId}/assignments`, form)
   }
 
-  deleteAssignment(qId: number, uId: number):Observable<any> {
+  deleteAssignment(qId: number, uId: number): Observable<any> {
     return this.http.delete(`${this.api}/questions/${qId}/assignments/${uId}`)
   }
 
-  importBooks(taskId: number, source: ImportSource, archive: File, fileNames: string): Observable<HttpEvent<any>> {
+  importBooks(taskId: number, source: ImportSource, archive: File, fileNames: string, forceUpdate: boolean): Observable<HttpEvent<any>> {
     const form = new FormData();
     form.append('archive', archive);
     form.append('file_names', fileNames);
+    if (forceUpdate) {
+      form.append('force_update', 'true');
+    }
     const req = new HttpRequest('POST', `${this.api}/tasks/${taskId}/import-${source.id}`,
       form, {reportProgress: true});
     return this.http.request(req);

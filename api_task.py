@@ -128,6 +128,6 @@ def export_markings(tid: int):
             book_columns.append(total if question_marking_map else None)
             book_columns.append(' || '.join(c.content.replace('\n', ' ').replace('\t', ' ') for c in book_comments))
             tsv.append('\t'.join([str(c) for c in book_columns]))
-        return '\n'.join(tsv), {'Content-Type': 'text/plain'}
+        return '\n'.join(tsv), {'Content-Type': 'text/plain; charset=UTF-8'}
     except TaskServiceError as e:
         return jsonify(msg=e.msg, detail=e.detail), 400

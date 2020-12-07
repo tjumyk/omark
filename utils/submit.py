@@ -47,4 +47,6 @@ class SubmitImporter(Importer):
                         continue
                     files[file_name] = os.path.join(submission_folder, file_name)
                 submission_info.append((submission_time, files))
+            # sort submission info list according to submission time (ascending order)
+            submission_info.sort(key=lambda x: x[0])
             yield student_id, submission_info

@@ -6,8 +6,8 @@
     <app-answer-book-student-card [task]="task" [book]="book" [enableAdmin]="false" [enablePopup]="false"
                                   (error)="error=$event"></app-answer-book-student-card>
   </div>
-  <div class="item" *ngIf="!task.marking_locked">
-    <div class="ui mini buttons">
+  <div class="item tools" *ngIf="!task.marking_locked">
+    <div class="ui buttons">
       <button class="ui button icon" (click)="tool='hand'" [class.active]="tool=='hand'"><i class="icon hand pointer"></i></button>
       <button class="ui button icon" (click)="tool='pen'" [class.active]="tool=='pen'"><i class="icon pencil"></i></button>
       <button class="ui button icon" (click)="tool='eraser'" [class.active]="tool=='eraser'"><i class="icon eraser"></i></button>

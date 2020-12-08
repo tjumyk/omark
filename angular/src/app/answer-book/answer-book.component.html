@@ -32,7 +32,8 @@
       <div class="main">
         <div class="ui grid doubling four column">
           <div class="column" *ngFor="let page of book.pages; index as i">
-            <app-answer-page-preview [task]="task" [page]="page" [pdfCache]="pdfCache" [enableAdmin]="isAdmin"
+            <app-answer-page-preview [task]="task" [page]="page" [pdfCache]="pdfCache"
+                                     [user]="user" [enableAdmin]="isAdmin"
                                      (zoomIn)="showAnnotator(i + 1)"
                                      (deleted)="afterPageDeleted(page)"
                                      (error)="error=$event"></app-answer-page-preview>

@@ -1,5 +1,5 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {AnswerPage, BasicError, Task} from "../models";
+import {Component, ElementRef, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {AnswerPage, BasicError, Task, User} from "../models";
 import {AnswerService, PDFCache, UpdateAnswerPageForm} from "../answer.service";
 import {AdminService} from "../admin.service";
 import {finalize} from "rxjs/operators";
@@ -18,6 +18,8 @@ export class AnswerPagePreviewComponent implements OnInit {
   @Input()
   pdfCache: PDFCache;
   @Input()
+  user: User;
+  @Input()
   enableAdmin: boolean;
 
   @Output()
@@ -34,10 +36,19 @@ export class AnswerPagePreviewComponent implements OnInit {
   updating: boolean;
 
   constructor(private adminService: AdminService,
-              private answerService: AnswerService) {
+              private answerService: AnswerService,
+              private element: ElementRef<HTMLElement>) {
   }
 
   ngOnInit() {
+    if(this.page && this.user && this.element && this.element.nativeElement){
+      for(let ann of this.page.annotations){
+        if(ann.creator_id == this.user.id){ // if current user has any annotation on this page
+          this.element.nativeElement.classList.add('annotated')
+          break;
+        }
+      }
+    }
   }
 
   deletePage(page: AnswerPage, btn: HTMLElement) {

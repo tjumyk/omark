@@ -32,7 +32,7 @@
       </div>
     </div>
   </div>
-  <table class="ui table unstackable sortable celled attached">
+  <table class="ui table unstackable sortable celled attached selectable">
     <thead>
     <tr>
       <th>#</th>
@@ -64,7 +64,7 @@
       </td>
       <td><b>{{book['_total_marks']}}</b></td>
       <td class="comments">
-        <div class="ui label" *ngFor="let comment of book.comments">
+        <div class="ui label basic" *ngFor="let comment of book.comments">
           {{comment.content}}
         </div>
       </td>

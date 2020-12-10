@@ -154,7 +154,7 @@ export class MarkingSummaryChartsComponent implements OnInit {
       while (binSize * maxNumOfBins < max) {
         binSize *= 2;
       }
-      numOfBins = Math.ceil(max / binSize);
+      numOfBins = Math.max(Math.ceil(max / binSize), 1);
       if (numOfBins * binSize == max) { // in case the max is exactly at the boundary, save one bin
         --numOfBins;
       }

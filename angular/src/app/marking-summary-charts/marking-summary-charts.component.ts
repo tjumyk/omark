@@ -134,9 +134,10 @@ export class MarkingSummaryChartsComponent implements OnInit {
   }
 
   private buildBinnedBarChart(results: number[], maxNumOfBins: number) {
+    const candidateBinSizes = [5, 10, 20, 50, 100];
     let numOfBins, binSize;
     if (!results || !results.length) { // fallback default
-      binSize = 1;
+      binSize = candidateBinSizes[0];
       numOfBins = 1;
     } else {
       let max = results[0];
@@ -144,7 +145,6 @@ export class MarkingSummaryChartsComponent implements OnInit {
         if (v > max)
           max = v;
       }
-      const candidateBinSizes = [1, 5, 10, 20, 50, 100];
       for (let i = 0; i < candidateBinSizes.length; i++) {
         binSize = candidateBinSizes[i];
         if (max / binSize <= maxNumOfBins) {
@@ -155,9 +155,6 @@ export class MarkingSummaryChartsComponent implements OnInit {
         binSize *= 2;
       }
       numOfBins = Math.max(Math.ceil(max / binSize), 1);
-      if (numOfBins * binSize == max) { // in case the max is exactly at the boundary, save one bin
-        --numOfBins;
-      }
     }
 
     let binCounts = new Array(numOfBins).fill(0);

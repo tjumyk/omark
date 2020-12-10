@@ -58,7 +58,7 @@ export class MarkingSummaryChartsComponent implements OnInit {
     if (this.data.length > 1) {
       this.data.push({
         question: null,
-        chartData: this.buildBinnedBarChart(totalMarksList, 10),
+        chartData: this.buildBinnedBarChart(totalMarksList, 20),
         isTotal: true
       })
     }

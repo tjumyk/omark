@@ -98,7 +98,10 @@ def export_markings(tid: int):
             comment_map[c.book_id].append(c)
 
         tsv = []
-        columns = ['BookID', 'UserID', 'UserName', 'Submitted At (UTC Time)']
+        has_submitted_at = any(book.submitted_at is not None for book in books)
+        columns = ['BookID', 'UserID', 'UserName']
+        if has_submitted_at:
+            columns.append('Submitted At (UTC Time)')
         questions = task.questions
         for q in questions:
             q_name = q.label or 'Q%d' % q.index
@@ -111,7 +114,9 @@ def export_markings(tid: int):
             book_markings = marking_map.get(book.id, [])
             book_comments = comment_map.get(book.id, [])
             student_name = book.student.name if book.student_id else None
-            book_columns = [book.id, book.student_id, student_name, str(book.submitted_at)]
+            book_columns = [book.id, book.student_id, student_name]
+            if has_submitted_at:
+                book_columns.append(str(book.submitted_at))
             question_marking_map = {m.question_id: m for m in book_markings}
             total = 0
             for q in questions:

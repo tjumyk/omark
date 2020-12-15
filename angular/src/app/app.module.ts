@@ -37,6 +37,7 @@ import {AnswerBookPrintComponent} from "./answer-book-print/answer-book-print.co
 import { AnswerBookCommentsViewComponent } from './answer-book-comments-view/answer-book-comments-view.component';
 import {ChartComponent} from "./chart/chart.component";
 import { MarkingSummaryChartsComponent } from './marking-summary-charts/marking-summary-charts.component';
+import { FilenamePipe } from './filename.pipe';
 
 @NgModule({
   declarations: [
@@ -72,7 +73,8 @@ import { MarkingSummaryChartsComponent } from './marking-summary-charts/marking-
     AnswerBookPrintComponent,
     AnswerBookCommentsViewComponent,
     ChartComponent,
-    MarkingSummaryChartsComponent
+    MarkingSummaryChartsComponent,
+    FilenamePipe
   ],
   imports: [
     BrowserModule,

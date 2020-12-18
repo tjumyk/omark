@@ -6,7 +6,7 @@
       <div class="progress">{{testsDone/totalTests|percent}}</div>
     </div>
   </div>
-  <button class="ui button red" (click)="stopFlag=true" *ngIf="!stopFlag"><i class="icon times"></i> Stop</button>
+  <button class="ui button red" (click)="stopFlag=true" *ngIf="!stopFlag && testsDone<totalTests"><i class="icon times"></i> Stop</button>
 </div>
 
 <div #wrapper class="wrapper">

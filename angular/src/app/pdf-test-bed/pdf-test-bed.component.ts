@@ -83,6 +83,7 @@ export class PdfTestBedComponent implements OnInit, AfterViewInit, OnDestroy {
     if (!books || !books.length)
       return;
 
+    console.log('Test Started');
     this.totalTests = books.length;
     this.testsDone = 0;
 
@@ -96,12 +97,12 @@ export class PdfTestBedComponent implements OnInit, AfterViewInit, OnDestroy {
     const context = canvas.getContext('2d');
 
     (function next(th) {
-      if(th.stopFlag){
-        console.log('Stopped');
+      if (currentBookIndex >= books.length) {
+        console.log('Test Completed');
         return;
       }
-      if(currentBookIndex >= books.length){
-        console.log('Complete');
+      if (th.stopFlag) {
+        console.log('Test Stopped');
         return;
       }
 
@@ -137,8 +138,8 @@ export class PdfTestBedComponent implements OnInit, AfterViewInit, OnDestroy {
               let currentPageIndex = 1; // start from 1
 
               const processNextPage = () => {
-                if(th.stopFlag){
-                  console.log('Stopped');
+                if (th.stopFlag) {
+                  console.log('Test Stopped');
                   return;
                 }
                 if (currentPageIndex > numPages) { // stop processing current doc if all pages are processed
@@ -166,7 +167,7 @@ export class PdfTestBedComponent implements OnInit, AfterViewInit, OnDestroy {
                     pdfPage.render({
                       canvasContext: context,
                       viewport: viewport
-                    }).promise.then(()=>{
+                    }).promise.then(() => {
                       pdfPage['cleanup']();
                       pdfPage = null; // clear page reference
                       ++currentPageIndex;
@@ -195,7 +196,7 @@ export class PdfTestBedComponent implements OnInit, AfterViewInit, OnDestroy {
     let paths = new Set<string>();
     for (let page of book.pages) {
       let path = page.file_path;
-      if(path.toLowerCase().endsWith('.pdf')){
+      if (path.toLowerCase().endsWith('.pdf')) {
         paths.add(path);
       }
     }

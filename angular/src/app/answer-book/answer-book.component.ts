@@ -10,6 +10,8 @@ import {AccountService} from "../account.service";
 import {CaptureSettings} from "../answer-book-capture/answer-book-capture.component";
 import {from, Subject, zip} from "rxjs";
 import {TitleService} from "../title.service";
+import {environment} from "../../environments/environment";
+
 
 export class AnswerPageGroup {
   filePath: string;
@@ -106,7 +108,7 @@ export class AnswerBookComponent implements OnInit, OnDestroy {
                     }
 
                     let bookTitle = `Book ${book.id}`;
-                    if(book.student){
+                    if (book.student) {
                       bookTitle += ` (${book.student.name})`
                     }
                     this.titleService.setTitle(bookTitle, this.task.name);
@@ -123,7 +125,7 @@ export class AnswerBookComponent implements OnInit, OnDestroy {
           error => this.error = error.error
         )
       },
-      error=>this.error = error.error
+      error => this.error = error.error
     )
   }
 
@@ -140,7 +142,11 @@ export class AnswerBookComponent implements OnInit, OnDestroy {
     ).subscribe(
       ([group, data]) => {
         if (group.filePath.toLowerCase().endsWith('.pdf')) {
-          pdfjsLib.getDocument(data).promise.then(
+          pdfjsLib.getDocument({
+            data,
+            cMapUrl: environment.cMapUrl,
+            cMapPacked: true
+          }).promise.then(
             doc => {
               if (bookId != this.bookId)
                 return; // stop processing if bookId has been changed
@@ -294,7 +300,7 @@ export class AnswerBookComponent implements OnInit, OnDestroy {
         clearInterval(this.preloadNextCheckerHandler);
         this.answerService.goToBook(this.bookId, true, true).subscribe(
           _book => {
-            if(!_book) // no next book
+            if (!_book) // no next book
               return;
 
             this.preloadingNext = true;
@@ -304,7 +310,7 @@ export class AnswerBookComponent implements OnInit, OnDestroy {
             from(groups).pipe(
               concatMap(group => this.answerService.getBookFile(_book.id, group.filePath)),
               takeUntil(this.abortLoadFiles),
-              finalize(()=>this.preloadingNext = false)
+              finalize(() => this.preloadingNext = false)
             ).subscribe(
               data => {
                 ++countLoaded;

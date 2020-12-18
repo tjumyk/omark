@@ -38,6 +38,7 @@ import { AnswerBookCommentsViewComponent } from './answer-book-comments-view/ans
 import {ChartComponent} from "./chart/chart.component";
 import { MarkingSummaryChartsComponent } from './marking-summary-charts/marking-summary-charts.component';
 import { FilenamePipe } from './filename.pipe';
+import { PdfTestbedComponent } from './pdf-testbed/pdf-testbed.component';
 
 @NgModule({
   declarations: [
@@ -74,7 +75,8 @@ import { FilenamePipe } from './filename.pipe';
     AnswerBookCommentsViewComponent,
     ChartComponent,
     MarkingSummaryChartsComponent,
-    FilenamePipe
+    FilenamePipe,
+    PdfTestbedComponent
   ],
   imports: [
     BrowserModule,

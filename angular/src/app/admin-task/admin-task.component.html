@@ -35,6 +35,7 @@
         <a class="item" [class.active]="activeTab=='questions'" (click)="activeTab='questions'">Questions <i class="icon question"></i></a>
         <a class="item" [class.active]="activeTab=='materials'" (click)="activeTab='materials'">Materials <i class="icon copy"></i></a>
         <a class="item" [class.active]="activeTab=='import_export'" (click)="activeTab='import_export'">Import/Export <i class="icon exchange"></i></a>
+        <a class="item" [class.active]="activeTab=='tools'" (click)="activeTab='tools'">Tools <i class="icon wrench"></i></a>
       </div>
     </div>
 
@@ -194,6 +195,13 @@
           </form>
         </div>
       </div> <!-- End of Materials Tab -->
+
+      <!-- Start of Tools Tab -->
+      <div class="ui tab" [class.active]="activeTab=='tools'">
+        <a class="ui button labeled icon" routerLink="/tasks/{{taskId}}/pdf-test-bed"><i class="icon bug"></i> PDF Test Bed</a>
+      </div>
+      <!-- End of Tools Tab -->
+
     </div>
   </div>
 

@@ -1,5 +1,13 @@
 <app-error [error]="error" *ngIf="error"></app-error>
 
+<div class="ui segment basic center aligned" *ngIf="totalTests">
+  <div class="ui progress">
+    <div class="bar" [ngStyle]="{'width.%': testsDone/totalTests*100}">
+      <div class="progress">{{testsDone/totalTests|percent}}</div>
+    </div>
+  </div>
+  <button class="ui button red" (click)="stopFlag=true" *ngIf="!stopFlag"><i class="icon times"></i> Stop</button>
+</div>
 
 <div #wrapper class="wrapper">
   <canvas #canvas width="0" height="0"></canvas>

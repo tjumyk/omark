@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {TaskService} from "../task.service";
 import {TitleService} from "../title.service";
 import {AccountService} from "../account.service";
@@ -13,7 +13,7 @@ import * as pdfjsLib from "pdfjs-dist/webpack";
   templateUrl: './pdf-testbed.component.html',
   styleUrls: ['./pdf-testbed.component.less']
 })
-export class PdfTestbedComponent implements OnInit, AfterViewInit {
+export class PdfTestbedComponent implements OnInit, AfterViewInit, OnDestroy {
   error: BasicError;
 
   user: User;
@@ -32,6 +32,8 @@ export class PdfTestbedComponent implements OnInit, AfterViewInit {
   @ViewChild('wrapper', {static: true})
   wrapper: ElementRef<HTMLElement>;
 
+  stopFlag: boolean;
+
   constructor(private taskService: TaskService,
               private titleService: TitleService,
               private route: ActivatedRoute,
@@ -41,6 +43,10 @@ export class PdfTestbedComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
+  }
+
+  ngOnDestroy() {
+    this.stopFlag = true;
   }
 
   ngAfterViewInit() {
@@ -90,6 +96,10 @@ export class PdfTestbedComponent implements OnInit, AfterViewInit {
     const context = canvas.getContext('2d');
 
     (function next(th) {
+      if(th.stopFlag){
+        console.log('Stopped');
+        return;
+      }
       if(currentBookIndex >= books.length){
         console.log('Complete');
         return;
@@ -100,7 +110,7 @@ export class PdfTestbedComponent implements OnInit, AfterViewInit {
       if (!currentBookFilePaths) { // book pages not loaded yet
         th.answerService.getBook(book.id).subscribe(
           book => {
-            currentBookFilePaths = th.getDistinctFilePaths(book);
+            currentBookFilePaths = th.getDistinctPDFFilePaths(book);
             next(th); //re-call next
           },
           error => th.error = error.error
@@ -110,6 +120,7 @@ export class PdfTestbedComponent implements OnInit, AfterViewInit {
 
       if (currentBookFilePathIndex >= currentBookFilePaths.length) { // stop processing current book
         ++currentBookIndex;
+        ++th.testsDone;
         currentBookFilePaths = undefined;
         currentBookFilePathIndex = 0;
         next(th);
@@ -126,6 +137,10 @@ export class PdfTestbedComponent implements OnInit, AfterViewInit {
               let currentPageIndex = 1; // start from 1
 
               const processNextPage = () => {
+                if(th.stopFlag){
+                  console.log('Stopped');
+                  return;
+                }
                 if (currentPageIndex > numPages) { // stop processing current doc if all pages are processed
                   doc['cleanup']();
                   doc = null; // clear doc reference
@@ -176,10 +191,13 @@ export class PdfTestbedComponent implements OnInit, AfterViewInit {
     })(this);
   }
 
-  private getDistinctFilePaths(book: AnswerBook): string[] {
+  private getDistinctPDFFilePaths(book: AnswerBook): string[] {
     let paths = new Set<string>();
     for (let page of book.pages) {
-      paths.add(page.file_path);
+      let path = page.file_path;
+      if(path.toLowerCase().endsWith('.pdf')){
+        paths.add(path);
+      }
     }
     return Array.from(paths);
   }

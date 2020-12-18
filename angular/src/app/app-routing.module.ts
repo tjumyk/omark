@@ -12,7 +12,7 @@ import {AnswerBooksComponent} from "./answer-books/answer-books.component";
 import {AnswerBookComponent} from "./answer-book/answer-book.component";
 import {AdminTaskComponent} from "./admin-task/admin-task.component";
 import {PageWideComponent} from "./page-wide/page-wide.component";
-import {PdfTestbedComponent} from "./pdf-testbed/pdf-testbed.component";
+import {PdfTestBedComponent} from "./pdf-test-bed/pdf-test-bed.component";
 
 
 const routes: Routes = [
@@ -44,7 +44,7 @@ const routes: Routes = [
           {path: '', pathMatch: 'full', redirectTo: 'books'},
           {path: 'books', component: AnswerBooksComponent},
           {path: 'books/:book_id', component: AnswerBookComponent},
-          {path: 'pdf-testbed', component: PdfTestbedComponent}
+          {path: 'pdf-test-bed', component: PdfTestBedComponent}
         ]
       }
     ]

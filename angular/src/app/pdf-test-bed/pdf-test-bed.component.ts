@@ -9,11 +9,11 @@ import {AnswerService} from "../answer.service";
 import * as pdfjsLib from "pdfjs-dist/webpack";
 
 @Component({
-  selector: 'app-pdf-testbed',
-  templateUrl: './pdf-testbed.component.html',
-  styleUrls: ['./pdf-testbed.component.less']
+  selector: 'app-pdf-test-bed',
+  templateUrl: './pdf-test-bed.component.html',
+  styleUrls: ['./pdf-test-bed.component.less']
 })
-export class PdfTestbedComponent implements OnInit, AfterViewInit, OnDestroy {
+export class PdfTestBedComponent implements OnInit, AfterViewInit, OnDestroy {
   error: BasicError;
 
   user: User;

@@ -38,7 +38,7 @@ import { AnswerBookCommentsViewComponent } from './answer-book-comments-view/ans
 import {ChartComponent} from "./chart/chart.component";
 import { MarkingSummaryChartsComponent } from './marking-summary-charts/marking-summary-charts.component';
 import { FilenamePipe } from './filename.pipe';
-import { PdfTestbedComponent } from './pdf-testbed/pdf-testbed.component';
+import { PdfTestBedComponent } from './pdf-test-bed/pdf-test-bed.component';
 
 @NgModule({
   declarations: [
@@ -76,7 +76,7 @@ import { PdfTestbedComponent } from './pdf-testbed/pdf-testbed.component';
     ChartComponent,
     MarkingSummaryChartsComponent,
     FilenamePipe,
-    PdfTestbedComponent
+    PdfTestBedComponent
   ],
   imports: [
     BrowserModule,

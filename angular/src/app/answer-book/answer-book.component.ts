@@ -63,8 +63,9 @@ export class AnswerBookComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    clearInterval(this.preloadNextCheckerHandler);
-    this.abortLoadFiles.next();
+    this.abortBackgroundJobs();
+    this.cleanupPDFCache();
+    this.bookId = undefined; // as an indicator to stop background pdf processing
     window.document.body.style.overflowY = null;
   }
 
@@ -82,8 +83,10 @@ export class AnswerBookComponent implements OnInit, OnDestroy {
 
             this.route.paramMap.subscribe(
               val => {
+                this.abortBackgroundJobs();
+                this.cleanupPDFCache();
+
                 this.book = undefined;
-                this.pdfCache = {};
                 this.annotatorShown = false;
                 this.annotatorStartPageIndex = undefined;
                 if (this.captureShown) {  // keep previous capture state, update body accordingly
@@ -91,9 +94,6 @@ export class AnswerBookComponent implements OnInit, OnDestroy {
                 } else {
                   window.document.body.style.overflowY = null;
                 }
-
-                clearInterval(this.preloadNextCheckerHandler);
-                this.abortLoadFiles.next();
 
                 this.bookId = parseInt(val.get('book_id'));
 
@@ -148,8 +148,10 @@ export class AnswerBookComponent implements OnInit, OnDestroy {
             cMapPacked: true
           }).promise.then(
             doc => {
-              if (bookId != this.bookId)
+              if (bookId != this.bookId) {
+                doc['cleanup'](); // cleanup doc
                 return; // stop processing if bookId has been changed
+              }
 
               const entry = new PDFCacheEntry();
               this.pdfCache[group.filePath] = entry;
@@ -164,6 +166,11 @@ export class AnswerBookComponent implements OnInit, OnDestroy {
                 }
                 doc.getPage(currentPageIndex).then(
                   pdfPage => {
+                    if (bookId != this.bookId) {
+                      pdfPage['cleanup'](); // cleanup page
+                      return; // stop processing if bookId has been changed
+                    }
+
                     entry.pages[currentPageIndex - 1] = pdfPage;
                     for (let page of group.pages) {
                       if (currentPageIndex == page.file_index) {
@@ -323,5 +330,24 @@ export class AnswerBookComponent implements OnInit, OnDestroy {
         )
       }
     }, 1000)
+  }
+
+  private abortBackgroundJobs() {
+    clearInterval(this.preloadNextCheckerHandler);
+    this.abortLoadFiles.next();
+  }
+
+  private cleanupPDFCache() {
+    if (this.pdfCache) {
+      for (let path in this.pdfCache) {
+        let entry = this.pdfCache[path];
+        entry.document['cleanup']();
+        for (let page of entry.pages) {
+          page['cleanup']();
+        }
+      }
+    }
+
+    this.pdfCache = {};
   }
 }

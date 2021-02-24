@@ -22,7 +22,7 @@
     </div>
   </div>
 
-  <div class="ui buttons">
+  <div class="ui basic buttons">
     <button class="ui button" (click)="toggleTaskLock(task, 'config', btnToggleConfigLock)" #btnToggleConfigLock><i class="ui icon lock red" *ngIf="task.config_locked; else unlocked"></i> Config Lock</button>
     <button class="ui button" (click)="toggleTaskLock(task, 'answer', btnToggleAnswerLock)" #btnToggleAnswerLock><i class="ui icon lock red" *ngIf="task.answer_locked; else unlocked"></i> Answer Lock</button>
     <button class="ui button" (click)="toggleTaskLock(task, 'marking', btnToggleMarkingLock)" #btnToggleMarkingLock><i class="ui icon lock red" *ngIf="task.marking_locked; else unlocked"></i> Marking Lock</button>
@@ -65,7 +65,7 @@
           </tbody>
         </table>
 
-        <div class="ui grid stackable two column" *ngIf="!task.config_locked">
+        <div class="ui grid stackable two column" *ngIf="!task.config_locked; else disallowQuestionConfig">
           <div class="column">
             <div class="ui segment config">
               <form class="ui form" #f="ngForm" (ngSubmit)="addQuestion(f)" [ngClass]="{'loading': addingQuestion}">
@@ -116,6 +116,12 @@
             </div>
           </div>
         </div>
+
+        <ng-template #disallowQuestionConfig>
+          <div class="ui message">
+            <i class="icon info circle"></i> Configuring questions and markers is not allowed when <span class="ui label basic">Config Lock</span> is ON.
+          </div>
+        </ng-template>
       </div> <!-- End of Questions Tab -->
 
       <!-- Start of Materials Tab -->
@@ -137,7 +143,7 @@
           </tbody>
         </table>
 
-        <div class="ui segment config" *ngIf="!task.config_locked">
+        <div class="ui segment config" *ngIf="!task.config_locked; else disallowAddMaterial">
           <div class="ui top attached progress" *ngIf="addingMaterial">
             <div class="bar" [ngStyle]="{'width.%': addMaterialProgress}"></div>
           </div>
@@ -152,11 +158,17 @@
             <button type="submit" class="ui button primary fluid"><i class="icon upload"></i> Add Material</button>
           </form>
         </div>
+
+        <ng-template #disallowAddMaterial>
+          <div class="ui message">
+            <i class="icon info circle"></i> Adding material is not allowed when <span class="ui label basic">Config Lock</span> is ON.
+          </div>
+        </ng-template>
       </div> <!-- End of Materials Tab -->
 
       <!-- Start of Import/Export Tab -->
       <div class="ui tab" [class.active]="activeTab=='import_export'">
-        <div class="ui segment config" *ngIf="!task.answer_locked">
+        <div class="ui segment config" *ngIf="!task.answer_locked; else disallowImportExport">
           <div class="ui top attached progress" *ngIf="importing">
             <div class="bar" [ngStyle]="{'width.%': importProgress}"></div>
           </div>
@@ -194,7 +206,13 @@
             <button type="submit" class="ui button primary fluid"><i class="icon upload"></i> Import Books</button>
           </form>
         </div>
-      </div> <!-- End of Materials Tab -->
+
+        <ng-template #disallowImportExport>
+          <div class="ui message">
+            <i class="icon info circle"></i> Import/Export is not allowed when <span class="ui label basic">Answer Lock</span> is ON.
+          </div>
+        </ng-template>
+      </div> <!-- End of Import/Export Tab -->
 
       <!-- Start of Tools Tab -->
       <div class="ui tab" [class.active]="activeTab=='tools'">

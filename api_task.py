@@ -126,7 +126,8 @@ def export_markings(tid: int):
                     if int(marks) == marks:
                         marks = int(marks)  # convert to int
                     book_columns.append(marks)
-                    total += marks
+                    if not q.excluded_from_total:
+                        total += marks
                 else:
                     book_columns.append(None)
 

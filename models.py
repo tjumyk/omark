@@ -113,6 +113,7 @@ class Question(db.Model):
     label = db.Column(db.String(32))
     marks = db.Column(db.Float, nullable=False)
     description = db.Column(db.Text)
+    excluded_from_total = db.Column(db.Boolean, nullable=False, default=False)
 
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     modified_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -124,7 +125,8 @@ class Question(db.Model):
 
     def to_dict(self, with_task: bool = False, with_marker_assignments: bool = False) -> dict:
         d = dict(id=self.id, task_id=self.task_id, index=self.index, label=self.label, marks=self.marks,
-                 description=self.description, created_at=self.created_at, modified_at=self.modified_at)
+                 description=self.description, excluded_from_total=self.excluded_from_total,
+                 created_at=self.created_at, modified_at=self.modified_at)
         if with_task:
             d['task'] = self.task.to_dict()
         if with_marker_assignments:

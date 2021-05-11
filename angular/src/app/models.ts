@@ -52,6 +52,7 @@ export class Question {
   label?: string;
   marks: number;
   description?: string;
+  excluded_from_total: boolean;
 
   created_at: string;
   modified_at: string;

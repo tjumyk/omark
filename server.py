@@ -2,6 +2,7 @@ import os
 import re
 import subprocess
 
+import click
 from flask import Flask, request, jsonify, send_from_directory
 
 from api_account import account_api
@@ -13,6 +14,8 @@ from api_marking import marking_api
 from auth_connect import oauth
 from models import db
 from services.account import AccountService, AccountServiceError
+from services.marking import MarkingService
+from services.task import TaskService
 from utils.ip import IPTool
 from utils.mirror import MirrorTool
 
@@ -133,6 +136,16 @@ def create_db():
 @app.cli.command()
 def drop_db():
     db.drop_all()
+
+
+@app.cli.command()
+@click.argument('question_id', type=int)
+@click.argument('file_path')
+def import_marks(question_id: int, file_path: str):
+    question = TaskService.get_question(question_id)
+    MarkingService.import_markings(question, file_path)
+    db.session.commit()
+
 
 
 @app.route('/api/version')

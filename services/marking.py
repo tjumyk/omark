@@ -1,9 +1,11 @@
 from typing import Optional
-
+import logging
 from sqlalchemy import func
 
 from error import BasicError
 from models import Marking, AnswerBook, Question, UserAlias, db, Annotation, AnswerPage, Comment
+
+logger = logging.getLogger(__name__)
 
 
 class MarkingServiceError(BasicError):
@@ -179,3 +181,39 @@ class MarkingService:
         if requester and (comment.creator_id is None or comment.creator_id != requester.id):
             raise MarkingServiceError('no permission')
         db.session.delete(comment)
+
+    @classmethod
+    def import_markings(cls, question: Question, file_path: str):
+        if question is None:
+            raise MarkingServiceError('question is required')
+        if not file_path:
+            raise MarkingServiceError('file_path is required')
+
+        task = question.task
+        from services.answer import AnswerService
+        from services.account import AccountService
+
+        with open(file_path) as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                parts = line.split('\t')  # treated as TSV file
+                assert (len(parts) == 2)
+                user_name, marks = parts
+                marks = float(marks)
+
+                # get user
+                user = AccountService.get_user_by_name(user_name)
+                if user is None:
+                    raise MarkingServiceError('user not found: %s' % user_name)
+
+                # get book
+                book = AnswerService.get_book_by_task_student(task, user)
+                if book is None:
+                    logger.warning('book not found for user: %s', user_name)
+                    continue
+
+                # add marking
+                marking = Marking(book_id=book.id, question_id=question.id, marks=marks)
+                db.session.add(marking)

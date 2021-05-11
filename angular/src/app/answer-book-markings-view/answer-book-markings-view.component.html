@@ -1,7 +1,7 @@
 <table class="ui table unstackable celled compact">
   <thead><tr><th>Q</th><th>Marks</th><th>Marker</th></tr></thead>
   <tbody>
-  <tr *ngFor="let item of qMap|keyvalue: compareQMapItems">
+  <tr *ngFor="let item of qMap|keyvalue: compareQMapItems" [class.excluded]="item.value.question.excluded_from_total">
     <td>
       <ng-container *ngIf="item.value.question.label; else qNum">{{item.value.question.label}}</ng-container>
       <ng-template #qNum>Q{{item.value.question.index}}</ng-template>
@@ -39,7 +39,7 @@
           <i class="icon edit link" (click)="startUpdateMarking(item.value.question)" *ngIf="!task.marking_locked && item.value.assigned"></i>
         </td>
         <td>
-          <app-user-mini-card [enablePopup]="false" [user]="item.value.marking.modifier || item.value.marking.creator"></app-user-mini-card>
+          <app-user-mini-card *ngIf="item.value.marking.modifier || item.value.marking.creator" [enablePopup]="false" [user]="item.value.marking.modifier || item.value.marking.creator"></app-user-mini-card>
         </td>
       </ng-container>
       <ng-template #notMarked>

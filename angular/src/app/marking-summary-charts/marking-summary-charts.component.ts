@@ -28,17 +28,22 @@ export class MarkingSummaryChartsComponent implements OnInit {
       return;
 
     // build mapping
-    let questionMarksList = {}, totalMarksList = [], marksList, totalMarks;
+    let questionMap = {}, questionMarksList = {}, totalMarksList = [], marksList, totalMarks;
+    for(let q of this.task.questions){
+      questionMap[q.id] = q;
+    }
     for(let book of this.books){
       if(book.markings.length){
         totalMarks = 0;
         for(let marking of book.markings){
-          marksList = questionMarksList[marking.question_id]
+          let qid = marking.question_id;
+          marksList = questionMarksList[qid]
           if(!marksList) {
-            questionMarksList[marking.question_id] = marksList = []
+            questionMarksList[qid] = marksList = []
           }
-          marksList.push(marking.marks)
-          totalMarks += marking.marks;
+          marksList.push(marking.marks);
+          if(!questionMap[qid].excluded_from_total)
+            totalMarks += marking.marks;
         }
         totalMarksList.push(totalMarks)
       }

@@ -138,7 +138,9 @@ export class AnswerBookMarkingsViewComponent implements OnInit {
     if (this.book.markings.length > 0) {
       let total = 0;
       for (let marking of this.book.markings) {
-        total += marking.marks;
+        const info = this.qMap[marking.question_id];
+        if(!info.question.excluded_from_total)
+          total += marking.marks;
       }
       this.total = total;
     } else {

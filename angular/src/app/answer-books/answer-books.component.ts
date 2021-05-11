@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {AnswerBook, BasicError, Task, User} from "../models";
+import {AnswerBook, BasicError, Question, Task, User} from "../models";
 import {ActivatedRoute} from "@angular/router";
 import {NewAnswerBookForm, TaskService} from "../task.service";
 import {debounceTime, finalize} from "rxjs/operators";
@@ -25,6 +25,7 @@ export class AnswerBooksComponent implements OnInit {
   taskId: number;
   task: Task;
 
+  questionMap: {[key: number]: Question} = {};
   books: AnswerBook[];
   loadingBooks: boolean;
   bookPages: Pagination<AnswerBook>;
@@ -55,6 +56,10 @@ export class AnswerBooksComponent implements OnInit {
           task => {
             this.task = task;
             this.titleService.setTitle(task.name);
+            this.questionMap = {};
+            for(let q of task.questions){
+              this.questionMap[q.id] = q;
+            }
 
             this.loadingBooks = true;
             this.taskService.getAnswerBooks(this.taskId).pipe(
@@ -81,8 +86,10 @@ export class AnswerBooksComponent implements OnInit {
     if(book.markings){
       let total = 0;
       for(let marking of book.markings){
-        book['_marks_' + marking.question_id] = marking.marks;
-        total += marking.marks;
+        let qid = marking.question_id;
+        book['_marks_' + qid] = marking.marks;
+        if(!this.questionMap[qid].excluded_from_total)
+          total += marking.marks;
       }
       if(book.markings.length > 0)
         book['_total_marks'] = total;

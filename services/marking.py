@@ -206,7 +206,8 @@ class MarkingService:
                 # get user
                 user = AccountService.get_user_by_name(user_name)
                 if user is None:
-                    raise MarkingServiceError('user not found: %s' % user_name)
+                    logger.warning('user not found: %s', user_name)
+                    continue
 
                 # get book
                 book = AnswerService.get_book_by_task_student(task, user)

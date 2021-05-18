@@ -63,7 +63,7 @@ def do_task_questions(tid: int):
 
         params = request.json
         q = TaskService.add_question(task, params.get('index'), params.get('label'), params.get('marks'),
-                                     params.get('description'))
+                                     params.get('description'), params.get('excluded_from_total'))
         db.session.commit()
         return jsonify(q.to_dict(with_marker_assignments=True)), 201
     except TaskServiceError as e:

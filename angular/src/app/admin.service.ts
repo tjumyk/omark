@@ -12,6 +12,7 @@ export class NewQuestionForm{
   label?: string;
   marks: number;
   description?: string;
+  excluded_from_total: boolean;
 }
 
 export class NewMarkerQuestionAssignmentForm {

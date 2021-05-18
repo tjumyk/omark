@@ -49,7 +49,10 @@
             <td>{{q.id}}</td>
             <td>{{q.index}}</td>
             <td>{{q.label}}</td>
-            <td>{{q.marks}}</td>
+            <td>
+              {{q.marks}}
+              <i class="icon ban" *ngIf="q.excluded_from_total" title="Not added to total"></i>
+            </td>
             <td>
               <div *ngFor="let ass of q.marker_assignments; index as j" class="ui label">
                 <app-user-mini-card  [enableAdmin]="true" [enableAvatar]="true" [enablePopup]="true" [user]="ass.marker"></app-user-mini-card>
@@ -86,6 +89,12 @@
                 <div class="field" [ngClass]="{'error': (labelModel.touched || labelModel.dirty || f.submitted) && labelModel.invalid}">
                   <label>Label (Optional)</label>
                   <input type="text" name="label" maxlength="32" [(ngModel)]="newQuestionForm.label" #labelModel="ngModel" placeholder="Use a label as the title of this question, e.g. Report">
+                </div>
+                <div class="field">
+                  <div class="ui checkbox">
+                    <input type="checkbox" name="excluded_from_total" [(ngModel)]="newQuestionForm.excluded_from_total" class="hidden" #inputExcludedFromTotal>
+                    <label (click)="inputExcludedFromTotal.click()">Do not add to total marks</label>
+                  </div>
                 </div>
                 <button type="submit" class="ui button primary fluid"><i class="icon plus"></i> Add Question</button>
               </form>
@@ -197,7 +206,7 @@
               </div>
             </div>
             <div class="field">
-              <div class="ui toggle checkbox">
+              <div class="ui checkbox">
                 <input type="checkbox" name="force_update" [(ngModel)]="importForceUpdate" class="hidden" #inputImportForceUpdate>
                 <label (click)="inputImportForceUpdate.click()">Force Update</label>
               </div>

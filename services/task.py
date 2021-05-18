@@ -96,7 +96,8 @@ class TaskService:
         return Question.query.get(_id)
 
     @staticmethod
-    def add_question(task: Task, index: int, label: Optional[str], marks: float, description: Optional[str]) \
+    def add_question(task: Task, index: int, label: Optional[str], marks: float, description: Optional[str],
+                     excluded_from_total: bool = False) \
             -> Question:
         if task is None:
             raise TaskServiceError('task is required')
@@ -121,7 +122,8 @@ class TaskService:
                 .scalar():
             raise TaskServiceError('duplicate index')
 
-        q = Question(task=task, index=index, label=label, marks=marks, description=description)
+        q = Question(task=task, index=index, label=label, marks=marks, description=description,
+                     excluded_from_total=excluded_from_total)
         db.session.add(q)
         return q
 

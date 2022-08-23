@@ -32,6 +32,7 @@ export class ImportSource {
 }
 
 export const IMPORT_SOURCES: ImportSource[] = [
+  {id: 'generic', name: 'Generic'},
   {id: 'give', name: 'CSE Give'},
   {id: 'submit', name: 'UNSWKG Submit'}
 ]

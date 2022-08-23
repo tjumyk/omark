@@ -179,7 +179,7 @@
                 <option [ngValue]="opt" *ngFor="let opt of IMPORT_SOURCES">{{opt.name}}</option>
               </select>
               <div class="errors">
-                <label *ngIf="systemModel.errors?.required"><i class="icon times"></i> System is required</label>
+                <label *ngIf="systemModel.errors?.required"><i class="icon times"></i> Source is required</label>
               </div>
             </div>
             <div class="field required" [ngClass]="{'error': (archiveModel.touched || archiveModel.dirty || f3.submitted) && archiveModel.invalid}">
@@ -189,7 +189,7 @@
                 <label *ngIf="archiveModel.errors?.required"><i class="icon times"></i> Archive file is required</label>
               </div>
             </div>
-            <div class="field required" [ngClass]="{'error': (fileNamesModel.touched || fileNamesModel.dirty || f3.submitted) && fileNamesModel.invalid}">
+            <div class="field required" [ngClass]="{'error': (fileNamesModel.touched || fileNamesModel.dirty || f3.submitted) && fileNamesModel.invalid}" *ngIf="importSource&&importSource.id!='generic'">
               <label>File Names</label>
               <textarea rows="3" name="file_names" required [(ngModel)]="importFileNames" #fileNamesModel="ngModel" placeholder="Name of files to extract from each submission (multiple names are separated by comma), e.g. report.pdf,bonus_report.pdf"></textarea>
               <div class="errors">

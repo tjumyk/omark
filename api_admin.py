@@ -15,7 +15,7 @@ from services.answer import AnswerService, AnswerServiceError
 from services.task import TaskService, TaskServiceError
 from utils.crypt import md5sum
 from utils.give import GiveImporter
-from utils.importer import ImporterError
+from utils.importer import ImporterError, GenericImporter
 from utils.mirror import MirrorTool
 from utils.pdf import get_pdf_pages, PDFError
 from utils.submit import SubmitImporter
@@ -122,6 +122,7 @@ def do_question_assignment(qid: int, uid: int):
         return jsonify(msg=e.msg, detail=e.detail), 400
 
 
+@admin_api.route('/tasks/<int:tid>/import-generic', methods=['POST'])
 @admin_api.route('/tasks/<int:tid>/import-give', methods=['POST'])
 @admin_api.route('/tasks/<int:tid>/import-submit', methods=['POST'])
 @requires_admin
@@ -138,7 +139,9 @@ def import_books(tid: int):
         file_names_str = request.form.get('file_names')
         force_update = request.form.get('force_update') == 'true'
 
-        if request.path.endswith('/import-give'):
+        if request.path.endswith('/import-generic'):
+            importer = GenericImporter
+        elif request.path.endswith('/import-give'):
             importer = GiveImporter
         else:  # /import-submit
             importer = SubmitImporter
@@ -149,10 +152,13 @@ def import_books(tid: int):
             return jsonify(msg='file names are required'), 400
 
         file_names = []
-        for name in file_names_str.split(','):
-            name = name.strip()
-            if name:
-                file_names.append(name)
+        if importer == GenericImporter:  # use fixed filename
+            file_names = [GenericImporter.PDF_FILE_NAME]
+        else:
+            for name in file_names_str.split(','):
+                name = name.strip()
+                if name:
+                    file_names.append(name)
         if not file_names:
             return jsonify(msg='file names are required'), 400
 

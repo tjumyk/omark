@@ -7,6 +7,7 @@ import {ActivatedRoute} from "@angular/router";
 import {AnswerBook, BasicError, Task, User} from "../models";
 import {AnswerService} from "../answer.service";
 import * as pdfjsLib from "pdfjs-dist/webpack";
+import {environment} from "../../environments/environment";
 
 @Component({
   selector: 'app-pdf-test-bed',
@@ -132,7 +133,11 @@ export class PdfTestBedComponent implements OnInit, AfterViewInit, OnDestroy {
       th.answerService.getBookFile(book.id, path).subscribe(
         data => {
           console.log(`[PDF] Book${book.id} ${path}`);
-          pdfjsLib.getDocument(data).promise.then(
+          pdfjsLib.getDocument({
+            data,
+            cMapUrl: environment.cMapUrl,
+            cMapPacked: true
+          }).promise.then(
             doc => {
               const numPages = doc.numPages;
               let currentPageIndex = 1; // start from 1
